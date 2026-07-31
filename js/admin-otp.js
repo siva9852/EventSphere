@@ -8,7 +8,7 @@ document.getElementById("adminOtpForm").addEventListener("submit", async (e) => 
 
     try {
 
-        const response = await fetch("http://localhost:3000/verify-otp", {
+        const response = await fetch("https://eventsphere-dndh.onrender.com/verify-otp", {
 
             method: "POST",
 

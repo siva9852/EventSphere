@@ -44,7 +44,7 @@ if (adminLoginForm) {
             }
 
             // Send OTP
-            const response = await fetch("http://localhost:3000/send-otp", {
+            const response = await fetch("https://eventsphere-dndh.onrender.com/send-otp", {
 
                 method: "POST",
 
