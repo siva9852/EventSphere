@@ -14,15 +14,35 @@ app.use(express.json());
 // Temporary OTP storage
 const otpStore = {};
 
-// Brevo SMTP
+// ================= BREVO SMTP =================
 const transporter = nodemailer.createTransport({
     host: "smtp-relay.brevo.com",
     port: 587,
     secure: false,
+    requireTLS: true,
     auth: {
         user: process.env.BREVO_SMTP_USER,
         pass: process.env.BREVO_SMTP_PASS,
     },
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 30000,
+});
+
+// Verify SMTP Connection
+transporter.verify(function (error, success) {
+
+    if (error) {
+
+        console.log("SMTP Verify Error:");
+        console.log(error);
+
+    } else {
+
+        console.log("SMTP Server is ready!");
+
+    }
+
 });
 
 // ================= SEND OTP =================
@@ -45,10 +65,10 @@ app.post("/send-otp", async (req, res) => {
         // Store OTP
         otpStore[email] = {
             otp: otp,
-            expiresAt: Date.now() + 5 * 60 * 1000 // 5 minutes
+            expiresAt: Date.now() + 5 * 60 * 1000
         };
 
-        console.log(otpStore);
+        console.log("Generated OTP:", otp);
 
         // Send Email
         await transporter.sendMail({
@@ -65,6 +85,7 @@ app.post("/send-otp", async (req, res) => {
 
     } catch (error) {
 
+        console.error("Send OTP Error:");
         console.error(error);
 
         res.status(500).json({
@@ -89,19 +110,23 @@ app.post("/verify-otp", (req, res) => {
     }
 
     if (Date.now() > otpStore[email].expiresAt) {
+
         delete otpStore[email];
 
         return res.status(400).json({
             success: false,
             message: "OTP expired."
         });
+
     }
 
     if (Number(otp) !== otpStore[email].otp) {
+
         return res.status(400).json({
             success: false,
             message: "Invalid OTP."
         });
+
     }
 
     delete otpStore[email];
@@ -115,12 +140,16 @@ app.post("/verify-otp", (req, res) => {
 
 // ================= HOME =================
 app.get("/", (req, res) => {
+
     res.send("EventSphere Backend is Running!");
+
 });
 
 // ================= START SERVER =================
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
+
     console.log(`Server running on port ${PORT}`);
+
 });
