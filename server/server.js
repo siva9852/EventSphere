@@ -1,10 +1,8 @@
 require("dotenv").config();
 
-console.log("SMTP User:", process.env.BREVO_SMTP_USER);
-
 const express = require("express");
 const cors = require("cors");
-const nodemailer = require("nodemailer");
+const axios = require("axios");
 
 const app = express();
 
@@ -13,37 +11,6 @@ app.use(express.json());
 
 // Temporary OTP storage
 const otpStore = {};
-
-// ================= BREVO SMTP =================
-const transporter = nodemailer.createTransport({
-    host: "smtp-relay.brevo.com",
-    port: 587,
-    secure: false,
-    requireTLS: true,
-    auth: {
-        user: process.env.BREVO_SMTP_USER,
-        pass: process.env.BREVO_SMTP_PASS,
-    },
-    connectionTimeout: 30000,
-    greetingTimeout: 30000,
-    socketTimeout: 30000,
-});
-
-// Verify SMTP Connection
-transporter.verify(function (error, success) {
-
-    if (error) {
-
-        console.log("SMTP Verify Error:");
-        console.log(error);
-
-    } else {
-
-        console.log("SMTP Server is ready!");
-
-    }
-
-});
 
 // ================= SEND OTP =================
 app.post("/send-otp", async (req, res) => {
@@ -59,24 +26,38 @@ app.post("/send-otp", async (req, res) => {
             });
         }
 
-        // Generate 6-digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000);
 
-        // Store OTP
         otpStore[email] = {
-            otp: otp,
+            otp,
             expiresAt: Date.now() + 5 * 60 * 1000
         };
 
         console.log("Generated OTP:", otp);
 
-        // Send Email
-        await transporter.sendMail({
-            from: '"EventSphere" <eventsphere.official2026@gmail.com>',
-            to: email,
-            subject: "EventSphere Email Verification OTP",
-            text: `Your EventSphere OTP is: ${otp}. It is valid for 5 minutes.`,
-        });
+        await axios.post(
+            "https://api.brevo.com/v3/smtp/email",
+            {
+                sender: {
+                    name: "EventSphere",
+                    email: "eventsphere.official2026@gmail.com"
+                },
+                to: [
+                    {
+                        email: email
+                    }
+                ],
+                subject: "EventSphere Email Verification OTP",
+                textContent: `Your EventSphere OTP is ${otp}. It is valid for 5 minutes.`
+            },
+            {
+                headers: {
+                    "accept": "application/json",
+                    "api-key": process.env.BREVO_API_KEY,
+                    "content-type": "application/json"
+                }
+            }
+        );
 
         res.json({
             success: true,
@@ -85,8 +66,7 @@ app.post("/send-otp", async (req, res) => {
 
     } catch (error) {
 
-        console.error("Send OTP Error:");
-        console.error(error);
+        console.error(error.response?.data || error.message);
 
         res.status(500).json({
             success: false,
@@ -131,7 +111,7 @@ app.post("/verify-otp", (req, res) => {
 
     delete otpStore[email];
 
-    return res.json({
+    res.json({
         success: true,
         message: "OTP verified successfully!"
     });
@@ -141,15 +121,14 @@ app.post("/verify-otp", (req, res) => {
 // ================= HOME =================
 app.get("/", (req, res) => {
 
-    res.send("EventSphere Backend is Running!");
+    res.send("EventSphere Backend Running");
 
 });
 
-// ================= START SERVER =================
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
 
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on ${PORT}`);
 
 });
