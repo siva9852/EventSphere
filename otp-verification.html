@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Verify OTP - EventSphere</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<div class="login-page">
+
+    <div class="login-box">
+
+        <h1>Verify OTP</h1>
+
+        <p>Enter the 6-digit OTP sent to your email.</p>
+
+        <form id="otpForm">
+
+            <input
+                type="text"
+                id="otp"
+                placeholder="Enter 6-digit OTP"
+                maxlength="6"
+                required
+            >
+
+            <button type="submit">
+                Verify OTP
+            </button>
+
+        </form>
+
+        <br>
+
+        <button id="resendOtp">
+            Resend OTP
+        </button>
+
+    </div>
+
+</div>
+
+<script type="module" src="js/otp.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin OTP Verification - EventSphere</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<div class="login-page">
+
+    <div class="login-box">
+
+        <h1>Admin OTP Verification</h1>
+
+        <p>Enter the OTP sent to your Admin Email.</p>
+
+        <form id="adminOtpForm">
+
+            <input
+                type="text"
+                id="adminOtp"
+                placeholder="Enter 6-digit OTP"
+                maxlength="6"
+                required>
+
+            <button type="submit">
+                Verify OTP
+            </button>
+
+        </form>
+
+        <br>
+
+        <button id="resendAdminOtp">
+            Resend OTP
+        </button>
+
+    </div>
+
+</div>
+
+<script type="module" src="js/admin-otp.js"></script>
+
+</body>
+
+</html>

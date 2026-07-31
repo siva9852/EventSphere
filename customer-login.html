@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Login - EventSphere</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Font Awesome Eye Icon -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="login-page">
+
+    <div class="login-box">
+
+        <h1>Customer Login</h1>
+
+        <p>Welcome back! Login to book your events.</p>
+
+        <form id="loginForm">
+
+            <input
+                type="email"
+                id="loginEmail"
+                placeholder="Email Address"
+                required>
+
+            <!-- Password with Eye Icon -->
+            <div class="password-box">
+
+                <input
+                    type="password"
+                    id="loginPassword"
+                    placeholder="Password"
+                    required>
+
+                <i class="fa-solid fa-eye" id="toggleLoginPassword"></i>
+
+            </div>
+
+            <div class="forgot-password">
+                <a href="#" id="forgotPassword">Forgot Password?</a>
+            </div>
+
+            <button type="submit">Login</button>
+
+        </form>
+
+        <p class="register-link">
+            Don't have an account?
+            <a href="customer-register.html">Register Here</a>
+        </p>
+
+    </div>
+
+</div>
+
+<script>
+const toggleLoginPassword = document.getElementById("toggleLoginPassword");
+const loginPassword = document.getElementById("loginPassword");
+
+toggleLoginPassword.addEventListener("click", () => {
+
+    if (loginPassword.type === "password") {
+
+        loginPassword.type = "text";
+        toggleLoginPassword.classList.remove("fa-eye");
+        toggleLoginPassword.classList.add("fa-eye-slash");
+
+    } else {
+
+        loginPassword.type = "password";
+        toggleLoginPassword.classList.remove("fa-eye-slash");
+        toggleLoginPassword.classList.add("fa-eye");
+
+    }
+
+});
+</script>
+
+<script type="module" src="js/firebase-config.js"></script>
+<script type="module" src="js/auth.js"></script>
+
+</body>
+
+</html>

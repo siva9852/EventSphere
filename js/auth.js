@@ -1,0 +1,151 @@
+import { auth, db } from "./firebase-config.js";
+
+import {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    sendPasswordResetEmail,
+    signOut
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+
+import {
+    doc,
+    setDoc
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+// ====================== REGISTRATION ======================
+
+const registerForm = document.getElementById("registerForm");
+
+if (registerForm) {
+
+    registerForm.addEventListener("submit", async (e) => {
+
+        e.preventDefault();
+
+        const fullName = document.getElementById("fullName").value;
+        const email = document.getElementById("email").value;
+        const phone = document.getElementById("phone").value;
+        const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+
+        if (password !== confirmPassword) {
+            alert("Passwords do not match!");
+            return;
+        }
+
+        try {
+
+            const response = await fetch("http://localhost:3000/send-otp", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    email: email
+                })
+
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                alert(data.message);
+                return;
+            }
+
+            // Store user details temporarily
+            localStorage.setItem("otpEmail", email);
+
+            localStorage.setItem("registerData", JSON.stringify({
+
+                fullName,
+                email,
+                phone,
+                password
+
+            }));
+
+            alert("OTP has been sent to your email.");
+
+            window.location.href = "otp-verification.html";
+
+        } catch (error) {
+
+            console.error(error);
+            alert("Server Error");
+
+        }
+
+    });
+
+}
+
+// ====================== LOGIN ======================
+
+const loginForm = document.getElementById("loginForm");
+
+if (loginForm) {
+
+    loginForm.addEventListener("submit", async (e) => {
+
+        e.preventDefault();
+
+        const email = document.getElementById("loginEmail").value;
+        const password = document.getElementById("loginPassword").value;
+
+        try {
+
+            await signInWithEmailAndPassword(auth, email, password);
+
+            alert("Login Successful!");
+
+            window.location.href = "customer-dashboard.html";
+
+        } catch (error) {
+
+            alert(error.message);
+
+        }
+
+    });
+
+}
+
+// ====================== FORGOT PASSWORD ======================
+
+const forgotPassword = document.getElementById("forgotPassword");
+
+if (forgotPassword) {
+
+    forgotPassword.addEventListener("click", async (e) => {
+
+        e.preventDefault();
+
+        const email = document.getElementById("loginEmail").value;
+
+        if (email === "") {
+
+            alert("Please enter your email address first.");
+
+            return;
+
+        }
+
+        try {
+
+            await sendPasswordResetEmail(auth, email);
+
+            alert("Password reset email has been sent.");
+
+        } catch (error) {
+
+            alert(error.message);
+
+        }
+
+    });
+
+}
