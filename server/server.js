@@ -14,9 +14,7 @@ const otpStore = {};
 
 // ================= SEND OTP =================
 app.post("/send-otp", async (req, res) => {
-
     try {
-
         const { email } = req.body;
 
         if (!email) {
@@ -26,15 +24,17 @@ app.post("/send-otp", async (req, res) => {
             });
         }
 
+        // Generate 6-digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000);
 
         otpStore[email] = {
             otp,
-            expiresAt: Date.now() + 5 * 60 * 1000
+            expiresAt: Date.now() + 5 * 60 * 1000 // 5 minutes
         };
 
         console.log("Generated OTP:", otp);
 
+        // Send email using Brevo API
         await axios.post(
             "https://api.brevo.com/v3/smtp/email",
             {
@@ -52,7 +52,7 @@ app.post("/send-otp", async (req, res) => {
             },
             {
                 headers: {
-                    "accept": "application/json",
+                    accept: "application/json",
                     "api-key": process.env.BREVO_API_KEY,
                     "content-type": "application/json"
                 }
@@ -65,21 +65,17 @@ app.post("/send-otp", async (req, res) => {
         });
 
     } catch (error) {
-
-        console.error(error.response?.data || error.message);
+        console.error("Brevo Error:", error.response?.data || error.message);
 
         res.status(500).json({
             success: false,
             message: "Failed to send OTP."
         });
-
     }
-
 });
 
 // ================= VERIFY OTP =================
 app.post("/verify-otp", (req, res) => {
-
     const { email, otp } = req.body;
 
     if (!otpStore[email]) {
@@ -90,23 +86,19 @@ app.post("/verify-otp", (req, res) => {
     }
 
     if (Date.now() > otpStore[email].expiresAt) {
-
         delete otpStore[email];
 
         return res.status(400).json({
             success: false,
             message: "OTP expired."
         });
-
     }
 
     if (Number(otp) !== otpStore[email].otp) {
-
         return res.status(400).json({
             success: false,
             message: "Invalid OTP."
         });
-
     }
 
     delete otpStore[email];
@@ -115,20 +107,16 @@ app.post("/verify-otp", (req, res) => {
         success: true,
         message: "OTP verified successfully!"
     });
-
 });
 
 // ================= HOME =================
 app.get("/", (req, res) => {
-
     res.send("EventSphere Backend Running");
-
 });
 
+// ================= START SERVER =================
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-
-    console.log(`Server running on ${PORT}`);
-
+    console.log(`Server running on port ${PORT}`);
 });
