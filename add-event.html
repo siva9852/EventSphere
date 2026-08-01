@@ -1,52 +1,71 @@
-import { db } from "./firebase-config.js";
+<!DOCTYPE html>
+<html lang="en">
 
-import {
-    collection,
-    addDoc,
-    serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+<head>
 
-const addEventForm = document.getElementById("addEventForm");
+    <meta charset="UTF-8">
 
-if (addEventForm) {
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    addEventForm.addEventListener("submit", async (e) => {
+    <title>Add Event - EventSphere</title>
 
-        e.preventDefault();
+    <link rel="stylesheet" href="css/style.css">
 
-        const eventName = document.getElementById("eventName").value;
-        const category = document.getElementById("category").value;
-        const price = document.getElementById("price").value;
-        const image = document.getElementById("image").value;
-        const description = document.getElementById("description").value;
+</head>
 
-        try {
+<body>
 
-            await addDoc(collection(db, "events"), {
+<div class="dashboard">
 
-                eventName,
-                category,
-                price: Number(price),
-                image,
-                description,
-                createdAt: serverTimestamp()
+    <div class="sidebar">
 
-            });
+        <h2>EventSphere</h2>
 
-            alert("Event Added Successfully!");
+        <ul>
 
-            addEventForm.reset();
+            <li><a href="admin-dashboard.html">🏠 Dashboard</a></li>
 
-        }
+            <li><a href="add-event.html">➕ Add Event</a></li>
 
-        catch (error) {
+            <li><a href="view-events.html">🎉 View Events</a></li>
 
-            console.error(error);
+            <li><a href="#">📅 Bookings</a></li>
 
-            alert(error.message);
+            <li><a href="#">👥 Customers</a></li>
 
-        }
+            <li><a href="#" onclick="logout()">🚪 Logout</a></li>
 
-    });
+        </ul>
 
-}
+    </div>
+
+    <div class="dashboard-content">
+
+        <h1>Add New Event</h1>
+
+        <form id="addEventForm">
+
+            <input type="text" id="eventName" placeholder="Event Name" required>
+
+            <input type="text" id="category" placeholder="Category" required>
+
+            <input type="number" id="price" placeholder="Price" required>
+
+            <input type="text" id="image" placeholder="Image URL" required>
+
+            <textarea id="description" placeholder="Description" rows="5" required></textarea>
+
+            <button type="submit">Add Event</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script type="module" src="js/admin.js"></script>
+<script type="module" src="js/admin-events.js"></script>
+
+</body>
+
+</html>
