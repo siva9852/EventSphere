@@ -1,33 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - EventSphere</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-<div class="login-page">
+<div class="dashboard">
 
-    <div class="login-box">
+    <div class="sidebar">
+
+        <h2>EventSphere</h2>
+
+        <ul>
+            <li><a href="admin-dashboard.html">🏠 Dashboard</a></li>
+            <li><a href="add-event.html">➕ Add Event</a></li>
+            <li><a href="view-events.html">🎉 View Events</a></li>
+            <li><a href="#">📅 Bookings</a></li>
+            <li><a href="#">👥 Customers</a></li>
+            <li><a href="#" onclick="logout()">🚪 Logout</a></li>
+        </ul>
+
+    </div>
+
+    <div class="dashboard-content">
 
         <h1>Admin Dashboard</h1>
 
         <h2>Welcome, Admin 🎉</h2>
 
-        <p>You have successfully logged in as an administrator.</p>
+        <p>Select an option from the left menu.</p>
 
-        <p>Here you will be able to:</p>
+        <div class="cards">
 
-        <ul style="text-align:left;">
-            <li>Manage Events</li>
-            <li>View Customers</li>
-            <li>Manage Bookings</li>
-            <li>Approve or Reject Requests</li>
-        </ul>
+            <div class="card">
+                <h3>Add Event</h3>
+                <p>Create new events.</p>
+            </div>
 
-        <button onclick="logout()">Logout</button>
+            <div class="card">
+                <h3>View Events</h3>
+                <p>Manage all events.</p>
+            </div>
+
+            <div class="card">
+                <h3>Bookings</h3>
+                <p>View customer bookings.</p>
+            </div>
+
+            <div class="card">
+                <h3>Customers</h3>
+                <p>Registered users.</p>
+            </div>
+
+        </div>
 
     </div>
 
