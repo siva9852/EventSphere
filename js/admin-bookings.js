@@ -4,13 +4,16 @@ import {
     collection,
     getDocs,
     doc,
-    updateDoc
+    updateDoc,
+    deleteDoc
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
 const bookingsContainer =
     document.getElementById("bookingsContainer");
 
+
+// ================= LOAD BOOKINGS =================
 
 async function loadBookings() {
 
@@ -31,13 +34,58 @@ async function loadBookings() {
         }
 
 
-        snapshot.forEach((bookingDoc) => {
+        const now = new Date();
+
+        let activeBookings = 0;
+
+
+        for (const bookingDoc of snapshot.docs) {
 
             const booking = bookingDoc.data();
 
-            const card = document.createElement("div");
+
+            // ================= AUTO DELETE AFTER 8:00 PM =================
+
+            if (booking.eventDate) {
+
+                const endTime =
+                    booking.eventEndTime || "20:00";
+
+                const eventEndDate =
+                    new Date(
+                        `${booking.eventDate}T${endTime}:00`
+                    );
+
+
+                if (now >= eventEndDate) {
+
+                    console.log(
+                        "Automatically deleting completed booking:",
+                        booking.eventName,
+                        booking.eventDate
+                    );
+
+
+                    await deleteDoc(
+                        doc(db, "bookings", bookingDoc.id)
+                    );
+
+
+                    continue;
+
+                }
+
+            }
+
+
+            activeBookings++;
+
+
+            const card =
+                document.createElement("div");
 
             card.className = "card";
+
 
             card.innerHTML = `
 
@@ -70,10 +118,13 @@ async function loadBookings() {
 
                 <p>
                     <strong>Status:</strong>
+
                     <span id="status-${bookingDoc.id}">
                         ${booking.status}
                     </span>
+
                 </p>
+
 
                 <button
                     onclick="approveBooking(
@@ -86,6 +137,7 @@ async function loadBookings() {
 
                 </button>
 
+
                 <button
                     onclick="rejectBooking(
                         '${bookingDoc.id}',
@@ -97,19 +149,32 @@ async function loadBookings() {
 
                 </button>
 
+
                 <hr>
 
             `;
 
+
             bookingsContainer.appendChild(card);
 
-        });
+        }
+
+
+        if (activeBookings === 0) {
+
+            bookingsContainer.innerHTML =
+                "<p>No active bookings found.</p>";
+
+        }
 
     }
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "Load Bookings Error:",
+            error
+        );
 
         bookingsContainer.innerHTML =
             "<p>Error loading bookings.</p>";
@@ -163,7 +228,8 @@ window.approveBooking = async function (
         );
 
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
 
         if (!data.success) {
@@ -243,7 +309,8 @@ window.rejectBooking = async function (
         );
 
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
 
         if (!data.success) {
@@ -279,4 +346,15 @@ window.rejectBooking = async function (
 };
 
 
+// ================= FIRST LOAD =================
+
 loadBookings();
+
+
+// ================= CHECK EVERY 30 SECONDS =================
+
+setInterval(() => {
+
+    loadBookings();
+
+}, 30000);

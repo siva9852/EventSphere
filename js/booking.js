@@ -9,34 +9,55 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
-const bookingForm = document.getElementById("bookingForm");
+const bookingForm =
+    document.getElementById("bookingForm");
+
 
 bookingForm.addEventListener("submit", async (e) => {
 
     e.preventDefault();
 
-    const eventId = localStorage.getItem("selectedEventId");
 
-    const eventDate = document.getElementById("eventDate").value;
-    const guests = document.getElementById("guests").value;
-    const location = document.getElementById("location").value;
-    const requirements = document.getElementById("requirements").value;
+    const eventId =
+        localStorage.getItem("selectedEventId");
 
-    const user = auth.currentUser;
+
+    const eventDate =
+        document.getElementById("eventDate").value;
+
+    const guests =
+        document.getElementById("guests").value;
+
+    const location =
+        document.getElementById("location").value;
+
+    const requirements =
+        document.getElementById("requirements").value;
+
+
+    const user =
+        auth.currentUser;
+
 
     if (!user) {
 
         alert("Please login first.");
 
-        window.location.href = "customer-login.html";
+        window.location.href =
+            "customer-login.html";
 
         return;
 
     }
 
+
     try {
 
-        const eventDoc = await getDoc(doc(db, "events", eventId));
+        const eventDoc =
+            await getDoc(
+                doc(db, "events", eventId)
+            );
+
 
         if (!eventDoc.exists()) {
 
@@ -46,39 +67,67 @@ bookingForm.addEventListener("submit", async (e) => {
 
         }
 
-        const event = eventDoc.data();
 
-        await addDoc(collection(db, "bookings"), {
+        const event =
+            eventDoc.data();
 
-            eventId: eventId,
 
-            eventName: event.eventName,
+        await addDoc(
+            collection(db, "bookings"),
+            {
 
-            price: event.price,
+                eventId: eventId,
 
-            customerId: user.uid,
+                eventName:
+                    event.eventName,
 
-            customerEmail: user.email,
+                price:
+                    event.price,
 
-            eventDate: eventDate,
+                customerId:
+                    user.uid,
 
-            guests: Number(guests),
+                customerEmail:
+                    user.email,
 
-            location: location,
+                eventDate:
+                    eventDate,
 
-            requirements: requirements,
+                // Event automatically ends at 8:00 PM
+                eventEndTime:
+                    "20:00",
 
-            status: "Pending",
+                guests:
+                    Number(guests),
 
-            createdAt: serverTimestamp()
+                location:
+                    location,
 
-        });
+                requirements:
+                    requirements,
 
-        alert("Booking Successful! Waiting for admin approval.");
+                status:
+                    "Pending",
 
-        localStorage.removeItem("selectedEventId");
+                createdAt:
+                    serverTimestamp()
 
-        window.location.href = "customer-dashboard.html";
+            }
+        );
+
+
+        alert(
+            "Booking Successful! Waiting for admin approval."
+        );
+
+
+        localStorage.removeItem(
+            "selectedEventId"
+        );
+
+
+        window.location.href =
+            "customer-dashboard.html";
 
     }
 
