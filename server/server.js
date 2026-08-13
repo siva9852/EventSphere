@@ -347,23 +347,51 @@ app.delete("/delete-customer", async (req, res) => {
 
         }
 
-        // Find Firebase Authentication user by email
 
-        const userRecord =
-            await firebaseAuth.getUserByEmail(email);
+        // Try to find and delete Firebase Authentication account
+
+        try {
+
+            const userRecord =
+                await firebaseAuth.getUserByEmail(email);
+
+            await firebaseAuth.deleteUser(
+                userRecord.uid
+            );
+
+            console.log(
+                `Customer deleted from Authentication: ${email}`
+            );
+
+        }
+
+        catch (authError) {
+
+            // If Authentication account does not exist,
+            // continue so Firestore record can still be deleted.
+
+            if (
+                authError.code ===
+                "auth/user-not-found"
+            ) {
+
+                console.log(
+                    `No Authentication account found for ${email}.`
+                );
+
+            }
+
+            else {
+
+                throw authError;
+
+            }
+
+        }
 
 
-        // Delete Firebase Authentication account
-
-        await firebaseAuth.deleteUser(
-            userRecord.uid
-        );
-
-
-        console.log(
-            `Customer deleted from Authentication: ${email}`
-        );
-
+        // Tell frontend it is safe to delete
+        // the Firestore customer record.
 
         res.json({
             success: true,
