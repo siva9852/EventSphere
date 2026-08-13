@@ -390,21 +390,21 @@ app.post("/booking-status", async (req, res) => {
 
 // ================= DELETE CUSTOMER =================
 
-app.delete("/delete-customer/:uid", async (req, res) => {
+app.delete("/delete-customer", async (req, res) => {
 
     try {
 
-        const uid = req.params.uid;
+        const { email } = req.body;
 
 
-        if (!uid) {
+        if (!email) {
 
             return res.status(400).json({
 
                 success: false,
 
                 message:
-                    "Customer UID is required."
+                    "Customer email is required."
 
             });
 
@@ -425,11 +425,21 @@ app.delete("/delete-customer/:uid", async (req, res) => {
         }
 
 
-        await admin.auth().deleteUser(uid);
+        // Find Firebase Authentication user by email
+
+        const userRecord =
+            await admin.auth().getUserByEmail(email);
+
+
+        // Delete Firebase Authentication account
+
+        await admin.auth().deleteUser(
+            userRecord.uid
+        );
 
 
         console.log(
-            `Customer deleted: ${uid}`
+            `Customer deleted from Authentication: ${email}`
         );
 
 

@@ -12,6 +12,8 @@ const customersContainer =
     document.getElementById("customersContainer");
 
 
+// ================= LOAD CUSTOMERS =================
+
 async function loadCustomers() {
 
     try {
@@ -40,14 +42,17 @@ async function loadCustomers() {
             }
 
 
-            const card = document.createElement("div");
+            const card =
+                document.createElement("div");
 
             card.className = "card";
 
 
             card.innerHTML = `
 
-                <h2>${customer.fullName || "No Name"}</h2>
+                <h2>
+                    ${customer.fullName || "No Name"}
+                </h2>
 
                 <p>
                     <strong>Email:</strong>
@@ -66,7 +71,8 @@ async function loadCustomers() {
 
                 <button
                     onclick="deleteCustomer(
-                        '${customerDoc.id}'
+                        '${customerDoc.id}',
+                        '${customer.email}'
                     )">
 
                     Delete Customer
@@ -98,7 +104,10 @@ async function loadCustomers() {
 
 // ================= DELETE CUSTOMER =================
 
-window.deleteCustomer = async function (customerId) {
+window.deleteCustomer = async function (
+    customerId,
+    customerEmail
+) {
 
     const confirmDelete = confirm(
         "Are you sure you want to delete this customer?"
@@ -112,15 +121,37 @@ window.deleteCustomer = async function (customerId) {
 
     try {
 
+        // Delete Firebase Authentication account
+
         const response = await fetch(
-            `https://eventsphere-dndh.onrender.com/delete-customer/${customerId}`,
+
+            "https://eventsphere-dndh.onrender.com/delete-customer",
+
             {
-                method: "DELETE"
+
+                method: "DELETE",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json"
+
+                },
+
+                body: JSON.stringify({
+
+                    email:
+                        customerEmail
+
+                })
+
             }
+
         );
 
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
 
         if (!data.success) {
@@ -138,12 +169,20 @@ window.deleteCustomer = async function (customerId) {
         // Delete customer record from Firestore
 
         await deleteDoc(
-            doc(db, "users", customerId)
+            doc(
+                db,
+                "users",
+                customerId
+            )
         );
 
 
-        alert("Customer deleted successfully!");
+        alert(
+            "Customer deleted successfully!"
+        );
 
+
+        // Reload customer list
 
         loadCustomers();
 
@@ -151,7 +190,10 @@ window.deleteCustomer = async function (customerId) {
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "Delete Customer Error:",
+            error
+        );
 
         alert(
             "Failed to delete customer."
@@ -161,5 +203,7 @@ window.deleteCustomer = async function (customerId) {
 
 };
 
+
+// ================= LOAD =================
 
 loadCustomers();
