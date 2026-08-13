@@ -24,17 +24,15 @@ app.post("/send-otp", async (req, res) => {
             });
         }
 
-        // Generate 6-digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000);
 
         otpStore[email] = {
             otp,
-            expiresAt: Date.now() + 5 * 60 * 1000 // 5 minutes
+            expiresAt: Date.now() + 5 * 60 * 1000
         };
 
         console.log("Generated OTP:", otp);
 
-        // Send email using Brevo API
         await axios.post(
             "https://api.brevo.com/v3/smtp/email",
             {
@@ -65,7 +63,10 @@ app.post("/send-otp", async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Brevo Error:", error.response?.data || error.message);
+        console.error(
+            "Brevo Error:",
+            error.response?.data || error.message
+        );
 
         res.status(500).json({
             success: false,
@@ -74,8 +75,10 @@ app.post("/send-otp", async (req, res) => {
     }
 });
 
+
 // ================= VERIFY OTP =================
 app.post("/verify-otp", (req, res) => {
+
     const { email, otp } = req.body;
 
     if (!otpStore[email]) {
@@ -86,6 +89,7 @@ app.post("/verify-otp", (req, res) => {
     }
 
     if (Date.now() > otpStore[email].expiresAt) {
+
         delete otpStore[email];
 
         return res.status(400).json({
@@ -95,6 +99,7 @@ app.post("/verify-otp", (req, res) => {
     }
 
     if (Number(otp) !== otpStore[email].otp) {
+
         return res.status(400).json({
             success: false,
             message: "Invalid OTP."
@@ -109,10 +114,115 @@ app.post("/verify-otp", (req, res) => {
     });
 });
 
+
+// ================= BOOKING STATUS EMAIL =================
+app.post("/booking-status", async (req, res) => {
+
+    try {
+
+        const {
+            email,
+            eventName,
+            status
+        } = req.body;
+
+        if (!email || !eventName || !status) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Email, event name and status are required."
+            });
+
+        }
+
+        let subject;
+        let message;
+
+        if (status === "Approved") {
+
+            subject = "EventSphere Booking Approved";
+
+            message =
+                `Your booking for "${eventName}" has been approved by the EventSphere admin.`;
+
+        } else if (status === "Rejected") {
+
+            subject = "EventSphere Booking Rejected";
+
+            message =
+                `Your booking for "${eventName}" has been rejected by the EventSphere admin.`;
+
+        } else {
+
+            return res.status(400).json({
+                success: false,
+                message: "Invalid booking status."
+            });
+
+        }
+
+
+        await axios.post(
+            "https://api.brevo.com/v3/smtp/email",
+            {
+                sender: {
+                    name: "EventSphere",
+                    email: "eventsphere.official2026@gmail.com"
+                },
+
+                to: [
+                    {
+                        email: email
+                    }
+                ],
+
+                subject: subject,
+
+                textContent: message
+            },
+
+            {
+                headers: {
+                    accept: "application/json",
+                    "api-key": process.env.BREVO_API_KEY,
+                    "content-type": "application/json"
+                }
+            }
+        );
+
+
+        console.log(
+            `Booking ${status} email sent to ${email}`
+        );
+
+        res.json({
+            success: true,
+            message: "Booking status email sent successfully!"
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "Booking Email Error:",
+            error.response?.data || error.message
+        );
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to send booking status email."
+        });
+
+    }
+
+});
+
+
 // ================= HOME =================
 app.get("/", (req, res) => {
     res.send("EventSphere Backend Running");
 });
+
 
 // ================= START SERVER =================
 const PORT = process.env.PORT || 3000;

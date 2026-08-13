@@ -8,20 +8,23 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
-const bookingsContainer = document.getElementById("bookingsContainer");
+const bookingsContainer =
+    document.getElementById("bookingsContainer");
 
 
 async function loadBookings() {
 
     try {
 
-        const snapshot = await getDocs(collection(db, "bookings"));
+        const snapshot =
+            await getDocs(collection(db, "bookings"));
 
         bookingsContainer.innerHTML = "";
 
         if (snapshot.empty) {
 
-            bookingsContainer.innerHTML = "<p>No bookings found.</p>";
+            bookingsContainer.innerHTML =
+                "<p>No bookings found.</p>";
 
             return;
 
@@ -40,15 +43,30 @@ async function loadBookings() {
 
                 <h2>${booking.eventName}</h2>
 
-                <p><strong>Customer:</strong> ${booking.customerEmail}</p>
+                <p>
+                    <strong>Customer:</strong>
+                    ${booking.customerEmail}
+                </p>
 
-                <p><strong>Event Date:</strong> ${booking.eventDate}</p>
+                <p>
+                    <strong>Event Date:</strong>
+                    ${booking.eventDate}
+                </p>
 
-                <p><strong>Guests:</strong> ${booking.guests}</p>
+                <p>
+                    <strong>Guests:</strong>
+                    ${booking.guests}
+                </p>
 
-                <p><strong>Location:</strong> ${booking.location}</p>
+                <p>
+                    <strong>Location:</strong>
+                    ${booking.location}
+                </p>
 
-                <p><strong>Requirements:</strong> ${booking.requirements || "None"}</p>
+                <p>
+                    <strong>Requirements:</strong>
+                    ${booking.requirements || "None"}
+                </p>
 
                 <p>
                     <strong>Status:</strong>
@@ -57,12 +75,26 @@ async function loadBookings() {
                     </span>
                 </p>
 
-                <button onclick="approveBooking('${bookingDoc.id}')">
+                <button
+                    onclick="approveBooking(
+                        '${bookingDoc.id}',
+                        '${booking.customerEmail}',
+                        '${booking.eventName}'
+                    )">
+
                     Approve
+
                 </button>
 
-                <button onclick="rejectBooking('${bookingDoc.id}')">
+                <button
+                    onclick="rejectBooking(
+                        '${bookingDoc.id}',
+                        '${booking.customerEmail}',
+                        '${booking.eventName}'
+                    )">
+
                     Reject
+
                 </button>
 
                 <hr>
@@ -87,7 +119,13 @@ async function loadBookings() {
 }
 
 
-window.approveBooking = async function (bookingId) {
+// ================= APPROVE =================
+
+window.approveBooking = async function (
+    bookingId,
+    customerEmail,
+    eventName
+) {
 
     try {
 
@@ -98,11 +136,55 @@ window.approveBooking = async function (bookingId) {
             }
         );
 
+
+        // Send email to customer
+
+        const response = await fetch(
+            "https://eventsphere-dndh.onrender.com/booking-status",
+            {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    email: customerEmail,
+
+                    eventName: eventName,
+
+                    status: "Approved"
+
+                })
+
+            }
+        );
+
+
+        const data = await response.json();
+
+
+        if (!data.success) {
+
+            alert(
+                "Booking approved, but email could not be sent."
+            );
+
+            return;
+
+        }
+
+
         document.getElementById(
             `status-${bookingId}`
         ).textContent = "Approved";
 
-        alert("Booking Approved!");
+
+        alert(
+            "Booking Approved! Email sent to customer."
+        );
 
     }
 
@@ -117,7 +199,13 @@ window.approveBooking = async function (bookingId) {
 };
 
 
-window.rejectBooking = async function (bookingId) {
+// ================= REJECT =================
+
+window.rejectBooking = async function (
+    bookingId,
+    customerEmail,
+    eventName
+) {
 
     try {
 
@@ -128,11 +216,55 @@ window.rejectBooking = async function (bookingId) {
             }
         );
 
+
+        // Send email to customer
+
+        const response = await fetch(
+            "https://eventsphere-dndh.onrender.com/booking-status",
+            {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    email: customerEmail,
+
+                    eventName: eventName,
+
+                    status: "Rejected"
+
+                })
+
+            }
+        );
+
+
+        const data = await response.json();
+
+
+        if (!data.success) {
+
+            alert(
+                "Booking rejected, but email could not be sent."
+            );
+
+            return;
+
+        }
+
+
         document.getElementById(
             `status-${bookingId}`
         ).textContent = "Rejected";
 
-        alert("Booking Rejected!");
+
+        alert(
+            "Booking Rejected! Email sent to customer."
+        );
 
     }
 
