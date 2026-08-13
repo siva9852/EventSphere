@@ -3,8 +3,13 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
-const admin = require("firebase-admin");
 const fs = require("fs");
+
+const { initializeApp, cert, getApps } =
+    require("firebase-admin/app");
+
+const { getAuth } =
+    require("firebase-admin/auth");
 
 const app = express();
 
@@ -17,6 +22,8 @@ app.use(express.json());
 const serviceAccountPath =
     "/etc/secrets/firebase-service-account.json";
 
+let firebaseAuth = null;
+
 if (fs.existsSync(serviceAccountPath)) {
 
     const serviceAccount =
@@ -24,16 +31,29 @@ if (fs.existsSync(serviceAccountPath)) {
             fs.readFileSync(serviceAccountPath, "utf8")
         );
 
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
-    });
+    if (getApps().length === 0) {
+
+        initializeApp({
+            credential: cert(serviceAccount)
+        });
+
+    }
+
+    firebaseAuth = getAuth();
 
     console.log("Firebase Admin initialized.");
+
+} else {
+
+    console.error(
+        "Firebase service account file not found."
+    );
 
 }
 
 
-// Temporary OTP storage
+// ================= TEMPORARY OTP STORAGE =================
+
 const otpStore = {};
 
 
@@ -58,23 +78,16 @@ app.post("/send-otp", async (req, res) => {
             Math.floor(100000 + Math.random() * 900000);
 
         otpStore[email] = {
-
             otp,
-
             expiresAt:
                 Date.now() + 5 * 60 * 1000
-
         };
 
         console.log("Generated OTP:", otp);
 
-
         await axios.post(
-
             "https://api.brevo.com/v3/smtp/email",
-
             {
-
                 sender: {
                     name: "EventSphere",
                     email: "eventsphere.official2026@gmail.com"
@@ -91,13 +104,10 @@ app.post("/send-otp", async (req, res) => {
 
                 textContent:
                     `Your EventSphere OTP is ${otp}. It is valid for 5 minutes.`
-
             },
 
             {
-
                 headers: {
-
                     accept: "application/json",
 
                     "api-key":
@@ -105,21 +115,13 @@ app.post("/send-otp", async (req, res) => {
 
                     "content-type":
                         "application/json"
-
                 }
-
             }
-
         );
 
-
         res.json({
-
             success: true,
-
-            message:
-                "OTP sent successfully!"
-
+            message: "OTP sent successfully!"
         });
 
     }
@@ -127,21 +129,14 @@ app.post("/send-otp", async (req, res) => {
     catch (error) {
 
         console.error(
-
             "Brevo Error:",
-
             error.response?.data ||
             error.message
-
         );
 
         res.status(500).json({
-
             success: false,
-
-            message:
-                "Failed to send OTP."
-
+            message: "Failed to send OTP."
         });
 
     }
@@ -158,20 +153,14 @@ app.post("/verify-otp", (req, res) => {
         otp
     } = req.body;
 
-
     if (!otpStore[email]) {
 
         return res.status(400).json({
-
             success: false,
-
-            message:
-                "OTP not found."
-
+            message: "OTP not found."
         });
 
     }
-
 
     if (
         Date.now() >
@@ -181,16 +170,11 @@ app.post("/verify-otp", (req, res) => {
         delete otpStore[email];
 
         return res.status(400).json({
-
             success: false,
-
-            message:
-                "OTP expired."
-
+            message: "OTP expired."
         });
 
     }
-
 
     if (
         Number(otp) !==
@@ -198,27 +182,17 @@ app.post("/verify-otp", (req, res) => {
     ) {
 
         return res.status(400).json({
-
             success: false,
-
-            message:
-                "Invalid OTP."
-
+            message: "Invalid OTP."
         });
 
     }
 
-
     delete otpStore[email];
 
-
     res.json({
-
         success: true,
-
-        message:
-            "OTP verified successfully!"
-
+        message: "OTP verified successfully!"
     });
 
 });
@@ -236,7 +210,6 @@ app.post("/booking-status", async (req, res) => {
             status
         } = req.body;
 
-
         if (
             !email ||
             !eventName ||
@@ -244,20 +217,15 @@ app.post("/booking-status", async (req, res) => {
         ) {
 
             return res.status(400).json({
-
                 success: false,
-
                 message:
                     "Email, event name and status are required."
-
             });
 
         }
 
-
         let subject;
         let message;
-
 
         if (status === "Approved") {
 
@@ -282,105 +250,68 @@ app.post("/booking-status", async (req, res) => {
         else {
 
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "Invalid booking status."
-
+                message: "Invalid booking status."
             });
 
         }
 
-
         await axios.post(
-
             "https://api.brevo.com/v3/smtp/email",
-
             {
-
                 sender: {
-
-                    name:
-                        "EventSphere",
-
-                    email:
-                        "eventsphere.official2026@gmail.com"
-
+                    name: "EventSphere",
+                    email: "eventsphere.official2026@gmail.com"
                 },
 
                 to: [
-
                     {
                         email: email
                     }
-
                 ],
 
-                subject:
-                    subject,
+                subject: subject,
 
-                textContent:
-                    message
-
+                textContent: message
             },
 
             {
-
                 headers: {
-
-                    accept:
-                        "application/json",
+                    accept: "application/json",
 
                     "api-key":
                         process.env.BREVO_API_KEY,
 
                     "content-type":
                         "application/json"
-
                 }
-
             }
-
         );
-
 
         console.log(
             `Booking ${status} email sent to ${email}`
         );
 
-
         res.json({
-
             success: true,
-
             message:
                 "Booking status email sent successfully!"
-
         });
-
 
     }
 
     catch (error) {
 
         console.error(
-
             "Booking Email Error:",
-
             error.response?.data ||
             error.message
-
         );
 
-
         res.status(500).json({
-
             success: false,
-
             message:
                 "Failed to send booking status email."
-
         });
 
     }
@@ -396,44 +327,35 @@ app.delete("/delete-customer", async (req, res) => {
 
         const { email } = req.body;
 
-
         if (!email) {
 
             return res.status(400).json({
-
                 success: false,
-
                 message:
                     "Customer email is required."
-
             });
 
         }
 
-
-        if (!admin.apps.length) {
+        if (!firebaseAuth) {
 
             return res.status(500).json({
-
                 success: false,
-
                 message:
                     "Firebase Admin is not initialized."
-
             });
 
         }
-
 
         // Find Firebase Authentication user by email
 
         const userRecord =
-            await admin.auth().getUserByEmail(email);
+            await firebaseAuth.getUserByEmail(email);
 
 
         // Delete Firebase Authentication account
 
-        await admin.auth().deleteUser(
+        await firebaseAuth.deleteUser(
             userRecord.uid
         );
 
@@ -444,12 +366,9 @@ app.delete("/delete-customer", async (req, res) => {
 
 
         res.json({
-
             success: true,
-
             message:
                 "Customer deleted successfully!"
-
         });
 
     }
@@ -461,14 +380,10 @@ app.delete("/delete-customer", async (req, res) => {
             error.message
         );
 
-
         res.status(500).json({
-
             success: false,
-
             message:
                 "Failed to delete customer."
-
         });
 
     }
@@ -491,7 +406,6 @@ app.get("/", (req, res) => {
 
 const PORT =
     process.env.PORT || 3000;
-
 
 app.listen(PORT, () => {
 
