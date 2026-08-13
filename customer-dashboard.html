@@ -1,23 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Dashboard</title>
+
+    <title>Customer Dashboard - EventSphere</title>
+
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-<div class="login-page">
-    <div class="login-box">
-        <h1>Welcome to EventSphere 🎉</h1>
-        <p>You have successfully logged in.</p>
+<div class="dashboard">
 
-        <h2>Customer Dashboard</h2>
+    <div class="sidebar">
 
-        <p>More features like event booking, profile, and bookings will be added here.</p>
+        <h2>EventSphere</h2>
+
+        <ul>
+
+            <li>
+                <a href="customer-dashboard.html">
+                    🏠 Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="customer-events.html">
+                    🎉 View Events
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    📅 My Bookings
+                </a>
+            </li>
+
+            <li>
+                <a href="#" onclick="logout()">
+                    🚪 Logout
+                </a>
+            </li>
+
+        </ul>
+
     </div>
+
+
+    <div class="dashboard-content">
+
+        <h1>Customer Dashboard</h1>
+
+        <h2>Welcome to EventSphere 🎉</h2>
+
+        <p>
+            Browse available events and book your favorite event.
+        </p>
+
+        <div class="cards">
+
+            <div class="card">
+
+                <h3>🎉 Events</h3>
+
+                <p>
+                    View all available events.
+                </p>
+
+                <a href="customer-events.html">
+                    <button>View Events</button>
+                </a>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>📅 My Bookings</h3>
+
+                <p>
+                    View your event bookings.
+                </p>
+
+                <button>
+                    My Bookings
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 
+<script type="module" src="js/auth.js"></script>
+
 </body>
+
 </html>
