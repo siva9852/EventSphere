@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Customers - EventSphere</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <div class="sidebar">
+
+        <h2>EventSphere</h2>
+
+        <ul>
+
+            <li>
+                <a href="admin-dashboard.html">
+                    🏠 Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="add-event.html">
+                    ➕ Add Event
+                </a>
+            </li>
+
+            <li>
+                <a href="view-events.html">
+                    🎉 View Events
+                </a>
+            </li>
+
+            <li>
+                <a href="admin-bookings.html">
+                    📅 Bookings
+                </a>
+            </li>
+
+            <li>
+                <a href="admin-customers.html">
+                    👥 Customers
+                </a>
+            </li>
+
+            <li>
+                <a href="#" onclick="logout()">
+                    🚪 Logout
+                </a>
+            </li>
+
+        </ul>
+
+    </div>
+
+
+    <div class="dashboard-content">
+
+        <h1>Registered Customers</h1>
+
+        <div id="customersContainer">
+
+            <p>Loading customers...</p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script type="module" src="js/admin-customers.js"></script>
+
+</body>
+
+</html>
