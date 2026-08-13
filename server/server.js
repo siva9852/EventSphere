@@ -3,119 +3,229 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
+const admin = require("firebase-admin");
+const fs = require("fs");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
+
+// ================= FIREBASE ADMIN =================
+
+const serviceAccountPath =
+    "/etc/secrets/firebase-service-account.json";
+
+if (fs.existsSync(serviceAccountPath)) {
+
+    const serviceAccount =
+        JSON.parse(
+            fs.readFileSync(serviceAccountPath, "utf8")
+        );
+
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+    });
+
+    console.log("Firebase Admin initialized.");
+
+}
+
+
 // Temporary OTP storage
 const otpStore = {};
 
+
 // ================= SEND OTP =================
+
 app.post("/send-otp", async (req, res) => {
+
     try {
+
         const { email } = req.body;
 
         if (!email) {
+
             return res.status(400).json({
                 success: false,
                 message: "Email is required."
             });
+
         }
 
-        const otp = Math.floor(100000 + Math.random() * 900000);
+        const otp =
+            Math.floor(100000 + Math.random() * 900000);
 
         otpStore[email] = {
+
             otp,
-            expiresAt: Date.now() + 5 * 60 * 1000
+
+            expiresAt:
+                Date.now() + 5 * 60 * 1000
+
         };
 
         console.log("Generated OTP:", otp);
 
+
         await axios.post(
+
             "https://api.brevo.com/v3/smtp/email",
+
             {
+
                 sender: {
                     name: "EventSphere",
                     email: "eventsphere.official2026@gmail.com"
                 },
+
                 to: [
                     {
                         email: email
                     }
                 ],
-                subject: "EventSphere Email Verification OTP",
-                textContent: `Your EventSphere OTP is ${otp}. It is valid for 5 minutes.`
+
+                subject:
+                    "EventSphere Email Verification OTP",
+
+                textContent:
+                    `Your EventSphere OTP is ${otp}. It is valid for 5 minutes.`
+
             },
+
             {
+
                 headers: {
+
                     accept: "application/json",
-                    "api-key": process.env.BREVO_API_KEY,
-                    "content-type": "application/json"
+
+                    "api-key":
+                        process.env.BREVO_API_KEY,
+
+                    "content-type":
+                        "application/json"
+
                 }
+
             }
+
         );
 
+
         res.json({
+
             success: true,
-            message: "OTP sent successfully!"
+
+            message:
+                "OTP sent successfully!"
+
         });
 
-    } catch (error) {
+    }
+
+    catch (error) {
+
         console.error(
+
             "Brevo Error:",
-            error.response?.data || error.message
+
+            error.response?.data ||
+            error.message
+
         );
 
         res.status(500).json({
+
             success: false,
-            message: "Failed to send OTP."
+
+            message:
+                "Failed to send OTP."
+
         });
+
     }
+
 });
 
 
 // ================= VERIFY OTP =================
+
 app.post("/verify-otp", (req, res) => {
 
-    const { email, otp } = req.body;
+    const {
+        email,
+        otp
+    } = req.body;
+
 
     if (!otpStore[email]) {
+
         return res.status(400).json({
+
             success: false,
-            message: "OTP not found."
+
+            message:
+                "OTP not found."
+
         });
+
     }
 
-    if (Date.now() > otpStore[email].expiresAt) {
+
+    if (
+        Date.now() >
+        otpStore[email].expiresAt
+    ) {
 
         delete otpStore[email];
 
         return res.status(400).json({
+
             success: false,
-            message: "OTP expired."
+
+            message:
+                "OTP expired."
+
         });
+
     }
 
-    if (Number(otp) !== otpStore[email].otp) {
+
+    if (
+        Number(otp) !==
+        otpStore[email].otp
+    ) {
 
         return res.status(400).json({
+
             success: false,
-            message: "Invalid OTP."
+
+            message:
+                "Invalid OTP."
+
         });
+
     }
+
 
     delete otpStore[email];
 
+
     res.json({
+
         success: true,
-        message: "OTP verified successfully!"
+
+        message:
+            "OTP verified successfully!"
+
     });
+
 });
 
 
 // ================= BOOKING STATUS EMAIL =================
+
 app.post("/booking-status", async (req, res) => {
 
     try {
@@ -126,68 +236,112 @@ app.post("/booking-status", async (req, res) => {
             status
         } = req.body;
 
-        if (!email || !eventName || !status) {
+
+        if (
+            !email ||
+            !eventName ||
+            !status
+        ) {
 
             return res.status(400).json({
+
                 success: false,
-                message: "Email, event name and status are required."
+
+                message:
+                    "Email, event name and status are required."
+
             });
 
         }
 
+
         let subject;
         let message;
 
+
         if (status === "Approved") {
 
-            subject = "EventSphere Booking Approved";
+            subject =
+                "EventSphere Booking Approved";
 
             message =
                 `Your booking for "${eventName}" has been approved by the EventSphere admin.`;
 
-        } else if (status === "Rejected") {
+        }
 
-            subject = "EventSphere Booking Rejected";
+        else if (status === "Rejected") {
+
+            subject =
+                "EventSphere Booking Rejected";
 
             message =
                 `Your booking for "${eventName}" has been rejected by the EventSphere admin.`;
 
-        } else {
+        }
+
+        else {
 
             return res.status(400).json({
+
                 success: false,
-                message: "Invalid booking status."
+
+                message:
+                    "Invalid booking status."
+
             });
 
         }
 
 
         await axios.post(
+
             "https://api.brevo.com/v3/smtp/email",
+
             {
+
                 sender: {
-                    name: "EventSphere",
-                    email: "eventsphere.official2026@gmail.com"
+
+                    name:
+                        "EventSphere",
+
+                    email:
+                        "eventsphere.official2026@gmail.com"
+
                 },
 
                 to: [
+
                     {
                         email: email
                     }
+
                 ],
 
-                subject: subject,
+                subject:
+                    subject,
 
-                textContent: message
+                textContent:
+                    message
+
             },
 
             {
+
                 headers: {
-                    accept: "application/json",
-                    "api-key": process.env.BREVO_API_KEY,
-                    "content-type": "application/json"
+
+                    accept:
+                        "application/json",
+
+                    "api-key":
+                        process.env.BREVO_API_KEY,
+
+                    "content-type":
+                        "application/json"
+
                 }
+
             }
+
         );
 
 
@@ -195,22 +349,116 @@ app.post("/booking-status", async (req, res) => {
             `Booking ${status} email sent to ${email}`
         );
 
+
         res.json({
+
             success: true,
-            message: "Booking status email sent successfully!"
+
+            message:
+                "Booking status email sent successfully!"
+
         });
 
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(
+
             "Booking Email Error:",
-            error.response?.data || error.message
+
+            error.response?.data ||
+            error.message
+
         );
 
+
         res.status(500).json({
+
             success: false,
-            message: "Failed to send booking status email."
+
+            message:
+                "Failed to send booking status email."
+
+        });
+
+    }
+
+});
+
+
+// ================= DELETE CUSTOMER =================
+
+app.delete("/delete-customer/:uid", async (req, res) => {
+
+    try {
+
+        const uid = req.params.uid;
+
+
+        if (!uid) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Customer UID is required."
+
+            });
+
+        }
+
+
+        if (!admin.apps.length) {
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    "Firebase Admin is not initialized."
+
+            });
+
+        }
+
+
+        await admin.auth().deleteUser(uid);
+
+
+        console.log(
+            `Customer deleted: ${uid}`
+        );
+
+
+        res.json({
+
+            success: true,
+
+            message:
+                "Customer deleted successfully!"
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Delete Customer Error:",
+            error.message
+        );
+
+
+        res.status(500).json({
+
+            success: false,
+
+            message:
+                "Failed to delete customer."
+
         });
 
     }
@@ -219,14 +467,26 @@ app.post("/booking-status", async (req, res) => {
 
 
 // ================= HOME =================
+
 app.get("/", (req, res) => {
-    res.send("EventSphere Backend Running");
+
+    res.send(
+        "EventSphere Backend Running"
+    );
+
 });
 
 
 // ================= START SERVER =================
-const PORT = process.env.PORT || 3000;
+
+const PORT =
+    process.env.PORT || 3000;
+
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+
+    console.log(
+        `Server running on port ${PORT}`
+    );
+
 });
