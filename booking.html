@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Book Event - EventSphere</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <div class="sidebar">
+
+        <h2>EventSphere</h2>
+
+        <ul>
+
+            <li><a href="customer-dashboard.html">🏠 Dashboard</a></li>
+
+            <li><a href="customer-events.html">🎉 Events</a></li>
+
+            <li><a href="#">📅 My Bookings</a></li>
+
+            <li><a href="#" onclick="logout()">🚪 Logout</a></li>
+
+        </ul>
+
+    </div>
+
+
+    <div class="dashboard-content">
+
+        <h1>Book Event</h1>
+
+        <form id="bookingForm">
+
+            <label>Event Date</label>
+
+            <input
+                type="date"
+                id="eventDate"
+                required
+            >
+
+            <label>Number of Guests</label>
+
+            <input
+                type="number"
+                id="guests"
+                min="1"
+                required
+            >
+
+            <label>Location</label>
+
+            <input
+                type="text"
+                id="location"
+                placeholder="Enter event location"
+                required
+            >
+
+            <label>Additional Requirements</label>
+
+            <textarea
+                id="requirements"
+                placeholder="Enter any additional requirements"
+                rows="5"
+            ></textarea>
+
+            <button type="submit">
+                Confirm Booking
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script type="module" src="js/booking.js"></script>
+
+</body>
+
+</html>

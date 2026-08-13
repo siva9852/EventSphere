@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Events - EventSphere</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <div class="sidebar">
+
+        <h2>EventSphere</h2>
+
+        <ul>
+
+            <li><a href="customer-dashboard.html">🏠 Dashboard</a></li>
+
+            <li><a href="customer-events.html">🎉 Events</a></li>
+
+            <li><a href="#">📅 My Bookings</a></li>
+
+            <li><a href="#" onclick="logout()">🚪 Logout</a></li>
+
+        </ul>
+
+    </div>
+
+
+    <div class="dashboard-content">
+
+        <h1>Available Events</h1>
+
+        <div id="eventsContainer">
+
+            <p>Loading events...</p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script type="module" src="js/auth.js"></script>
+
+<script type="module" src="js/customer-events.js"></script>
+
+</body>
+
+</html>
