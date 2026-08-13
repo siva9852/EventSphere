@@ -5,7 +5,9 @@ import {
     addDoc,
     getDoc,
     doc,
-    serverTimestamp
+    serverTimestamp,
+    setDoc,
+    increment
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
@@ -20,7 +22,6 @@ bookingForm.addEventListener("submit", async (e) => {
 
     const eventId =
         localStorage.getItem("selectedEventId");
-
 
     const eventDate =
         document.getElementById("eventDate").value;
@@ -72,11 +73,14 @@ bookingForm.addEventListener("submit", async (e) => {
             eventDoc.data();
 
 
+        // ================= CREATE BOOKING =================
+
         await addDoc(
             collection(db, "bookings"),
             {
 
-                eventId: eventId,
+                eventId:
+                    eventId,
 
                 eventName:
                     event.eventName,
@@ -93,7 +97,7 @@ bookingForm.addEventListener("submit", async (e) => {
                 eventDate:
                     eventDate,
 
-                // Event automatically ends at 8:00 PM
+                // Event ends at 8:00 PM
                 eventEndTime:
                     "20:00",
 
@@ -112,6 +116,20 @@ bookingForm.addEventListener("submit", async (e) => {
                 createdAt:
                     serverTimestamp()
 
+            }
+        );
+
+
+        // ================= UPDATE TOTAL BOOKINGS =================
+
+        await setDoc(
+            doc(db, "statistics", "main"),
+            {
+                totalBookings:
+                    increment(1)
+            },
+            {
+                merge: true
             }
         );
 

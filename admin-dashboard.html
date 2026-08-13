@@ -15,10 +15,6 @@
 
 <body>
 
-<h1 style="color:red; text-align:center;">
-    NEW ADMIN DASHBOARD
-</h1>
-
 <div class="dashboard">
 
     <div class="sidebar">
@@ -27,21 +23,34 @@
 
         <ul>
 
-            <li><a href="admin-dashboard.html">🏠 Dashboard</a></li>
+            <li>
+                <a href="admin-dashboard.html">🏠 Dashboard</a>
+            </li>
 
-            <li><a href="add-event.html">➕ Add Event</a></li>
+            <li>
+                <a href="add-event.html">➕ Add Event</a>
+            </li>
 
-            <li><a href="view-events.html">🎉 View Events</a></li>
+            <li>
+                <a href="view-events.html">🎉 View Events</a>
+            </li>
 
-            <li><a href="admin-bookings.html">📅 Bookings</a></li>
+            <li>
+                <a href="admin-bookings.html">📅 Bookings</a>
+            </li>
 
-            <li><a href="admin-customers.html">👥 Customers</a></li>
+            <li>
+                <a href="admin-customers.html">👥 Customers</a>
+            </li>
 
-            <li><a href="#" onclick="logout()">🚪 Logout</a></li>
+            <li>
+                <a href="#" onclick="logout()">🚪 Logout</a>
+            </li>
 
         </ul>
 
     </div>
+
 
     <div class="dashboard-content">
 
@@ -49,28 +58,63 @@
 
         <h2>Welcome, Admin 🎉</h2>
 
-        <p>Select an option from the left menu.</p>
+        <p>EventSphere Statistics</p>
+
 
         <div class="cards">
 
             <div class="card">
-                <h3>Add Event</h3>
-                <p>Create new events.</p>
+
+                <h3>👥 Total Customers</h3>
+
+                <p id="totalCustomers">
+                    Loading...
+                </p>
+
             </div>
 
-            <div class="card">
-                <h3>View Events</h3>
-                <p>Manage all events.</p>
-            </div>
 
             <div class="card">
-                <h3>Bookings</h3>
-                <p>View customer bookings.</p>
+
+                <h3>📅 Total Bookings</h3>
+
+                <p id="totalBookings">
+                    Loading...
+                </p>
+
             </div>
 
+
             <div class="card">
-                <h3>Customers</h3>
-                <p>Registered users.</p>
+
+                <h3>🟢 Active Bookings</h3>
+
+                <p id="activeBookings">
+                    Loading...
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>✅ Completed Bookings</h3>
+
+                <p id="completedBookings">
+                    Loading...
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>🎉 Total Events</h3>
+
+                <p id="totalEvents">
+                    Loading...
+                </p>
+
             </div>
 
         </div>
@@ -78,6 +122,7 @@
     </div>
 
 </div>
+
 
 <script type="module" src="js/admin.js"></script>
 
