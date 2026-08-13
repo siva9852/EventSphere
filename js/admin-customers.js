@@ -2,7 +2,9 @@ import { db } from "./firebase-config.js";
 
 import {
     collection,
-    getDocs
+    getDocs,
+    deleteDoc,
+    doc
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
@@ -37,9 +39,11 @@ async function loadCustomers() {
                 return;
             }
 
+
             const card = document.createElement("div");
 
             card.className = "card";
+
 
             card.innerHTML = `
 
@@ -60,9 +64,19 @@ async function loadCustomers() {
                     ${customer.role}
                 </p>
 
+                <button
+                    onclick="deleteCustomer(
+                        '${customerDoc.id}'
+                    )">
+
+                    Delete Customer
+
+                </button>
+
                 <hr>
 
             `;
+
 
             customersContainer.appendChild(card);
 
@@ -80,6 +94,72 @@ async function loadCustomers() {
     }
 
 }
+
+
+// ================= DELETE CUSTOMER =================
+
+window.deleteCustomer = async function (customerId) {
+
+    const confirmDelete = confirm(
+        "Are you sure you want to delete this customer?"
+    );
+
+
+    if (!confirmDelete) {
+        return;
+    }
+
+
+    try {
+
+        const response = await fetch(
+            `https://eventsphere-dndh.onrender.com/delete-customer/${customerId}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+
+        const data = await response.json();
+
+
+        if (!data.success) {
+
+            alert(
+                data.message ||
+                "Failed to delete customer."
+            );
+
+            return;
+
+        }
+
+
+        // Delete customer record from Firestore
+
+        await deleteDoc(
+            doc(db, "users", customerId)
+        );
+
+
+        alert("Customer deleted successfully!");
+
+
+        loadCustomers();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Failed to delete customer."
+        );
+
+    }
+
+};
 
 
 loadCustomers();
