@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,11 +10,176 @@
     <title>Customer Dashboard - EventSphere</title>
 
     <link rel="stylesheet" href="css/style.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+    <style>
+
+        /* ================= CUSTOMER DASHBOARD CARDS ================= */
+
+        .dashboard .cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+
+        .dashboard .card {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+
+            background: #ffffff;
+
+            padding: 30px;
+
+            border-radius: 16px;
+
+            box-shadow:
+                0 4px 15px rgba(0, 0, 0, 0.10);
+
+            min-height: 125px;
+        }
+
+
+        /* ================= ICON BOX ================= */
+
+        .dashboard-card-icon {
+            width: 96px;
+            height: 96px;
+
+            min-width: 96px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #eef2ff;
+
+            border-radius: 16px;
+        }
+
+
+        .dashboard-card-icon i {
+            font-size: 48px;
+
+            color: #2563eb;
+        }
+
+
+        /* ================= CARD CONTENT ================= */
+
+        .dashboard-card-content {
+            flex: 1;
+        }
+
+
+        .dashboard-card-content h3 {
+            margin: 0 0 12px 0;
+
+            color: #123f91;
+
+            font-size: 22px;
+        }
+
+
+        .dashboard-card-content p {
+            margin: 0 0 16px 0;
+
+            color: #333;
+
+            font-size: 16px;
+        }
+
+
+        /* ================= CARD BUTTON ================= */
+
+        .dashboard-card-content a {
+            text-decoration: none;
+        }
+
+
+        .dashboard-card-content button {
+            background: white;
+
+            color: #1d4ed8;
+
+            border: 1.5px solid #2563eb;
+
+            border-radius: 4px;
+
+            padding: 8px 16px;
+
+            font-size: 15px;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+
+        .dashboard-card-content button:hover {
+            background: #2563eb;
+
+            color: white;
+        }
+
+
+        /* ================= MOBILE ================= */
+
+        @media (max-width: 800px) {
+
+            .dashboard .cards {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+
+        @media (max-width: 500px) {
+
+            .dashboard .card {
+                padding: 20px;
+
+                gap: 18px;
+            }
+
+
+            .dashboard-card-icon {
+                width: 70px;
+                height: 70px;
+
+                min-width: 70px;
+            }
+
+
+            .dashboard-card-icon i {
+                font-size: 34px;
+            }
+
+
+            .dashboard-card-content h3 {
+                font-size: 19px;
+            }
+
+        }
+
+    </style>
+
 </head>
+
 
 <body>
 
+
 <div class="dashboard">
+
+
+    <!-- ================= SIDEBAR ================= -->
 
     <div class="sidebar">
 
@@ -27,17 +193,20 @@
                 </a>
             </li>
 
+
             <li>
                 <a href="customer-events.html">
                     🎉 View Events
                 </a>
             </li>
 
+
             <li>
                 <a href="my-bookings.html">
                     📅 My Bookings
                 </a>
             </li>
+
 
             <li>
                 <a href="#" onclick="logout()">
@@ -50,46 +219,97 @@
     </div>
 
 
+    <!-- ================= DASHBOARD CONTENT ================= -->
+
     <div class="dashboard-content">
 
         <h1>Customer Dashboard</h1>
 
-        <h2>Welcome to EventSphere 🎉</h2>
+
+        <h2>
+            Welcome to EventSphere 🎉
+        </h2>
+
 
         <p>
             Browse available events and book your favorite event.
         </p>
 
+
         <div class="cards">
 
+
+            <!-- ================= EVENTS CARD ================= -->
+
             <div class="card">
 
-                <h3>🎉 Events</h3>
+                <div class="dashboard-card-icon">
 
-                <p>
-                    View all available events.
-                </p>
+                    <i class="fa-solid fa-calendar-days"></i>
 
-                <a href="customer-events.html">
-                    <button>View Events</button>
-                </a>
+                </div>
+
+
+                <div class="dashboard-card-content">
+
+                    <h3>
+                        Events
+                    </h3>
+
+
+                    <p>
+                        View all available events.
+                    </p>
+
+
+                    <a href="customer-events.html">
+
+                        <button>
+                            View Events
+                        </button>
+
+                    </a>
+
+                </div>
 
             </div>
 
 
+            <!-- ================= MY BOOKINGS CARD ================= -->
+
             <div class="card">
 
-                <h3>📅 My Bookings</h3>
+                <div class="dashboard-card-icon">
 
-                <p>
-                    View your event bookings.
-                </p>
+                    <i class="fa-solid fa-calendar-check"></i>
 
-                <button>
-                    My Bookings
-                </button>
+                </div>
+
+
+                <div class="dashboard-card-content">
+
+                    <h3>
+                        My Bookings
+                    </h3>
+
+
+                    <p>
+                        View your event bookings.
+                    </p>
+
+
+                    <a href="my-bookings.html">
+
+                        <button>
+                            My Bookings
+                        </button>
+
+                    </a>
+
+                </div>
 
             </div>
+
 
         </div>
 
@@ -97,7 +317,11 @@
 
 </div>
 
+
+<!-- ================= AUTH ================= -->
+
 <script type="module" src="js/auth.js"></script>
+
 
 </body>
 
