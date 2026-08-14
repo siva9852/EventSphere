@@ -11,11 +11,16 @@
 
     <link rel="stylesheet" href="css/style.css">
 
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
 </head>
 
 <body>
 
 <div class="dashboard">
+
+    <!-- SIDEBAR -->
 
     <div class="sidebar">
 
@@ -23,48 +28,220 @@
 
         <ul>
 
-            <li><a href="admin-dashboard.html">🏠 Dashboard</a></li>
+            <li>
+                <a href="admin-dashboard.html">
+                    🏠 Dashboard
+                </a>
+            </li>
 
-            <li><a href="add-event.html">➕ Add Event</a></li>
+            <li class="active">
+                <a href="add-event.html">
+                    ➕ Add Event
+                </a>
+            </li>
 
-            <li><a href="view-events.html">🎉 View Events</a></li>
+            <li>
+                <a href="view-events.html">
+                    🎉 View Events
+                </a>
+            </li>
 
-            <li><a href="#">📅 Bookings</a></li>
+            <li>
+                <a href="admin-bookings.html">
+                    📅 Bookings
+                </a>
+            </li>
 
-            <li><a href="#">👥 Customers</a></li>
+            <li>
+                <a href="admin-customers.html">
+                    👥 Customers
+                </a>
+            </li>
 
-            <li><a href="#" onclick="logout()">🚪 Logout</a></li>
+            <li>
+                <a href="#" onclick="logout()">
+                    🚪 Logout
+                </a>
+            </li>
 
         </ul>
 
     </div>
 
-    <div class="dashboard-content">
 
-        <h1>Add New Event</h1>
+    <!-- MAIN CONTENT -->
 
-        <form id="addEventForm">
+    <div class="dashboard-content add-event-page">
 
-            <input type="text" id="eventName" placeholder="Event Name" required>
+        <div class="page-heading">
 
-            <input type="text" id="category" placeholder="Category" required>
+            <div class="heading-icon">
+                <i class="fa-solid fa-calendar-plus"></i>
+            </div>
 
-            <input type="number" id="price" placeholder="Price" required>
+            <div>
 
-            <input type="text" id="image" placeholder="Image URL" required>
+                <h1>Add New Event</h1>
 
-            <textarea id="description" placeholder="Description" rows="5" required></textarea>
+                <p>
+                    Fill in the details below to create a new event.
+                </p>
 
-            <button type="submit">Add Event</button>
+            </div>
 
-        </form>
+        </div>
+
+
+        <!-- EVENT FORM -->
+
+        <div class="event-form-card">
+
+            <form id="eventForm">
+
+                <div class="event-form-row">
+
+                    <!-- EVENT NAME -->
+
+                    <div class="event-field">
+
+                        <label>
+                            Event Name <span>*</span>
+                        </label>
+
+                        <div class="input-box">
+
+                            <i class="fa-solid fa-tag"></i>
+
+                            <input
+                                type="text"
+                                id="eventName"
+                                placeholder="Enter event name"
+                                required>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CATEGORY -->
+
+                    <div class="event-field">
+
+                        <label>
+                            Category <span>*</span>
+                        </label>
+
+                        <div class="input-box">
+
+                            <i class="fa-solid fa-list"></i>
+
+                            <input
+                                type="text"
+                                id="category"
+                                placeholder="Enter category"
+                                required>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PRICE -->
+
+                    <div class="event-field">
+
+                        <label>
+                            Price <span>*</span>
+                        </label>
+
+                        <div class="input-box">
+
+                            <i class="fa-solid fa-indian-rupee-sign"></i>
+
+                            <input
+                                type="number"
+                                id="price"
+                                placeholder="Enter price"
+                                required>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- IMAGE URL -->
+
+                    <div class="event-field">
+
+                        <label>
+                            Image URL <span>*</span>
+                        </label>
+
+                        <div class="input-box">
+
+                            <i class="fa-solid fa-link"></i>
+
+                            <input
+                                type="url"
+                                id="imageUrl"
+                                placeholder="Enter image URL"
+                                required>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DESCRIPTION -->
+
+                <div class="event-field description-field">
+
+                    <label>
+                        Description <span>*</span>
+                    </label>
+
+                    <div class="textarea-box">
+
+                        <i class="fa-solid fa-file-lines"></i>
+
+                        <textarea
+                            id="description"
+                            placeholder="Enter event description..."
+                            required></textarea>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BUTTON -->
+
+                <div class="event-button-container">
+
+                    <button
+                        type="submit"
+                        class="add-event-button">
+
+                        <i class="fa-solid fa-plus"></i>
+
+                        Add Event
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
 
     </div>
 
 </div>
 
+
 <script type="module" src="js/admin.js"></script>
-<script type="module" src="js/admin-events.js"></script>
 
 </body>
 
