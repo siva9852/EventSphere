@@ -1844,3 +1844,20 @@ body{
     }
 
 }
+
+/* ================= ADMIN DELETE BUTTON ================= */
+
+.delete-event-button {
+    background: #e53935;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    padding: 11px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.delete-event-button:hover {
+    background: #c62828;
+}

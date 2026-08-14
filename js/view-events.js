@@ -10,18 +10,27 @@ import {
 
 const eventsContainer = document.getElementById("eventsContainer");
 
+eventsContainer.className = "events-grid";
+
+
+// ====================== LOAD EVENTS ======================
 
 async function loadEvents() {
 
     try {
 
-        const querySnapshot = await getDocs(collection(db, "events"));
+        const querySnapshot =
+            await getDocs(collection(db, "events"));
 
         eventsContainer.innerHTML = "";
 
+
         if (querySnapshot.empty) {
 
-            eventsContainer.innerHTML = "<p>No events found.</p>";
+            eventsContainer.innerHTML =
+                `<div class="no-events">
+                    <p>No events found.</p>
+                </div>`;
 
             return;
 
@@ -32,33 +41,61 @@ async function loadEvents() {
 
             const event = eventDoc.data();
 
-            const eventCard = document.createElement("div");
+            const eventCard =
+                document.createElement("div");
 
-            eventCard.className = "card";
+            eventCard.className = "event-card";
+
 
             eventCard.innerHTML = `
 
-                <img 
-                    src="${event.image}" 
-                    alt="${event.eventName}"
-                    style="width:250px; height:150px; object-fit:cover;"
-                >
+                <div class="event-image-container">
 
-                <h2>${event.eventName}</h2>
+                    <img
+                        src="${event.image}"
+                        alt="${event.eventName}"
+                        class="event-image">
 
-                <p><strong>Category:</strong> ${event.category}</p>
+                </div>
 
-                <p><strong>Price:</strong> ₹${event.price}</p>
 
-                <p>${event.description}</p>
+                <div class="event-card-content">
 
-                <button onclick="deleteEvent('${eventDoc.id}')">
-                    Delete Event
-                </button>
+                    <h2>${event.eventName}</h2>
 
-                <hr>
+
+                    <div class="event-info">
+
+                        <p>
+                            <strong>Category:</strong>
+                            ${event.category}
+                        </p>
+
+                        <p>
+                            <strong>Price:</strong>
+                            ₹${event.price}
+                        </p>
+
+                    </div>
+
+
+                    <p class="event-description">
+                        ${event.description}
+                    </p>
+
+
+                    <button
+                        class="delete-event-button"
+                        onclick="deleteEvent('${eventDoc.id}')">
+
+                        Delete Event
+
+                    </button>
+
+                </div>
 
             `;
+
 
             eventsContainer.appendChild(eventCard);
 
@@ -78,6 +115,8 @@ async function loadEvents() {
 }
 
 
+// ====================== DELETE EVENT ======================
+
 window.deleteEvent = async function(eventId) {
 
     if (!confirm("Are you sure you want to delete this event?")) {
@@ -89,7 +128,9 @@ window.deleteEvent = async function(eventId) {
 
     try {
 
-        await deleteDoc(doc(db, "events", eventId));
+        await deleteDoc(
+            doc(db, "events", eventId)
+        );
 
         alert("Event Deleted Successfully!");
 
@@ -107,5 +148,7 @@ window.deleteEvent = async function(eventId) {
 
 };
 
+
+// ====================== START ======================
 
 loadEvents();
