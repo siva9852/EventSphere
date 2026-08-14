@@ -782,3 +782,647 @@ body{
     color:#1f3c88;
     margin-bottom:10px;
 }
+
+
+
+/* =========================================
+   ADMIN BOOKINGS PAGE
+========================================= */
+
+.bookings-page {
+    padding: 35px 50px;
+}
+
+
+/* =========================================
+   FILTER BUTTONS
+========================================= */
+
+.booking-filters {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 24px;
+
+    margin-top: 25px;
+
+    margin-bottom: 30px;
+
+}
+
+
+.filter-btn {
+
+    height: 58px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: white;
+
+    box-shadow:
+        0 3px 12px rgba(0,0,0,0.12);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 14px;
+
+    font-size: 18px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+}
+
+
+.filter-btn:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 5px 15px rgba(0,0,0,0.16);
+
+}
+
+
+.active-filter {
+
+    background: #21489a;
+
+    color: white;
+
+}
+
+
+/* =========================================
+   COUNT BADGES
+========================================= */
+
+.count-badge {
+
+    min-width: 30px;
+
+    height: 30px;
+
+    padding: 0 8px;
+
+    border-radius: 50px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+}
+
+
+.all-count {
+
+    background: #f0f3fa;
+
+    color: #21489a;
+
+}
+
+
+.pending-count {
+
+    background: #f6a623;
+
+    color: white;
+
+}
+
+
+.approved-count {
+
+    background: #18a957;
+
+    color: white;
+
+}
+
+
+.rejected-count {
+
+    background: #e53935;
+
+    color: white;
+
+}
+
+
+/* =========================================
+   SEARCH BOX
+========================================= */
+
+.booking-search {
+
+    height: 65px;
+
+    background: white;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 3px 12px rgba(0,0,0,0.10);
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 0 22px;
+
+    margin-bottom: 28px;
+
+}
+
+
+.booking-search span {
+
+    font-size: 22px;
+
+    margin-right: 15px;
+
+}
+
+
+.booking-search input {
+
+    width: 100%;
+
+    height: 100%;
+
+    border: none;
+
+    outline: none;
+
+    font-size: 17px;
+
+    color: #333;
+
+}
+
+
+.booking-search input::placeholder {
+
+    color: #9aa0ad;
+
+}
+
+
+/* =========================================
+   BOOKING CARD
+========================================= */
+
+.booking-card {
+
+    background: white;
+
+    border-radius: 12px;
+
+    padding: 28px;
+
+    margin-bottom: 22px;
+
+    box-shadow:
+        0 3px 15px rgba(0,0,0,0.10);
+
+    position: relative;
+
+}
+
+
+.booking-card h2 {
+
+    color: #174394;
+
+    margin: 0 0 25px 0;
+
+    font-size: 25px;
+
+}
+
+
+/* =========================================
+   STATUS BADGE
+========================================= */
+
+.booking-status {
+
+    position: absolute;
+
+    right: 28px;
+
+    top: 25px;
+
+    padding: 10px 20px;
+
+    border-radius: 25px;
+
+    font-weight: bold;
+
+    font-size: 15px;
+
+}
+
+
+.status-approved {
+
+    background: #e3f6ea;
+
+    color: #149447;
+
+}
+
+
+.status-pending {
+
+    background: #fff1d8;
+
+    color: #d88a00;
+
+}
+
+
+.status-rejected {
+
+    background: #fde3e3;
+
+    color: #dc3030;
+
+}
+
+
+/* =========================================
+   BOOKING DETAILS - 3 COLUMNS
+========================================= */
+
+.booking-details {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr 0.8fr;
+
+    gap: 35px;
+
+}
+
+
+.booking-column {
+
+    padding-right: 25px;
+
+    border-right: 1px solid #e1e1e1;
+
+}
+
+
+.booking-column:last-child {
+
+    border-right: none;
+
+}
+
+
+.booking-info {
+
+    margin-bottom: 18px;
+
+    font-size: 16px;
+
+    line-height: 1.5;
+
+}
+
+
+.booking-info strong {
+
+    color: #3f4147;
+
+}
+
+
+.booking-info span {
+
+    color: #333;
+
+}
+
+
+/* =========================================
+   ACTION BUTTONS
+========================================= */
+
+.booking-actions {
+
+    margin-top: 22px;
+
+    display: flex;
+
+    gap: 14px;
+
+}
+
+
+.booking-actions button {
+
+    padding: 10px 22px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+}
+
+
+.approve-btn {
+
+    background: #18a957;
+
+    color: white;
+
+}
+
+
+.reject-btn {
+
+    background: #e53935;
+
+    color: white;
+
+}
+
+
+.booking-actions button:hover {
+
+    opacity: 0.85;
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 900px) {
+
+    .booking-filters {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+    }
+
+
+    .booking-details {
+
+        grid-template-columns: 1fr;
+
+        gap: 10px;
+
+    }
+
+
+    .booking-column {
+
+        border-right: none;
+
+        border-bottom: 1px solid #e1e1e1;
+
+        padding-bottom: 15px;
+
+    }
+
+
+    .booking-column:last-child {
+
+        border-bottom: none;
+
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .bookings-page {
+
+        padding: 20px;
+
+    }
+
+
+    .booking-filters {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .booking-status {
+
+        position: static;
+
+        display: inline-block;
+
+        margin-bottom: 15px;
+
+    }
+
+}
+
+/* =========================================
+   BOOK EVENT PAGE
+========================================= */
+
+.booking-page {
+    padding: 35px 50px;
+}
+
+.booking-subtitle {
+    color: #666;
+    font-size: 16px;
+    margin-top: -10px;
+    margin-bottom: 25px;
+}
+
+
+/* =========================================
+   BOOKING FORM CARD
+========================================= */
+
+.booking-form-card {
+
+    background: white;
+
+    max-width: 850px;
+
+    padding: 35px;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 4px 16px rgba(0,0,0,0.10);
+
+}
+
+
+/* =========================================
+   FORM GROUP
+========================================= */
+
+.booking-form-group {
+
+    margin-bottom: 22px;
+
+}
+
+
+.booking-form-group label {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    color: #333;
+
+}
+
+
+.booking-form-group input,
+.booking-form-group textarea {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 13px 15px;
+
+    border: 1px solid #d5d9e2;
+
+    border-radius: 7px;
+
+    font-size: 15px;
+
+    font-family: inherit;
+
+    outline: none;
+
+    transition: 0.2s;
+
+}
+
+
+.booking-form-group input {
+
+    height: 48px;
+
+}
+
+
+.booking-form-group textarea {
+
+    resize: vertical;
+
+    min-height: 120px;
+
+}
+
+
+.booking-form-group input:focus,
+.booking-form-group textarea:focus {
+
+    border-color: #21489a;
+
+    box-shadow:
+        0 0 0 2px rgba(33,72,154,0.10);
+
+}
+
+
+/* =========================================
+   CONFIRM BUTTON
+========================================= */
+
+.confirm-booking-btn {
+
+    width: 100%;
+
+    height: 50px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #21489a;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+}
+
+
+.confirm-booking-btn:hover {
+
+    background: #173b82;
+
+    transform: translateY(-1px);
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 700px) {
+
+    .booking-page {
+
+        padding: 25px 20px;
+
+    }
+
+
+    .booking-form-card {
+
+        padding: 22px;
+
+    }
+
+}

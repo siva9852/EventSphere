@@ -5,11 +5,13 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>Book Event - EventSphere</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet"
+          href="css/style.css">
 
 </head>
 
@@ -17,76 +19,171 @@
 
 <div class="dashboard">
 
+    <!-- SIDEBAR -->
+
     <div class="sidebar">
 
         <h2>EventSphere</h2>
 
         <ul>
 
-            <li><a href="customer-dashboard.html">🏠 Dashboard</a></li>
+            <li>
+                <a href="customer-dashboard.html">
+                    🏠 Dashboard
+                </a>
+            </li>
 
-            <li><a href="customer-events.html">🎉 Events</a></li>
+            <li>
+                <a href="customer-events.html">
+                    🎉 Events
+                </a>
+            </li>
 
-            <li><a href="#">📅 My Bookings</a></li>
+            <li>
+                <a href="#">
+                    📅 My Bookings
+                </a>
+            </li>
 
-            <li><a href="#" onclick="logout()">🚪 Logout</a></li>
+            <li>
+                <a href="#"
+                   onclick="logout()">
+                    🚪 Logout
+                </a>
+            </li>
 
         </ul>
 
     </div>
 
 
-    <div class="dashboard-content">
+    <!-- MAIN CONTENT -->
+
+    <div class="dashboard-content booking-page">
 
         <h1>Book Event</h1>
 
-        <form id="bookingForm">
+        <p class="booking-subtitle">
+            Enter your event details to submit a booking request.
+        </p>
 
-            <label>Event Date</label>
 
-            <input
-                type="date"
-                id="eventDate"
-                required
-            >
+        <div class="booking-form-card">
 
-            <label>Number of Guests</label>
+            <form id="bookingForm">
 
-            <input
-                type="number"
-                id="guests"
-                min="1"
-                required
-            >
 
-            <label>Location</label>
+                <!-- EVENT DATE -->
 
-            <input
-                type="text"
-                id="location"
-                placeholder="Enter event location"
-                required
-            >
+                <div class="booking-form-group">
 
-            <label>Additional Requirements</label>
+                    <label for="eventDate">
+                        📅 Event Date
+                    </label>
 
-            <textarea
-                id="requirements"
-                placeholder="Enter any additional requirements"
-                rows="5"
-            ></textarea>
+                    <input
+                        type="date"
+                        id="eventDate"
+                        required
+                    >
 
-            <button type="submit">
-                Confirm Booking
-            </button>
+                </div>
 
-        </form>
+
+                <!-- EVENT END TIME -->
+
+                <div class="booking-form-group">
+
+                    <label for="eventEndTime">
+                        🕐 Event End Time
+                    </label>
+
+                    <input
+                        type="time"
+                        id="eventEndTime"
+                        value="20:00"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- GUESTS -->
+
+                <div class="booking-form-group">
+
+                    <label for="guests">
+                        👥 Number of Guests
+                    </label>
+
+                    <input
+                        type="number"
+                        id="guests"
+                        min="1"
+                        placeholder="Enter number of guests"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- LOCATION -->
+
+                <div class="booking-form-group">
+
+                    <label for="location">
+                        📍 Location
+                    </label>
+
+                    <input
+                        type="text"
+                        id="location"
+                        placeholder="Enter event location"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- REQUIREMENTS -->
+
+                <div class="booking-form-group">
+
+                    <label for="requirements">
+                        📝 Additional Requirements
+                    </label>
+
+                    <textarea
+                        id="requirements"
+                        placeholder="Enter any additional requirements"
+                        rows="5"
+                    ></textarea>
+
+                </div>
+
+
+                <!-- BUTTON -->
+
+                <button
+                    type="submit"
+                    class="confirm-booking-btn">
+
+                    Confirm Booking
+
+                </button>
+
+            </form>
+
+        </div>
 
     </div>
 
 </div>
 
-<script type="module" src="js/booking.js"></script>
+
+<script type="module"
+        src="js/booking.js">
+</script>
 
 </body>
 

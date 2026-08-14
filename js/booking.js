@@ -26,6 +26,9 @@ bookingForm.addEventListener("submit", async (e) => {
     const eventDate =
         document.getElementById("eventDate").value;
 
+    const eventEndTime =
+        document.getElementById("eventEndTime").value;
+
     const guests =
         document.getElementById("guests").value;
 
@@ -97,9 +100,9 @@ bookingForm.addEventListener("submit", async (e) => {
                 eventDate:
                     eventDate,
 
-                // Event ends at 8:00 PM
+                // Customer selected event end time
                 eventEndTime:
-                    "20:00",
+                    eventEndTime,
 
                 guests:
                     Number(guests),

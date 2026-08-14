@@ -17,6 +17,8 @@
 
 <div class="dashboard">
 
+    <!-- SIDEBAR -->
+
     <div class="sidebar">
 
         <h2>EventSphere</h2>
@@ -24,27 +26,40 @@
         <ul>
 
             <li>
-                <a href="admin-dashboard.html">🏠 Dashboard</a>
+                <a href="admin-dashboard.html">
+                    🏠 Dashboard
+                </a>
             </li>
 
             <li>
-                <a href="add-event.html">➕ Add Event</a>
+                <a href="add-event.html">
+                    ➕ Add Event
+                </a>
             </li>
 
             <li>
-                <a href="view-events.html">🎉 View Events</a>
+                <a href="view-events.html">
+                    🎉 View Events
+                </a>
             </li>
 
             <li>
-                <a href="admin-bookings.html">📅 Bookings</a>
+                <a href="admin-bookings.html"
+                   class="active-menu">
+                    📅 Bookings
+                </a>
             </li>
 
             <li>
-                <a href="admin-customers.html">👥 Customers</a>
+                <a href="admin-customers.html">
+                    👥 Customers
+                </a>
             </li>
 
             <li>
-                <a href="#" onclick="logout()">🚪 Logout</a>
+                <a href="#" onclick="logout()">
+                    🚪 Logout
+                </a>
             </li>
 
         </ul>
@@ -52,9 +67,95 @@
     </div>
 
 
-    <div class="dashboard-content">
+    <!-- MAIN CONTENT -->
+
+    <div class="dashboard-content bookings-page">
 
         <h1>Customer Bookings</h1>
+
+
+        <!-- STATUS FILTERS -->
+
+        <div class="booking-filters">
+
+            <button
+                class="filter-btn active-filter"
+                onclick="filterBookings('All')">
+
+                <span>All</span>
+
+                <span
+                    class="count-badge all-count"
+                    id="allCount">
+                    0
+                </span>
+
+            </button>
+
+
+            <button
+                class="filter-btn"
+                onclick="filterBookings('Pending')">
+
+                <span>Pending</span>
+
+                <span
+                    class="count-badge pending-count"
+                    id="pendingCount">
+                    0
+                </span>
+
+            </button>
+
+
+            <button
+                class="filter-btn"
+                onclick="filterBookings('Approved')">
+
+                <span>Approved</span>
+
+                <span
+                    class="count-badge approved-count"
+                    id="approvedCount">
+                    0
+                </span>
+
+            </button>
+
+
+            <button
+                class="filter-btn"
+                onclick="filterBookings('Rejected')">
+
+                <span>Rejected</span>
+
+                <span
+                    class="count-badge rejected-count"
+                    id="rejectedCount">
+                    0
+                </span>
+
+            </button>
+
+        </div>
+
+
+        <!-- SEARCH -->
+
+        <div class="booking-search">
+
+            <span>🔍</span>
+
+            <input
+                type="text"
+                id="bookingSearch"
+                placeholder="Search customer, email or event..."
+            >
+
+        </div>
+
+
+        <!-- BOOKINGS -->
 
         <div id="bookingsContainer">
 
@@ -67,7 +168,9 @@
 </div>
 
 
-<script type="module" src="js/admin-bookings.js"></script>
+<script type="module"
+        src="js/admin-bookings.js">
+</script>
 
 </body>
 

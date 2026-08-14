@@ -9,8 +9,107 @@ import {
     doc,
     getDoc,
     getDocs,
-    collection
+    collection,
+    setDoc
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+
+// ====================== ADMIN INACTIVITY LOGOUT ======================
+
+const INACTIVITY_TIME = 15 * 60 * 1000; // 15 minutes
+
+let inactivityTimer = null;
+
+
+// Start inactivity timer
+
+function startInactivityTimer() {
+
+    if (inactivityTimer) {
+        clearTimeout(inactivityTimer);
+    }
+
+    inactivityTimer = setTimeout(async () => {
+
+        try {
+
+            await signOut(auth);
+
+            alert(
+                "You have been logged out due to inactivity."
+            );
+
+            window.location.href =
+                "admin-login.html";
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Automatic Logout Error:",
+                error
+            );
+
+        }
+
+    }, INACTIVITY_TIME);
+
+}
+
+
+// Reset inactivity timer
+
+function resetInactivityTimer() {
+
+    if (auth.currentUser) {
+
+        startInactivityTimer();
+
+    }
+
+}
+
+
+// Detect admin activity
+
+[
+    "click",
+    "mousemove",
+    "keydown",
+    "scroll",
+    "touchstart"
+].forEach((event) => {
+
+    document.addEventListener(
+        event,
+        resetInactivityTimer
+    );
+
+});
+
+
+// Check authentication state
+
+auth.onAuthStateChanged((user) => {
+
+    if (user) {
+
+        startInactivityTimer();
+
+    } else {
+
+        if (inactivityTimer) {
+
+            clearTimeout(inactivityTimer);
+
+            inactivityTimer = null;
+
+        }
+
+    }
+
+});
 
 
 // ====================== ADMIN LOGIN ======================
@@ -52,7 +151,6 @@ if (adminLoginForm) {
             const docRef =
                 doc(db, "users", user.uid);
 
-
             const docSnap =
                 await getDoc(docRef);
 
@@ -65,7 +163,6 @@ if (adminLoginForm) {
                 alert(
                     "Access Denied! You are not an Admin."
                 );
-
 
                 await signOut(auth);
 
@@ -80,7 +177,6 @@ if (adminLoginForm) {
                 await fetch(
                     "https://eventsphere-dndh.onrender.com/send-otp",
                     {
-
                         method: "POST",
 
                         headers: {
@@ -91,7 +187,6 @@ if (adminLoginForm) {
                         body: JSON.stringify({
                             email: email
                         })
-
                     }
                 );
 
@@ -110,8 +205,6 @@ if (adminLoginForm) {
 
             }
 
-
-            // Save Admin Email
 
             localStorage.setItem(
                 "adminOtpEmail",
@@ -153,20 +246,20 @@ async function loadDashboardStats() {
     const activeBookingsElement =
         document.getElementById("activeBookings");
 
-    const completedEventsElement =
-        document.getElementById("completedEvents");
+    const completedBookingsElement =
+        document.getElementById("completedBookings");
 
     const totalEventsElement =
         document.getElementById("totalEvents");
 
 
-    // Only run this section on Admin Dashboard
+    // Run only on Admin Dashboard
 
     if (
         !totalCustomersElement ||
         !totalBookingsElement ||
         !activeBookingsElement ||
-        !completedEventsElement ||
+        !completedBookingsElement ||
         !totalEventsElement
     ) {
 
@@ -194,7 +287,7 @@ async function loadDashboardStats() {
                 userDoc.data();
 
 
-            if (user.role === "customer") {
+            if (user.role === "user") {
 
                 totalCustomers++;
 
@@ -215,15 +308,11 @@ async function loadDashboardStats() {
             );
 
 
-        const totalEvents =
+        totalEventsElement.textContent =
             eventsSnapshot.size;
 
 
-        totalEventsElement.textContent =
-            totalEvents;
-
-
-        // ================= ACTIVE BOOKINGS =================
+        // ================= BOOKINGS =================
 
         const bookingsSnapshot =
             await getDocs(
@@ -231,14 +320,18 @@ async function loadDashboardStats() {
             );
 
 
-        let activeBookings = 0;
-
-
         const now =
             new Date();
 
 
-        bookingsSnapshot.forEach((bookingDoc) => {
+        let activeBookings = 0;
+
+        let newlyCompleted = 0;
+
+
+        for (
+            const bookingDoc of bookingsSnapshot.docs
+        ) {
 
             const booking =
                 bookingDoc.data();
@@ -246,10 +339,12 @@ async function loadDashboardStats() {
 
             if (!booking.eventDate) {
 
-                return;
+                continue;
 
             }
 
+
+            // Customer-selected end time
 
             const eventEndTime =
                 booking.eventEndTime || "20:00";
@@ -261,20 +356,38 @@ async function loadDashboardStats() {
                 );
 
 
+            // ================= ACTIVE =================
+
             if (now < eventEnd) {
 
                 activeBookings++;
 
             }
 
-        });
+
+            // ================= COMPLETED =================
+
+            else {
+
+                newlyCompleted++;
+
+                console.log(
+                    "Completed booking:",
+                    booking.eventName,
+                    booking.eventDate,
+                    eventEndTime
+                );
+
+            }
+
+        }
 
 
         activeBookingsElement.textContent =
             activeBookings;
 
 
-        // ================= TOTAL BOOKINGS =================
+        // ================= STATISTICS =================
 
         const statsRef =
             doc(db, "statistics", "main");
@@ -284,30 +397,66 @@ async function loadDashboardStats() {
             await getDoc(statsRef);
 
 
+        let completedBookings = 0;
+
+
         if (statsSnap.exists()) {
 
             const stats =
                 statsSnap.data();
 
 
-            totalBookingsElement.textContent =
-                stats.totalBookings || 0;
-
-
-            completedEventsElement.textContent =
+            completedBookings =
                 stats.completedEvents || 0;
 
         }
 
-        else {
 
-            totalBookingsElement.textContent =
-                0;
+        // Add newly completed bookings
 
-            completedEventsElement.textContent =
-                0;
+        if (newlyCompleted > 0) {
+
+            completedBookings +=
+                newlyCompleted;
+
+
+            await setDoc(
+                statsRef,
+                {
+                    completedEvents:
+                        completedBookings
+                },
+                {
+                    merge: true
+                }
+            );
 
         }
+
+
+        completedBookingsElement.textContent =
+            completedBookings;
+
+
+        // ================= TOTAL BOOKINGS =================
+
+        let totalBookings = 0;
+
+
+        if (statsSnap.exists()) {
+
+            const stats =
+                statsSnap.data();
+
+
+            totalBookings =
+                stats.totalBookings || 0;
+
+        }
+
+
+        totalBookingsElement.textContent =
+            totalBookings;
 
     }
 
@@ -328,7 +477,7 @@ async function loadDashboardStats() {
         activeBookingsElement.textContent =
             "Error";
 
-        completedEventsElement.textContent =
+        completedBookingsElement.textContent =
             "Error";
 
         totalEventsElement.textContent =
@@ -339,9 +488,18 @@ async function loadDashboardStats() {
 }
 
 
-// Load dashboard statistics
+// ====================== LOAD DASHBOARD ======================
 
 loadDashboardStats();
+
+
+// Refresh every 30 seconds
+
+setInterval(() => {
+
+    loadDashboardStats();
+
+}, 30000);
 
 
 // ====================== LOGOUT ======================
@@ -351,6 +509,16 @@ window.logout = async function () {
     try {
 
         await signOut(auth);
+
+
+        if (inactivityTimer) {
+
+            clearTimeout(inactivityTimer);
+
+            inactivityTimer = null;
+
+        }
+
 
         alert(
             "Logged out successfully!"

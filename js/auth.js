@@ -12,6 +12,99 @@ import {
     setDoc
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
+
+// ====================== INACTIVITY LOGOUT ======================
+
+const INACTIVITY_TIME = 15 * 60 * 1000; // 15 minutes
+
+let inactivityTimer = null;
+
+
+// Start inactivity timer only when a user is logged in
+function startInactivityTimer() {
+
+    if (inactivityTimer) {
+        clearTimeout(inactivityTimer);
+    }
+
+    inactivityTimer = setTimeout(async () => {
+
+        try {
+
+            await signOut(auth);
+
+            alert(
+                "You have been logged out due to inactivity."
+            );
+
+            window.location.href =
+                "customer-login.html";
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Automatic Logout Error:",
+                error
+            );
+
+        }
+
+    }, INACTIVITY_TIME);
+
+}
+
+
+// Reset timer whenever user performs activity
+function resetInactivityTimer() {
+
+    if (auth.currentUser) {
+        startInactivityTimer();
+    }
+
+}
+
+
+// Detect user activity
+[
+    "click",
+    "mousemove",
+    "keydown",
+    "scroll",
+    "touchstart"
+].forEach((event) => {
+
+    document.addEventListener(
+        event,
+        resetInactivityTimer
+    );
+
+});
+
+
+// Check Firebase login state
+auth.onAuthStateChanged((user) => {
+
+    if (user) {
+
+        startInactivityTimer();
+
+    } else {
+
+        if (inactivityTimer) {
+
+            clearTimeout(inactivityTimer);
+
+            inactivityTimer = null;
+
+        }
+
+    }
+
+});
+
+
 // ====================== REGISTRATION ======================
 
 const registerForm = document.getElementById("registerForm");
@@ -22,59 +115,102 @@ if (registerForm) {
 
         e.preventDefault();
 
-        const fullName = document.getElementById("fullName").value;
-        const email = document.getElementById("email").value;
-        const phone = document.getElementById("phone").value;
-        const password = document.getElementById("password").value;
-        const confirmPassword = document.getElementById("confirmPassword").value;
+        const fullName =
+            document.getElementById("fullName").value;
+
+        const email =
+            document.getElementById("email").value;
+
+        const phone =
+            document.getElementById("phone").value;
+
+        const password =
+            document.getElementById("password").value;
+
+        const confirmPassword =
+            document.getElementById("confirmPassword").value;
+
 
         if (password !== confirmPassword) {
+
             alert("Passwords do not match!");
+
             return;
+
         }
+
 
         try {
 
-            const response = await fetch("https://eventsphere-dndh.onrender.com/send-otp", {
+            const response =
+                await fetch(
+                    "https://eventsphere-dndh.onrender.com/send-otp",
+                    {
 
-                method: "POST",
+                        method: "POST",
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
 
-                body: JSON.stringify({
-                    email: email
-                })
+                        body: JSON.stringify({
+                            email: email
+                        })
 
-            });
+                    }
+                );
 
-            const data = await response.json();
+
+            const data =
+                await response.json();
+
 
             if (!data.success) {
+
                 alert(data.message);
+
                 return;
+
             }
 
+
             // Store user details temporarily
-            localStorage.setItem("otpEmail", email);
 
-            localStorage.setItem("registerData", JSON.stringify({
+            localStorage.setItem(
+                "otpEmail",
+                email
+            );
 
-                fullName,
-                email,
-                phone,
-                password
 
-            }));
+            localStorage.setItem(
+                "registerData",
+                JSON.stringify({
 
-            alert("OTP has been sent to your email.");
+                    fullName,
+                    email,
+                    phone,
+                    password
 
-            window.location.href = "otp-verification.html";
+                })
+            );
 
-        } catch (error) {
+
+            alert(
+                "OTP has been sent to your email."
+            );
+
+
+            window.location.href =
+                "otp-verification.html";
+
+
+        }
+
+        catch (error) {
 
             console.error(error);
+
             alert("Server Error");
 
         }
@@ -83,69 +219,154 @@ if (registerForm) {
 
 }
 
+
 // ====================== LOGIN ======================
 
-const loginForm = document.getElementById("loginForm");
+const loginForm =
+    document.getElementById("loginForm");
+
 
 if (loginForm) {
 
-    loginForm.addEventListener("submit", async (e) => {
+    loginForm.addEventListener(
+        "submit",
+        async (e) => {
 
-        e.preventDefault();
+            e.preventDefault();
 
-        const email = document.getElementById("loginEmail").value;
-        const password = document.getElementById("loginPassword").value;
 
-        try {
+            const email =
+                document.getElementById(
+                    "loginEmail"
+                ).value;
 
-            await signInWithEmailAndPassword(auth, email, password);
+            const password =
+                document.getElementById(
+                    "loginPassword"
+                ).value;
 
-            alert("Login Successful!");
 
-            window.location.href = "customer-dashboard.html";
+            try {
 
-        } catch (error) {
+                await signInWithEmailAndPassword(
+                    auth,
+                    email,
+                    password
+                );
 
-            alert(error.message);
+
+                alert(
+                    "Login Successful!"
+                );
+
+
+                window.location.href =
+                    "customer-dashboard.html";
+
+
+            }
+
+            catch (error) {
+
+                alert(error.message);
+
+            }
 
         }
-
-    });
+    );
 
 }
+
 
 // ====================== FORGOT PASSWORD ======================
 
-const forgotPassword = document.getElementById("forgotPassword");
+const forgotPassword =
+    document.getElementById(
+        "forgotPassword"
+    );
+
 
 if (forgotPassword) {
 
-    forgotPassword.addEventListener("click", async (e) => {
+    forgotPassword.addEventListener(
+        "click",
+        async (e) => {
 
-        e.preventDefault();
+            e.preventDefault();
 
-        const email = document.getElementById("loginEmail").value;
 
-        if (email === "") {
+            const email =
+                document.getElementById(
+                    "loginEmail"
+                ).value;
 
-            alert("Please enter your email address first.");
 
-            return;
+            if (email === "") {
+
+                alert(
+                    "Please enter your email address first."
+                );
+
+                return;
+
+            }
+
+
+            try {
+
+                await sendPasswordResetEmail(
+                    auth,
+                    email
+                );
+
+
+                alert(
+                    "Password reset email has been sent."
+                );
+
+            }
+
+            catch (error) {
+
+                alert(error.message);
+
+            }
 
         }
-
-        try {
-
-            await sendPasswordResetEmail(auth, email);
-
-            alert("Password reset email has been sent.");
-
-        } catch (error) {
-
-            alert(error.message);
-
-        }
-
-    });
+    );
 
 }
+
+
+// ====================== USER LOGOUT ======================
+
+window.logout = async function () {
+
+    try {
+
+        await signOut(auth);
+
+        if (inactivityTimer) {
+
+            clearTimeout(inactivityTimer);
+
+            inactivityTimer = null;
+
+        }
+
+        alert(
+            "Logged out successfully!"
+        );
+
+        window.location.href =
+            "customer-login.html";
+
+    }
+
+    catch (error) {
+
+        alert(error.message);
+
+    }
+
+};
