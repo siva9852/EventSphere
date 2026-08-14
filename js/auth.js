@@ -15,7 +15,7 @@ import {
 
 // ====================== INACTIVITY LOGOUT ======================
 
-const INACTIVITY_TIME = 1 * 60 * 1000; // 1 minute
+const INACTIVITY_TIME = 30 * 60 * 1000; // 30 minutes
 
 let inactivityTimer = null;
 
