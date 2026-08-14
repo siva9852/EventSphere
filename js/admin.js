@@ -232,7 +232,6 @@ if (adminLoginForm) {
 
 }
 
-
 // ====================== DASHBOARD STATISTICS ======================
 
 async function loadDashboardStats() {
@@ -262,9 +261,7 @@ async function loadDashboardStats() {
         !completedBookingsElement ||
         !totalEventsElement
     ) {
-
         return;
-
     }
 
 
@@ -277,24 +274,17 @@ async function loadDashboardStats() {
                 collection(db, "users")
             );
 
-
         let totalCustomers = 0;
-
 
         usersSnapshot.forEach((userDoc) => {
 
-            const user =
-                userDoc.data();
-
+            const user = userDoc.data();
 
             if (user.role === "user") {
-
                 totalCustomers++;
-
             }
 
         });
-
 
         totalCustomersElement.textContent =
             totalCustomers;
@@ -307,7 +297,6 @@ async function loadDashboardStats() {
                 collection(db, "events")
             );
 
-
         totalEventsElement.textContent =
             eventsSnapshot.size;
 
@@ -319,32 +308,26 @@ async function loadDashboardStats() {
                 collection(db, "bookings")
             );
 
-
-        const now =
-            new Date();
-
+        const now = new Date();
 
         let activeBookings = 0;
+        let completedBookings = 0;
 
-        let newlyCompleted = 0;
+
+        bookingsSnapshot.forEach((bookingDoc) => {
+
+            const booking = bookingDoc.data();
 
 
-        for (
-            const bookingDoc of bookingsSnapshot.docs
-        ) {
-
-            const booking =
-                bookingDoc.data();
-
+            // If event date is missing,
+            // don't count it as active/completed
 
             if (!booking.eventDate) {
-
-                continue;
-
+                return;
             }
 
 
-            // Customer-selected end time
+            // Event end time
 
             const eventEndTime =
                 booking.eventEndTime || "20:00";
@@ -356,107 +339,37 @@ async function loadDashboardStats() {
                 );
 
 
+            // ================= COMPLETED =================
+
+            if (now >= eventEnd) {
+
+                completedBookings++;
+
+            }
+
+
             // ================= ACTIVE =================
 
-            if (now < eventEnd) {
+            else {
 
                 activeBookings++;
 
             }
 
+        });
 
-            // ================= COMPLETED =================
 
-            else {
+        // ================= DISPLAY COUNTS =================
 
-                newlyCompleted++;
-
-                console.log(
-                    "Completed booking:",
-                    booking.eventName,
-                    booking.eventDate,
-                    eventEndTime
-                );
-
-            }
-
-        }
-
+        totalBookingsElement.textContent =
+            bookingsSnapshot.size;
 
         activeBookingsElement.textContent =
             activeBookings;
 
-
-        // ================= STATISTICS =================
-
-        const statsRef =
-            doc(db, "statistics", "main");
-
-
-        const statsSnap =
-            await getDoc(statsRef);
-
-
-        let completedBookings = 0;
-
-
-        if (statsSnap.exists()) {
-
-            const stats =
-                statsSnap.data();
-
-
-            completedBookings =
-                stats.completedEvents || 0;
-
-        }
-
-
-        // Add newly completed bookings
-
-        if (newlyCompleted > 0) {
-
-            completedBookings +=
-                newlyCompleted;
-
-
-            await setDoc(
-                statsRef,
-                {
-                    completedEvents:
-                        completedBookings
-                },
-                {
-                    merge: true
-                }
-            );
-
-        }
-
-
         completedBookingsElement.textContent =
             completedBookings;
 
-
-        // ================= TOTAL BOOKINGS =================
-
-        let totalBookings = 0;
-
-
-        if (statsSnap.exists()) {
-
-            const stats =
-                statsSnap.data();
-
-
-            totalBookings =
-                stats.totalBookings || 0;
-
-        }
-
-
-        totalBookingsElement.textContent =
-            totalBookings;
 
     }
 
@@ -510,20 +423,9 @@ window.logout = async function () {
 
         await signOut(auth);
 
-
-        if (inactivityTimer) {
-
-            clearTimeout(inactivityTimer);
-
-            inactivityTimer = null;
-
-        }
-
-
         alert(
             "Logged out successfully!"
         );
-
 
         window.location.href =
             "admin-login.html";
