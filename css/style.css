@@ -1643,3 +1643,204 @@ body{
     }
 
 }
+
+/* ================= CUSTOMER EVENTS PAGE ================= */
+
+.customer-events-page {
+    padding: 45px;
+    background: #f7f8fc;
+    min-height: 100vh;
+}
+
+
+/* HEADING */
+
+.events-heading {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    margin-bottom: 30px;
+}
+
+.events-heading-icon {
+    width: 90px;
+    height: 90px;
+    border-radius: 22px;
+    background: #eef2ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.events-heading-icon i {
+    font-size: 42px;
+    color: #2563eb;
+}
+
+.events-heading h1 {
+    margin: 0;
+    font-size: 36px;
+    color: #20458f;
+}
+
+.events-heading p {
+    margin-top: 8px;
+    font-size: 16px;
+    color: #555;
+}
+
+
+/* MEDIUM EVENTS GRID */
+
+.events-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(300px, 620px));
+    gap: 22px;
+}
+
+
+/* MEDIUM EVENT CARD */
+
+.event-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+}
+
+
+/* MEDIUM IMAGE */
+
+.event-image-container {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+}
+
+.event-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+
+/* CONTENT */
+
+.event-card-content {
+    padding: 20px;
+}
+
+.event-card-content h2 {
+    margin: 0 0 14px 0;
+    color: #20458f;
+    font-size: 23px;
+}
+
+
+/* INFO */
+
+.event-info {
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.event-info p {
+    margin: 4px 0;
+    color: #444;
+    font-size: 15px;
+}
+
+.event-info i {
+    color: #2563eb;
+    margin-right: 6px;
+}
+
+
+/* DESCRIPTION */
+
+.event-description {
+    color: #555;
+    line-height: 1.5;
+    margin: 15px 0;
+    font-size: 15px;
+}
+
+
+/* BOOK BUTTON */
+
+.book-event-button {
+    background: #155eef;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    padding: 11px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.book-event-button:hover {
+    background: #0d4fd8;
+}
+
+.book-event-button i {
+    margin-right: 7px;
+}
+
+
+/* NO EVENTS */
+
+.no-events {
+    background: white;
+    border-radius: 16px;
+    padding: 50px;
+    text-align: center;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+    grid-column: 1 / -1;
+}
+
+
+/* ACTIVE SIDEBAR */
+
+.sidebar li.active {
+    background: rgba(0, 0, 0, 0.18);
+    border-radius: 12px;
+}
+
+.sidebar li.active a {
+    color: white;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+
+    .events-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .customer-events-page {
+        padding: 25px;
+    }
+
+    .events-heading-icon {
+        width: 70px;
+        height: 70px;
+    }
+
+    .events-heading-icon i {
+        font-size: 32px;
+    }
+
+    .events-heading h1 {
+        font-size: 28px;
+    }
+
+}

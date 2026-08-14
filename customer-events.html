@@ -11,11 +11,16 @@
 
     <link rel="stylesheet" href="css/style.css">
 
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
 </head>
 
 <body>
 
 <div class="dashboard">
+
+    <!-- SIDEBAR -->
 
     <div class="sidebar">
 
@@ -23,24 +28,61 @@
 
         <ul>
 
-            <li><a href="customer-dashboard.html">🏠 Dashboard</a></li>
+            <li>
+                <a href="customer-dashboard.html">
+                    🏠 Dashboard
+                </a>
+            </li>
 
-            <li><a href="customer-events.html">🎉 Events</a></li>
+            <li class="active">
+                <a href="customer-events.html">
+                    🎉 Events
+                </a>
+            </li>
 
-            <li><a href="#">📅 My Bookings</a></li>
+            <li>
+                <a href="my-bookings.html">
+                    📅 My Bookings
+                </a>
+            </li>
 
-            <li><a href="#" onclick="logout()">🚪 Logout</a></li>
+            <li>
+                <a href="#" onclick="logout()">
+                    🚪 Logout
+                </a>
+            </li>
 
         </ul>
 
     </div>
 
 
-    <div class="dashboard-content">
+    <!-- MAIN CONTENT -->
 
-        <h1>Available Events</h1>
+    <div class="dashboard-content customer-events-page">
 
-        <div id="eventsContainer">
+        <div class="events-heading">
+
+            <div class="events-heading-icon">
+                <i class="fa-solid fa-calendar-days"></i>
+            </div>
+
+            <div>
+
+                <h1>Available Events</h1>
+
+                <p>
+                    Explore our available events and book your favorite one.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- EVENTS -->
+
+        <div id="eventsContainer" class="events-grid">
 
             <p>Loading events...</p>
 

@@ -6,20 +6,42 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
-const eventsContainer = document.getElementById("eventsContainer");
+const eventsContainer =
+    document.getElementById("eventsContainer");
 
+
+// ====================== LOAD EVENTS ======================
 
 async function loadEvents() {
 
     try {
 
-        const querySnapshot = await getDocs(collection(db, "events"));
+        const querySnapshot =
+            await getDocs(
+                collection(db, "events")
+            );
+
 
         eventsContainer.innerHTML = "";
 
+
         if (querySnapshot.empty) {
 
-            eventsContainer.innerHTML = "<p>No events available.</p>";
+            eventsContainer.innerHTML = `
+
+                <div class="no-events">
+
+                    <i class="fa-solid fa-calendar-xmark"></i>
+
+                    <h2>No Events Available</h2>
+
+                    <p>
+                        There are currently no events available.
+                    </p>
+
+                </div>
+
+            `;
 
             return;
 
@@ -28,43 +50,89 @@ async function loadEvents() {
 
         querySnapshot.forEach((eventDoc) => {
 
-            const event = eventDoc.data();
+            const event =
+                eventDoc.data();
 
-            const eventCard = document.createElement("div");
 
-            eventCard.className = "card";
+            const eventCard =
+                document.createElement("div");
+
+
+            eventCard.className =
+                "event-card";
+
 
             eventCard.innerHTML = `
 
-                <img
-                    src="${event.image}"
-                    alt="${event.eventName}"
-                    style="width:250px; height:150px; object-fit:cover;"
-                >
+                <div class="event-image-container">
 
-                <h2>${event.eventName}</h2>
+                    <img
+                        src="${event.image}"
+                        alt="${event.eventName}"
+                        class="event-image"
+                    >
 
-                <p>
-                    <strong>Category:</strong>
-                    ${event.category}
-                </p>
+                </div>
 
-                <p>
-                    <strong>Price:</strong>
-                    ₹${event.price}
-                </p>
 
-                <p>${event.description}</p>
+                <div class="event-card-content">
 
-                <button onclick="bookEvent('${eventDoc.id}')">
-                    Book Now
-                </button>
+                    <h2>
+                        ${event.eventName}
+                    </h2>
 
-                <hr>
+
+                    <div class="event-info">
+
+                        <p>
+
+                            <i class="fa-solid fa-tag"></i>
+
+                            <strong>Category:</strong>
+
+                            ${event.category}
+
+                        </p>
+
+
+                        <p>
+
+                            <i class="fa-solid fa-indian-rupee-sign"></i>
+
+                            <strong>Price:</strong>
+
+                            ₹${event.price}
+
+                        </p>
+
+                    </div>
+
+
+                    <p class="event-description">
+
+                        ${event.description}
+
+                    </p>
+
+
+                    <button
+                        class="book-event-button"
+                        onclick="bookEvent('${eventDoc.id}')">
+
+                        <i class="fa-solid fa-calendar-check"></i>
+
+                        Book Now
+
+                    </button>
+
+                </div>
 
             `;
 
-            eventsContainer.appendChild(eventCard);
+
+            eventsContainer.appendChild(
+                eventCard
+            );
 
         });
 
@@ -74,21 +142,43 @@ async function loadEvents() {
 
         console.error(error);
 
-        eventsContainer.innerHTML =
-            "<p>Error loading events.</p>";
+
+        eventsContainer.innerHTML = `
+
+            <div class="no-events">
+
+                <i class="fa-solid fa-circle-exclamation"></i>
+
+                <h2>Error Loading Events</h2>
+
+                <p>
+                    Please try again later.
+                </p>
+
+            </div>
+
+        `;
 
     }
 
 }
 
 
+// ====================== BOOK EVENT ======================
+
 window.bookEvent = function(eventId) {
 
-    localStorage.setItem("selectedEventId", eventId);
+    localStorage.setItem(
+        "selectedEventId",
+        eventId
+    );
 
-    window.location.href = "booking.html";
+    window.location.href =
+        "booking.html";
 
 };
 
+
+// ====================== START ======================
 
 loadEvents();
