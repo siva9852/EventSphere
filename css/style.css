@@ -1861,3 +1861,431 @@ body{
 .delete-event-button:hover {
     background: #c62828;
 }
+
+.otp-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background:
+        linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
+        url("images/hero.jpg") center/cover;
+}
+
+.otp-box {
+    width: 400px;
+    padding: 35px;
+    text-align: center;
+    border-radius: 22px;
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+}
+
+.admin-icon {
+    width: 60px;
+    height: 60px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #2855c7;
+    color: white;
+    font-size: 28px;
+}
+
+.otp-box h1 {
+    color: #21458f;
+    font-size: 32px;
+    margin: 18px 0 10px;
+}
+
+.otp-box p {
+    color: #52627a;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.otp-line {
+    width: 70px;
+    height: 3px;
+    background: #2855c7;
+    margin: 18px auto 25px;
+    border-radius: 5px;
+}
+
+.otp-box input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 15px;
+    border: 1px solid #d5dce8;
+    border-radius: 10px;
+    font-size: 16px;
+    background: rgba(255,255,255,0.7);
+}
+
+.otp-box button[type="submit"] {
+    width: 100%;
+    padding: 14px;
+    margin-top: 18px;
+    border: none;
+    border-radius: 10px;
+    background: #2855c7;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.otp-box button[type="submit"]:hover {
+    background: #1d43a5;
+}
+
+.resend-text {
+    margin-top: 25px !important;
+    margin-bottom: 5px;
+}
+
+.resend-button {
+    color: #1749b5;
+    font-size: 16px !important;
+    font-weight: bold;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer;
+    padding: 8px !important;
+    margin-top: 0 !important;
+}
+
+.secure-text {
+    margin-top: 35px;
+    color: #667085;
+    font-size: 14px;
+}
+.otp-inputs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.otp-digit {
+    width: 48px !important;
+    height: 55px;
+    padding: 0 !important;
+    text-align: center;
+    font-size: 22px !important;
+    font-weight: bold;
+    border: 1px solid #d5dce8;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.8);
+}
+
+.otp-digit:focus {
+    outline: 2px solid #2855c7;
+    border-color: #2855c7;
+}
+
+/* ================= CUSTOMER REGISTER ================= */
+
+.register-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #eef0f3;
+}
+
+.register-box {
+    width: 460px;
+    padding: 38px 45px;
+    text-align: center;
+    border-radius: 24px;
+    background: rgba(255,255,255,0.92);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.18);
+}
+
+.register-icon {
+    width: 70px;
+    height: 70px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #e8efff;
+    color: #2855c7;
+    font-size: 30px;
+}
+
+.register-box h1 {
+    color: #21458f;
+    font-size: 38px;
+    margin: 25px 0 10px;
+}
+
+.register-box > p {
+    color: #52627a;
+    font-size: 17px;
+    line-height: 1.5;
+}
+
+.register-line {
+    width: 70px;
+    height: 4px;
+    background: #2855c7;
+    margin: 22px auto 35px;
+    border-radius: 5px;
+}
+
+.register-input {
+    height: 58px;
+    margin-bottom: 16px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    background: white;
+    border: 1px solid #d5dce8;
+    border-radius: 11px;
+}
+
+.register-input > i:first-child {
+    color: #718096;
+    margin-right: 13px;
+    font-size: 20px;
+}
+
+.register-input input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 17px;
+}
+
+.register-input .password-eye {
+    margin: 0;
+    color: #718096;
+    cursor: pointer;
+    font-size: 19px;
+}
+
+.register-box button[type="submit"] {
+    width: 100%;
+    padding: 15px;
+    margin-top: 8px;
+    border: none;
+    border-radius: 10px;
+    background: #2855c7;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.register-box button[type="submit"]:hover {
+    background: #1d43a5;
+}
+
+.register-link {
+    margin-top: 22px !important;
+}
+
+.register-link a {
+    color: #1749b5;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* Fix password icons */
+
+.register-input.password-box {
+    position: relative;
+}
+
+.register-input.password-box > i:first-child {
+    position: static;
+    margin-right: 13px;
+}
+
+.register-input.password-box input {
+    flex: 1;
+    width: auto;
+}
+
+.register-input.password-box .password-eye {
+    position: static;
+    margin-left: 10px;
+    flex-shrink: 0;
+}
+
+/* ================= CUSTOMER OTP ================= */
+
+.customer-otp-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background:
+        linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)),
+        url("../images/hero.jpg") center/cover;
+
+    padding: 20px;
+}
+
+.customer-otp-box {
+    width: 500px;
+    padding: 30px;
+    text-align: center;
+
+    background: rgba(255,255,255,0.95);
+    border-radius: 20px;
+
+    box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+}
+
+.customer-otp-icon {
+    width: 50px;
+    height: 50px;
+    margin: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    background: #eaf0ff;
+
+    font-size: 22px;
+}
+
+.customer-otp-box h1 {
+    color: #21458f;
+    font-size: 32px;
+    margin: 18px 0 8px;
+}
+
+.customer-otp-box > p {
+    color: #52627a;
+    font-size: 16px;
+}
+
+.customer-otp-input {
+    display: flex;
+    align-items: center;
+
+    margin-top: 25px;
+
+    border: 1px solid #d5dce8;
+    border-radius: 10px;
+
+    padding: 0 15px;
+}
+
+.customer-otp-input span {
+    font-size: 17px;
+}
+
+.customer-otp-input input {
+    width: 100%;
+    border: none;
+    outline: none;
+
+    padding: 14px;
+    font-size: 16px;
+}
+
+.customer-otp-box form button {
+    width: 100%;
+    margin-top: 18px;
+
+    padding: 14px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #2855c7;
+    color: white;
+
+    font-size: 17px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.customer-otp-box form button:hover {
+    background: #1d43a5;
+}
+
+.customer-resend-button {
+    width: 100%;
+
+    margin-top: 15px;
+    padding: 13px;
+
+    border: 1px solid #2855c7;
+    border-radius: 10px;
+
+    background: white;
+    color: #2855c7;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.customer-resend-button:hover {
+    background: #f1f5ff;
+}
+
+.otp-timer {
+    margin-top: 20px;
+    color: #667085;
+    font-size: 15px;
+}
+
+.otp-timer strong {
+    color: #2855c7;
+}
+
+/* ================= CUSTOMER OTP BOXES ================= */
+
+.customer-otp-input {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 25px;
+    border: none;
+    padding: 0;
+}
+
+.otp-box-input {
+    width: 52px;
+    height: 58px;
+
+    text-align: center;
+
+    background: #ffffff;
+
+    border: 2px solid #8fa3c2;
+    border-radius: 10px;
+
+    font-size: 22px;
+    font-weight: bold;
+    color: #21458f;
+
+    outline: none;
+    box-sizing: border-box;
+
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.otp-box-input:focus {
+    border: 2px solid #2855c7;
+    box-shadow: 0 0 0 3px rgba(40,85,199,0.15);
+}

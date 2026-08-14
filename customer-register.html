@@ -2,51 +2,82 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Customer Register - EventSphere</title>
 
     <link rel="stylesheet" href="css/style.css">
 
-    <!-- Font Awesome -->
     <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 </head>
 
 <body>
 
-<div class="login-page">
+<div class="register-page">
 
-    <div class="login-box">
+    <div class="register-box">
+
+        <div class="register-icon">
+            <i class="fa-solid fa-user-plus"></i>
+        </div>
 
         <h1>Create Account</h1>
 
-        <p>Join EventSphere and start booking your dream events.</p>
+        <p>
+            Join EventSphere and start booking your dream events.
+        </p>
+
+        <div class="register-line"></div>
+
 
         <form id="registerForm">
 
-            <input
-                type="text"
-                id="fullName"
-                placeholder="Full Name"
-                required>
+            <div class="register-input">
 
-            <input
-                type="email"
-                id="email"
-                placeholder="Email Address"
-                required>
+                <i class="fa-solid fa-user"></i>
 
-            <input
-                type="tel"
-                id="phone"
-                placeholder="Phone Number"
-                required>
+                <input
+                    type="text"
+                    id="fullName"
+                    placeholder="Full Name"
+                    required>
 
-            <!-- Password -->
+            </div>
 
-            <div class="password-box">
+
+            <div class="register-input">
+
+                <i class="fa-solid fa-envelope"></i>
+
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Email Address"
+                    required>
+
+            </div>
+
+
+            <div class="register-input">
+
+                <i class="fa-solid fa-phone"></i>
+
+                <input
+                    type="tel"
+                    id="phone"
+                    placeholder="Phone Number"
+                    required>
+
+            </div>
+
+
+            <div class="register-input password-box">
+
+                <i class="fa-solid fa-key"></i>
 
                 <input
                     type="password"
@@ -54,13 +85,15 @@
                     placeholder="Password"
                     required>
 
-                <i class="fa-solid fa-eye" id="togglePassword"></i>
+                <i class="fa-solid fa-eye password-eye"
+                    id="togglePassword"></i>
 
             </div>
 
-            <!-- Confirm Password -->
 
-            <div class="password-box">
+            <div class="register-input password-box">
+
+                <i class="fa-solid fa-key"></i>
 
                 <input
                     type="password"
@@ -68,9 +101,11 @@
                     placeholder="Confirm Password"
                     required>
 
-                <i class="fa-solid fa-eye" id="toggleConfirmPassword"></i>
+                <i class="fa-solid fa-eye password-eye"
+                    id="toggleConfirmPassword"></i>
 
             </div>
+
 
             <button type="submit">
                 Create Account
@@ -78,32 +113,41 @@
 
         </form>
 
+
         <p class="register-link">
+
             Already have an account?
+
             <a href="customer-login.html">
                 Login Here
             </a>
+
         </p>
 
     </div>
 
 </div>
 
+
 <script>
 
-const togglePassword = document.getElementById("togglePassword");
-const password = document.getElementById("password");
+const togglePassword =
+    document.getElementById("togglePassword");
+
+const password =
+    document.getElementById("password");
+
 
 togglePassword.addEventListener("click", () => {
 
-    if(password.type === "password"){
+    if (password.type === "password") {
 
         password.type = "text";
 
         togglePassword.classList.remove("fa-eye");
         togglePassword.classList.add("fa-eye-slash");
 
-    }else{
+    } else {
 
         password.type = "password";
 
@@ -114,19 +158,24 @@ togglePassword.addEventListener("click", () => {
 
 });
 
-const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
-const confirmPassword = document.getElementById("confirmPassword");
+
+const toggleConfirmPassword =
+    document.getElementById("toggleConfirmPassword");
+
+const confirmPassword =
+    document.getElementById("confirmPassword");
+
 
 toggleConfirmPassword.addEventListener("click", () => {
 
-    if(confirmPassword.type === "password"){
+    if (confirmPassword.type === "password") {
 
         confirmPassword.type = "text";
 
         toggleConfirmPassword.classList.remove("fa-eye");
         toggleConfirmPassword.classList.add("fa-eye-slash");
 
-    }else{
+    } else {
 
         confirmPassword.type = "password";
 
@@ -138,6 +187,7 @@ toggleConfirmPassword.addEventListener("click", () => {
 });
 
 </script>
+
 
 <script type="module" src="js/firebase-config.js"></script>
 <script type="module" src="js/auth.js"></script>
