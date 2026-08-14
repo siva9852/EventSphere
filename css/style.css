@@ -2289,3 +2289,136 @@ body{
     border: 2px solid #2855c7;
     box-shadow: 0 0 0 3px rgba(40,85,199,0.15);
 }
+
+/* ================= ADMIN LOGIN ================= */
+
+.admin-login-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background:
+        linear-gradient(rgba(10,25,55,0.45), rgba(10,25,55,0.45)),
+        url("../images/hero.jpg") center/cover;
+
+    padding: 20px;
+}
+
+.admin-login-box {
+    width: 480px;
+    padding: 45px;
+
+    text-align: center;
+
+    background: rgba(255,255,255,0.94);
+    backdrop-filter: blur(12px);
+
+    border-radius: 24px;
+
+    box-shadow: 0 20px 50px rgba(0,0,0,0.28);
+}
+
+.admin-login-icon {
+    width: 68px;
+    height: 68px;
+
+    margin: 0 auto 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #eaf0ff;
+    color: #2855c7;
+
+    font-size: 30px;
+}
+
+.admin-login-box h1 {
+    color: #21458f;
+    font-size: 38px;
+    margin: 5px 0 10px;
+}
+
+.admin-login-box > p {
+    color: #52627a;
+    font-size: 17px;
+    margin-bottom: 28px;
+}
+
+.admin-login-box input {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 16px;
+    margin-bottom: 16px;
+
+    border: 1px solid #d5dce8;
+    border-radius: 11px;
+
+    font-size: 17px;
+    outline: none;
+
+    background: white;
+}
+
+.admin-login-box input:focus {
+    border-color: #2855c7;
+}
+
+.admin-login-box .password-box {
+    position: relative;
+}
+
+.admin-login-box .password-box input {
+    padding-right: 48px;
+}
+
+.admin-login-box .password-box i {
+    position: absolute;
+
+    right: 16px;
+    top: 18px;
+
+    color: #718096;
+
+    cursor: pointer;
+}
+
+.admin-login-box button[type="submit"] {
+    width: 100%;
+
+    padding: 16px;
+
+    border: none;
+    border-radius: 11px;
+
+    background: linear-gradient(90deg, #2855c7, #1769e0);
+
+    color: white;
+
+    font-size: 18px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.admin-login-box button[type="submit"]:hover {
+    background: #1d43a5;
+}
+
+.admin-secure {
+    margin-top: 25px;
+
+    color: #667085;
+
+    font-size: 14px;
+}
+
+.admin-secure i {
+    color: #2855c7;
+    margin-right: 5px;
+}
