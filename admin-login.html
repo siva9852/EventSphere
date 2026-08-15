@@ -24,9 +24,7 @@
 
 <div class="admin-login-page">
 
-
     <div class="admin-login-box">
-
 
         <div class="admin-login-icon">
 
@@ -93,7 +91,6 @@
             Secure Admin Access
 
         </div>
-
 
     </div>
 
@@ -174,47 +171,6 @@ toggleAdminPassword.addEventListener(
 
 <script type="module"
         src="js/admin.js">
-</script>
-
-
-<!-- ================= PREVENT BACK TO LOGIN ================= -->
-
-<script type="module">
-
-import { auth }
-    from "./js/firebase-config.js";
-
-
-auth.onAuthStateChanged(
-    (user) => {
-
-        if (user) {
-
-            window.location.replace(
-                "admin-dashboard.html"
-            );
-
-        }
-
-    }
-);
-
-
-window.addEventListener(
-    "pageshow",
-    () => {
-
-        if (auth.currentUser) {
-
-            window.location.replace(
-                "admin-dashboard.html"
-            );
-
-        }
-
-    }
-);
-
 </script>
 
 

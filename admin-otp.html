@@ -21,9 +21,7 @@
 
 <div class="otp-page">
 
-
     <div class="otp-box">
-
 
         <div class="admin-icon">
             🛡️
@@ -36,11 +34,8 @@
 
 
         <p>
-
             Enter the OTP sent to your admin email<br>
-
             to access the dashboard.
-
         </p>
 
 
@@ -49,9 +44,7 @@
 
         <form id="adminOtpForm">
 
-
             <div class="otp-inputs">
-
 
                 <input
                     type="text"
@@ -61,6 +54,11 @@
                     inputmode="numeric"
                     autocomplete="one-time-code">
 
+                <input
+                    type="text"
+                    maxlength="1"
+                    class="otp-digit"
+                    inputmode="numeric">
 
                 <input
                     type="text"
@@ -68,27 +66,17 @@
                     class="otp-digit"
                     inputmode="numeric">
 
-
                 <input
                     type="text"
                     maxlength="1"
                     class="otp-digit"
                     inputmode="numeric">
 
-
                 <input
                     type="text"
                     maxlength="1"
                     class="otp-digit"
                     inputmode="numeric">
-
-
-                <input
-                    type="text"
-                    maxlength="1"
-                    class="otp-digit"
-                    inputmode="numeric">
-
 
                 <input
                     type="text"
@@ -105,19 +93,14 @@
 
 
             <button type="submit">
-
                 Verify OTP
-
             </button>
-
 
         </form>
 
 
         <p class="resend-text">
-
             Didn't receive the OTP?
-
         </p>
 
 
@@ -135,7 +118,6 @@
             🔒 Secure access to your admin dashboard
 
         </div>
-
 
     </div>
 
@@ -159,26 +141,12 @@ const hiddenOtp =
     );
 
 
-function updateHiddenOTP() {
-
-    hiddenOtp.value =
-        Array.from(otpInputs)
-            .map(
-                input => input.value
-            )
-            .join("");
-
-}
-
-
 otpInputs.forEach(
     (input, index) => {
-
 
         input.addEventListener(
             "input",
             () => {
-
 
                 input.value =
                     input.value.replace(
@@ -200,7 +168,12 @@ otpInputs.forEach(
                 }
 
 
-                updateHiddenOTP();
+                hiddenOtp.value =
+                    Array.from(otpInputs)
+                        .map(
+                            input => input.value
+                        )
+                        .join("");
 
             }
         );
@@ -209,7 +182,6 @@ otpInputs.forEach(
         input.addEventListener(
             "keydown",
             (e) => {
-
 
                 if (
                     e.key === "Backspace" &&
@@ -226,7 +198,6 @@ otpInputs.forEach(
             }
         );
 
-
     }
 );
 
@@ -242,48 +213,32 @@ otpInputs.forEach(
 
 
 
-<!-- ================= PREVENT OLD OTP PAGE ================= -->
+<!-- ================= CHECK OTP SESSION ================= -->
 
 <script type="module">
 
-import { auth }
-    from "./js/firebase-config.js";
+const adminOtpEmail =
+    localStorage.getItem(
+        "adminOtpEmail"
+    );
 
 
-auth.onAuthStateChanged(
-    (user) => {
+/*
+ * Only check whether the OTP process
+ * was started.
+ *
+ * DO NOT check Firebase auth here,
+ * because Firebase login happens before
+ * OTP verification.
+ */
 
-        /*
-         * If the admin is already authenticated,
-         * don't allow the OTP page to remain visible.
-         */
+if (!adminOtpEmail) {
 
-        if (user) {
+    window.location.replace(
+        "admin-login.html"
+    );
 
-            window.location.replace(
-                "admin-dashboard.html"
-            );
-
-        }
-
-    }
-);
-
-
-window.addEventListener(
-    "pageshow",
-    () => {
-
-        if (auth.currentUser) {
-
-            window.location.replace(
-                "admin-dashboard.html"
-            );
-
-        }
-
-    }
-);
+}
 
 </script>
 

@@ -34,6 +34,14 @@ function startInactivityTimer() {
 
             await signOut(auth);
 
+            sessionStorage.removeItem(
+                "adminOtpVerified"
+            );
+
+            localStorage.removeItem(
+                "adminOtpEmail"
+            );
+
             alert(
                 "You have been logged out due to inactivity."
             );
@@ -89,7 +97,7 @@ function resetInactivityTimer() {
 });
 
 
-// Check authentication state
+// ====================== AUTH STATE ======================
 
 auth.onAuthStateChanged((user) => {
 
@@ -134,7 +142,8 @@ if (adminLoginForm) {
             const email =
                 document.getElementById(
                     "adminEmail"
-                ).value;
+                ).value.trim();
+
 
             const password =
                 document.getElementById(
@@ -143,6 +152,19 @@ if (adminLoginForm) {
 
 
             try {
+
+                // Clear any old OTP verification
+
+                sessionStorage.removeItem(
+                    "adminOtpVerified"
+                );
+
+                localStorage.removeItem(
+                    "adminOtpEmail"
+                );
+
+
+                // ================= LOGIN =================
 
                 const userCredential =
                     await signInWithEmailAndPassword(
@@ -230,6 +252,8 @@ if (adminLoginForm) {
                 }
 
 
+                // Store email for OTP verification
+
                 localStorage.setItem(
                     "adminOtpEmail",
                     email
@@ -243,9 +267,10 @@ if (adminLoginForm) {
 
                 /*
                  * IMPORTANT:
-                 * Use replace() so the old
-                 * admin login page is not kept
-                 * in browser history.
+                 * Do not set adminOtpVerified here.
+                 *
+                 * It will only be set after the
+                 * correct OTP is entered.
                  */
 
                 window.location.replace(
@@ -255,6 +280,12 @@ if (adminLoginForm) {
             }
 
             catch (error) {
+
+                console.error(
+                    "Admin Login Error:",
+                    error
+                );
+
 
                 alert(
                     error.message
@@ -277,20 +308,24 @@ async function loadDashboardStats() {
             "totalCustomers"
         );
 
+
     const totalBookingsElement =
         document.getElementById(
             "totalBookings"
         );
+
 
     const activeBookingsElement =
         document.getElementById(
             "activeBookings"
         );
 
+
     const completedBookingsElement =
         document.getElementById(
             "completedBookings"
         );
+
 
     const totalEventsElement =
         document.getElementById(
@@ -337,8 +372,8 @@ async function loadDashboardStats() {
 
 
                 if (
-                    user.role ===
-                    "user"
+                    user.role === "user" ||
+                    user.role === "customer"
                 ) {
 
                     totalCustomers++;
@@ -462,14 +497,18 @@ async function loadDashboardStats() {
         totalCustomersElement.textContent =
             "Error";
 
+
         totalBookingsElement.textContent =
             "Error";
+
 
         activeBookingsElement.textContent =
             "Error";
 
+
         completedBookingsElement.textContent =
             "Error";
+
 
         totalEventsElement.textContent =
             "Error";
@@ -503,8 +542,18 @@ window.logout =
 
         try {
 
-            await signOut(
-                auth
+            await signOut(auth);
+
+
+            // Clear admin OTP session
+
+            sessionStorage.removeItem(
+                "adminOtpVerified"
+            );
+
+
+            localStorage.removeItem(
+                "adminOtpEmail"
             );
 
 
@@ -512,11 +561,6 @@ window.logout =
                 "Logged out successfully!"
             );
 
-
-            /*
-             * Prevent returning to the
-             * admin dashboard using Back.
-             */
 
             window.location.replace(
                 "admin-login.html"

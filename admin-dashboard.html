@@ -22,8 +22,6 @@
 <div class="dashboard">
 
 
-    <!-- ================= SIDEBAR ================= -->
-
     <div class="sidebar">
 
         <h2>
@@ -83,10 +81,7 @@
 
 
 
-    <!-- ================= DASHBOARD CONTENT ================= -->
-
     <div class="dashboard-content">
-
 
         <h1>
             Admin Dashboard
@@ -103,18 +98,14 @@
         </p>
 
 
-
         <div class="cards">
 
-
-            <!-- TOTAL CUSTOMERS -->
 
             <div class="card">
 
                 <h3>
                     👥 Total Customers
                 </h3>
-
 
                 <p id="totalCustomers">
                     Loading...
@@ -123,15 +114,11 @@
             </div>
 
 
-
-            <!-- TOTAL BOOKINGS -->
-
             <div class="card">
 
                 <h3>
                     📅 Total Bookings
                 </h3>
-
 
                 <p id="totalBookings">
                     Loading...
@@ -140,15 +127,11 @@
             </div>
 
 
-
-            <!-- ACTIVE BOOKINGS -->
-
             <div class="card">
 
                 <h3>
                     🟢 Active Bookings
                 </h3>
-
 
                 <p id="activeBookings">
                     Loading...
@@ -157,15 +140,11 @@
             </div>
 
 
-
-            <!-- COMPLETED BOOKINGS -->
-
             <div class="card">
 
                 <h3>
                     ✅ Completed Bookings
                 </h3>
-
 
                 <p id="completedBookings">
                     Loading...
@@ -174,15 +153,11 @@
             </div>
 
 
-
-            <!-- TOTAL EVENTS -->
-
             <div class="card">
 
                 <h3>
                     🎉 Total Events
                 </h3>
-
 
                 <p id="totalEvents">
                     Loading...
@@ -199,49 +174,73 @@
 
 
 
-<!-- ================= ADMIN BACK BUTTON PROTECTION ================= -->
+<!-- ================= ADMIN AUTH + BACK PROTECTION ================= -->
 
 <script type="module">
 
 import { auth }
     from "./js/firebase-config.js";
 
+import {
+    signOut
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 
-auth.onAuthStateChanged(
-    (user) => {
 
-        /*
-         * If the admin is not logged in,
-         * send them back to admin login.
-         */
+auth.onAuthStateChanged(async (user) => {
 
-        if (!user) {
+    const otpVerified =
+        sessionStorage.getItem(
+            "adminOtpVerified"
+        );
 
-            window.location.replace(
-                "admin-login.html"
-            );
 
-            return;
+    /*
+     * Admin must have:
+     *
+     * 1. Firebase login
+     * 2. Successful OTP verification
+     */
+
+    if (
+        !user ||
+        otpVerified !== "true"
+    ) {
+
+        sessionStorage.removeItem(
+            "adminOtpVerified"
+        );
+
+
+        if (user) {
+
+            await signOut(auth);
 
         }
 
 
-        /*
-         * Add a history entry so pressing
-         * Chrome Back keeps the admin
-         * inside the dashboard.
-         */
-
-        history.pushState(
-            {
-                adminDashboard: true
-            },
-            "",
-            window.location.href
+        window.location.replace(
+            "admin-login.html"
         );
 
+        return;
+
     }
-);
+
+
+    /*
+     * Keep dashboard in browser history
+     * so Back does not leave the dashboard.
+     */
+
+    history.pushState(
+        {
+            adminDashboard: true
+        },
+        "",
+        window.location.href
+    );
+
+});
 
 
 // ====================== BACK BUTTON ======================
@@ -250,12 +249,16 @@ window.addEventListener(
     "popstate",
     () => {
 
-        /*
-         * If admin is logged in,
-         * stay on Admin Dashboard.
-         */
+        const otpVerified =
+            sessionStorage.getItem(
+                "adminOtpVerified"
+            );
 
-        if (auth.currentUser) {
+
+        if (
+            auth.currentUser &&
+            otpVerified === "true"
+        ) {
 
             history.pushState(
                 {

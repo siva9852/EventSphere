@@ -8,16 +8,13 @@ otpInputs.forEach((input, index) => {
 
     input.addEventListener("input", () => {
 
-        input.value =
-            input.value.replace(/\D/g, "");
+        input.value = input.value.replace(/\D/g, "");
 
         if (
             input.value &&
             index < otpInputs.length - 1
         ) {
-
             otpInputs[index + 1].focus();
-
         }
 
         hiddenOtp.value =
@@ -35,9 +32,7 @@ otpInputs.forEach((input, index) => {
             !input.value &&
             index > 0
         ) {
-
             otpInputs[index - 1].focus();
-
         }
 
     });
@@ -65,12 +60,8 @@ adminOtpForm.addEventListener(
 
 
         const email =
-            localStorage.getItem(
-                "adminOtpEmail"
-            );
+            localStorage.getItem("adminOtpEmail");
 
-
-        // Check email
 
         if (!email) {
 
@@ -86,8 +77,6 @@ adminOtpForm.addEventListener(
 
         }
 
-
-        // Check OTP
 
         if (otp.length !== 6) {
 
@@ -114,14 +103,10 @@ adminOtpForm.addEventListener(
                                 "application/json"
                         },
 
-                        body:
-                            JSON.stringify({
-
-                                email: email,
-
-                                otp: otp
-
-                            })
+                        body: JSON.stringify({
+                            email: email,
+                            otp: otp
+                        })
 
                     }
                 );
@@ -131,45 +116,44 @@ adminOtpForm.addEventListener(
                 await response.json();
 
 
-            if (data.success) {
-
-
-                alert(
-                    "Admin OTP Verified Successfully!"
-                );
-
-
-                /*
-                 * Remove OTP information
-                 * after successful verification.
-                 */
-
-                localStorage.removeItem(
-                    "adminOtpEmail"
-                );
-
-
-                /*
-                 * IMPORTANT:
-                 * replace() prevents the old
-                 * OTP page from remaining in
-                 * browser history.
-                 */
-
-                window.location.replace(
-                    "admin-dashboard.html"
-                );
-
-
-            }
-
-            else {
+            if (!data.success) {
 
                 alert(
                     data.message
                 );
 
+                return;
+
             }
+
+
+            // ================= OTP SUCCESS =================
+
+            /*
+             * Mark admin OTP as verified.
+             * The Admin Dashboard will only open
+             * when this value exists.
+             */
+
+            sessionStorage.setItem(
+                "adminOtpVerified",
+                "true"
+            );
+
+
+            localStorage.removeItem(
+                "adminOtpEmail"
+            );
+
+
+            alert(
+                "Admin OTP Verified Successfully!"
+            );
+
+
+            window.location.replace(
+                "admin-dashboard.html"
+            );
 
         }
 
@@ -179,7 +163,6 @@ adminOtpForm.addEventListener(
                 "Admin OTP Error:",
                 error
             );
-
 
             alert(
                 "Server Error"
