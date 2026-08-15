@@ -1,20 +1,32 @@
 const otpInputs = document.querySelectorAll(".otp-digit");
 const hiddenOtp = document.getElementById("adminOtp");
 
+
+// ====================== OTP INPUT ======================
+
 otpInputs.forEach((input, index) => {
 
     input.addEventListener("input", () => {
 
-        input.value = input.value.replace(/\D/g, "");
+        input.value =
+            input.value.replace(/\D/g, "");
 
-        if (input.value && index < otpInputs.length - 1) {
+        if (
+            input.value &&
+            index < otpInputs.length - 1
+        ) {
+
             otpInputs[index + 1].focus();
+
         }
 
         hiddenOtp.value =
-            Array.from(otpInputs).map(i => i.value).join("");
+            Array.from(otpInputs)
+                .map(input => input.value)
+                .join("");
 
     });
+
 
     input.addEventListener("keydown", (e) => {
 
@@ -23,7 +35,9 @@ otpInputs.forEach((input, index) => {
             !input.value &&
             index > 0
         ) {
+
             otpInputs[index - 1].focus();
+
         }
 
     });
@@ -31,61 +45,147 @@ otpInputs.forEach((input, index) => {
 });
 
 
-document.getElementById("adminOtpForm").addEventListener("submit", async (e) => {
+// ====================== ADMIN OTP VERIFICATION ======================
 
-    e.preventDefault();
+const adminOtpForm =
+    document.getElementById("adminOtpForm");
 
-    const otp = Array.from(otpInputs)
-        .map(input => input.value)
-        .join("");
 
-    const email = localStorage.getItem("adminOtpEmail");
+adminOtpForm.addEventListener(
+    "submit",
+    async (e) => {
 
-    if (otp.length !== 6) {
-        alert("Please enter the complete 6-digit OTP.");
-        return;
-    }
+        e.preventDefault();
 
-    try {
 
-        const response = await fetch(
-            "https://eventsphere-dndh.onrender.com/verify-otp",
-            {
-                method: "POST",
+        const otp =
+            Array.from(otpInputs)
+                .map(input => input.value)
+                .join("");
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
 
-                body: JSON.stringify({
-                    email: email,
-                    otp: otp
-                })
-            }
-        );
+        const email =
+            localStorage.getItem(
+                "adminOtpEmail"
+            );
 
-        const data = await response.json();
 
-        if (data.success) {
+        // Check email
 
-            alert("Admin OTP Verified Successfully!");
+        if (!email) {
 
-            localStorage.removeItem("adminOtpEmail");
+            alert(
+                "Admin OTP session expired. Please login again."
+            );
 
-            window.location.href = "admin-dashboard.html";
+            window.location.replace(
+                "admin-login.html"
+            );
 
-        } else {
-
-            alert(data.message);
+            return;
 
         }
 
-    } catch (error) {
 
-        console.error(error);
+        // Check OTP
 
-        alert("Server Error");
+        if (otp.length !== 6) {
+
+            alert(
+                "Please enter the complete 6-digit OTP."
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "https://eventsphere-dndh.onrender.com/verify-otp",
+                    {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify({
+
+                                email: email,
+
+                                otp: otp
+
+                            })
+
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (data.success) {
+
+
+                alert(
+                    "Admin OTP Verified Successfully!"
+                );
+
+
+                /*
+                 * Remove OTP information
+                 * after successful verification.
+                 */
+
+                localStorage.removeItem(
+                    "adminOtpEmail"
+                );
+
+
+                /*
+                 * IMPORTANT:
+                 * replace() prevents the old
+                 * OTP page from remaining in
+                 * browser history.
+                 */
+
+                window.location.replace(
+                    "admin-dashboard.html"
+                );
+
+
+            }
+
+            else {
+
+                alert(
+                    data.message
+                );
+
+            }
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Admin OTP Error:",
+                error
+            );
+
+
+            alert(
+                "Server Error"
+            );
+
+        }
 
     }
-
-});
+);

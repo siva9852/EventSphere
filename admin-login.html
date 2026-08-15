@@ -4,38 +4,58 @@
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>Admin Login - EventSphere</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet"
+          href="css/style.css">
 
     <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 </head>
 
+
 <body>
+
 
 <div class="admin-login-page">
 
+
     <div class="admin-login-box">
 
+
         <div class="admin-login-icon">
+
             <i class="fa-solid fa-user-shield"></i>
+
         </div>
 
-        <h1>Admin Login</h1>
 
-        <p>Login to manage EventSphere.</p>
+        <h1>
+            Admin Login
+        </h1>
 
-        <form id="adminLoginForm">
+
+        <p>
+            Login to manage EventSphere.
+        </p>
+
+
+        <form id="adminLoginForm"
+              autocomplete="off">
+
 
             <input
                 type="email"
                 id="adminEmail"
                 placeholder="Admin Email"
+                autocomplete="off"
                 required>
+
 
             <div class="password-box">
 
@@ -43,7 +63,9 @@
                     type="password"
                     id="adminPassword"
                     placeholder="Password"
+                    autocomplete="new-password"
                     required>
+
 
                 <i
                     class="fa-solid fa-eye"
@@ -52,56 +74,149 @@
 
             </div>
 
+
             <button type="submit">
-                Login <i class="fa-solid fa-arrow-right"></i>
+
+                Login
+
+                <i class="fa-solid fa-arrow-right"></i>
+
             </button>
 
         </form>
 
+
         <div class="admin-secure">
+
             <i class="fa-solid fa-shield-halved"></i>
+
             Secure Admin Access
+
         </div>
+
 
     </div>
 
 </div>
 
 
+
+<!-- ================= PASSWORD TOGGLE ================= -->
+
 <script>
 
 const toggleAdminPassword =
-    document.getElementById("toggleAdminPassword");
+    document.getElementById(
+        "toggleAdminPassword"
+    );
+
 
 const adminPassword =
-    document.getElementById("adminPassword");
+    document.getElementById(
+        "adminPassword"
+    );
 
 
-toggleAdminPassword.addEventListener("click", () => {
+toggleAdminPassword.addEventListener(
+    "click",
+    () => {
 
-    if (adminPassword.type === "password") {
+        if (
+            adminPassword.type ===
+            "password"
+        ) {
 
-        adminPassword.type = "text";
+            adminPassword.type =
+                "text";
 
-        toggleAdminPassword.classList.remove("fa-eye");
-        toggleAdminPassword.classList.add("fa-eye-slash");
 
-    } else {
+            toggleAdminPassword.classList.remove(
+                "fa-eye"
+            );
 
-        adminPassword.type = "password";
 
-        toggleAdminPassword.classList.remove("fa-eye-slash");
-        toggleAdminPassword.classList.add("fa-eye");
+            toggleAdminPassword.classList.add(
+                "fa-eye-slash"
+            );
+
+        }
+
+        else {
+
+            adminPassword.type =
+                "password";
+
+
+            toggleAdminPassword.classList.remove(
+                "fa-eye-slash"
+            );
+
+
+            toggleAdminPassword.classList.add(
+                "fa-eye"
+            );
+
+        }
 
     }
-
-});
+);
 
 </script>
 
 
-<script type="module" src="js/firebase-config.js"></script>
-<script type="module" src="js/admin.js"></script>
+
+<!-- ================= FIREBASE ================= -->
+
+<script type="module"
+        src="js/firebase-config.js">
+</script>
+
+
+<script type="module"
+        src="js/admin.js">
+</script>
+
+
+<!-- ================= PREVENT BACK TO LOGIN ================= -->
+
+<script type="module">
+
+import { auth }
+    from "./js/firebase-config.js";
+
+
+auth.onAuthStateChanged(
+    (user) => {
+
+        if (user) {
+
+            window.location.replace(
+                "admin-dashboard.html"
+            );
+
+        }
+
+    }
+);
+
+
+window.addEventListener(
+    "pageshow",
+    () => {
+
+        if (auth.currentUser) {
+
+            window.location.replace(
+                "admin-dashboard.html"
+            );
+
+        }
+
+    }
+);
+
+</script>
+
 
 </body>
 

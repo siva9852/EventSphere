@@ -2,91 +2,237 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>Customer Login - EventSphere</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet"
+          href="css/style.css">
 
     <!-- Font Awesome Eye Icon -->
+
     <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 </head>
 
+
 <body>
+
 
 <div class="login-page">
 
     <div class="login-box">
 
-        <h1>Customer Login</h1>
+        <h1>
+            Customer Login
+        </h1>
 
-        <p>Welcome back! Login to book your events.</p>
 
-        <form id="loginForm">
+        <p>
+            Welcome back! Login to book your events.
+        </p>
+
+
+        <form id="loginForm"
+              autocomplete="off">
+
 
             <input
                 type="email"
                 id="loginEmail"
                 placeholder="Email Address"
+                autocomplete="off"
                 required>
 
-            <!-- Password with Eye Icon -->
+
+            <!-- Password -->
+
             <div class="password-box">
 
                 <input
                     type="password"
                     id="loginPassword"
                     placeholder="Password"
+                    autocomplete="new-password"
                     required>
 
-                <i class="fa-solid fa-eye" id="toggleLoginPassword"></i>
+
+                <i
+                    class="fa-solid fa-eye"
+                    id="toggleLoginPassword">
+                </i>
 
             </div>
+
+
+            <!-- Forgot Password -->
 
             <div class="forgot-password">
-                <a href="#" id="forgotPassword">Forgot Password?</a>
+
+                <a href="#"
+                   id="forgotPassword">
+
+                    Forgot Password?
+
+                </a>
+
             </div>
 
-            <button type="submit">Login</button>
+
+            <button type="submit">
+
+                Login
+
+            </button>
+
 
         </form>
 
+
         <p class="register-link">
+
             Don't have an account?
-            <a href="customer-register.html">Register Here</a>
+
+            <a href="customer-register.html">
+
+                Register Here
+
+            </a>
+
         </p>
 
     </div>
 
 </div>
 
+
+
+<!-- ================= PASSWORD TOGGLE ================= -->
+
 <script>
-const toggleLoginPassword = document.getElementById("toggleLoginPassword");
-const loginPassword = document.getElementById("loginPassword");
 
-toggleLoginPassword.addEventListener("click", () => {
+const toggleLoginPassword =
+    document.getElementById(
+        "toggleLoginPassword"
+    );
 
-    if (loginPassword.type === "password") {
 
-        loginPassword.type = "text";
-        toggleLoginPassword.classList.remove("fa-eye");
-        toggleLoginPassword.classList.add("fa-eye-slash");
+const loginPassword =
+    document.getElementById(
+        "loginPassword"
+    );
 
-    } else {
 
-        loginPassword.type = "password";
-        toggleLoginPassword.classList.remove("fa-eye-slash");
-        toggleLoginPassword.classList.add("fa-eye");
+toggleLoginPassword.addEventListener(
+    "click",
+    () => {
+
+        if (
+            loginPassword.type ===
+            "password"
+        ) {
+
+            loginPassword.type =
+                "text";
+
+
+            toggleLoginPassword.classList.remove(
+                "fa-eye"
+            );
+
+
+            toggleLoginPassword.classList.add(
+                "fa-eye-slash"
+            );
+
+        }
+
+        else {
+
+            loginPassword.type =
+                "password";
+
+
+            toggleLoginPassword.classList.remove(
+                "fa-eye-slash"
+            );
+
+
+            toggleLoginPassword.classList.add(
+                "fa-eye"
+            );
+
+        }
 
     }
+);
 
-});
 </script>
 
-<script type="module" src="js/firebase-config.js"></script>
-<script type="module" src="js/auth.js"></script>
+
+
+<!-- ================= FIREBASE ================= -->
+
+<script type="module"
+        src="js/firebase-config.js">
+</script>
+
+
+<script type="module"
+        src="js/auth.js">
+</script>
+
+
+<!-- ================= PREVENT BACK TO LOGIN ================= -->
+
+<script type="module">
+
+import { auth }
+    from "./js/firebase-config.js";
+
+
+auth.onAuthStateChanged(
+    (user) => {
+
+        if (user) {
+
+            /*
+             * If the customer is already logged in,
+             * don't allow the login page to remain visible.
+             */
+
+            window.location.replace(
+                "customer-dashboard.html"
+            );
+
+        }
+
+    }
+);
+
+
+window.addEventListener(
+    "pageshow",
+    () => {
+
+        if (auth.currentUser) {
+
+            window.location.replace(
+                "customer-dashboard.html"
+            );
+
+        }
+
+    }
+);
+
+</script>
+
 
 </body>
 

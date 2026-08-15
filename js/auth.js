@@ -15,12 +15,11 @@ import {
 
 // ====================== INACTIVITY LOGOUT ======================
 
-const INACTIVITY_TIME = 30 * 60 * 1000; // 30 minutes
+const INACTIVITY_TIME = 30 * 60 * 1000;
 
 let inactivityTimer = null;
 
 
-// Start inactivity timer only when a user is logged in
 function startInactivityTimer() {
 
     if (inactivityTimer) {
@@ -37,8 +36,9 @@ function startInactivityTimer() {
                 "You have been logged out due to inactivity."
             );
 
-            window.location.href =
-                "customer-login.html";
+            window.location.replace(
+                "customer-login.html"
+            );
 
         }
 
@@ -56,7 +56,6 @@ function startInactivityTimer() {
 }
 
 
-// Reset timer whenever user performs activity
 function resetInactivityTimer() {
 
     if (auth.currentUser) {
@@ -67,6 +66,7 @@ function resetInactivityTimer() {
 
 
 // Detect user activity
+
 [
     "click",
     "mousemove",
@@ -84,13 +84,16 @@ function resetInactivityTimer() {
 
 
 // Check Firebase login state
+
 auth.onAuthStateChanged((user) => {
 
     if (user) {
 
         startInactivityTimer();
 
-    } else {
+    }
+
+    else {
 
         if (inactivityTimer) {
 
@@ -107,115 +110,144 @@ auth.onAuthStateChanged((user) => {
 
 // ====================== REGISTRATION ======================
 
-const registerForm = document.getElementById("registerForm");
+const registerForm =
+    document.getElementById(
+        "registerForm"
+    );
+
 
 if (registerForm) {
 
-    registerForm.addEventListener("submit", async (e) => {
+    registerForm.addEventListener(
+        "submit",
+        async (e) => {
 
-        e.preventDefault();
-
-        const fullName =
-            document.getElementById("fullName").value;
-
-        const email =
-            document.getElementById("email").value;
-
-        const phone =
-            document.getElementById("phone").value;
-
-        const password =
-            document.getElementById("password").value;
-
-        const confirmPassword =
-            document.getElementById("confirmPassword").value;
+            e.preventDefault();
 
 
-        if (password !== confirmPassword) {
+            const fullName =
+                document.getElementById(
+                    "fullName"
+                ).value;
 
-            alert("Passwords do not match!");
+            const email =
+                document.getElementById(
+                    "email"
+                ).value;
 
-            return;
+            const phone =
+                document.getElementById(
+                    "phone"
+                ).value;
 
-        }
+            const password =
+                document.getElementById(
+                    "password"
+                ).value;
+
+            const confirmPassword =
+                document.getElementById(
+                    "confirmPassword"
+                ).value;
 
 
-        try {
+            if (password !== confirmPassword) {
 
-            const response =
-                await fetch(
-                    "https://eventsphere-dndh.onrender.com/send-otp",
-                    {
-
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body: JSON.stringify({
-                            email: email
-                        })
-
-                    }
+                alert(
+                    "Passwords do not match!"
                 );
-
-
-            const data =
-                await response.json();
-
-
-            if (!data.success) {
-
-                alert(data.message);
 
                 return;
 
             }
 
 
-            // Store user details temporarily
+            try {
 
-            localStorage.setItem(
-                "otpEmail",
-                email
-            );
+                const response =
+                    await fetch(
+                        "https://eventsphere-dndh.onrender.com/send-otp",
+                        {
 
+                            method: "POST",
 
-            localStorage.setItem(
-                "registerData",
-                JSON.stringify({
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
 
-                    fullName,
-                    email,
-                    phone,
-                    password
+                            body:
+                                JSON.stringify({
+                                    email: email
+                                })
 
-                })
-            );
-
-
-            alert(
-                "OTP has been sent to your email."
-            );
+                        }
+                    );
 
 
-            window.location.href =
-                "otp-verification.html";
+                const data =
+                    await response.json();
 
+
+                if (!data.success) {
+
+                    alert(
+                        data.message
+                    );
+
+                    return;
+
+                }
+
+
+                // Store user details temporarily
+
+                localStorage.setItem(
+                    "otpEmail",
+                    email
+                );
+
+
+                localStorage.setItem(
+                    "registerData",
+                    JSON.stringify({
+
+                        fullName,
+                        email,
+                        phone,
+                        password
+
+                    })
+                );
+
+
+                alert(
+                    "OTP has been sent to your email."
+                );
+
+
+                // Replace instead of normal navigation
+
+                window.location.replace(
+                    "otp-verification.html"
+                );
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    error
+                );
+
+                alert(
+                    "Server Error"
+                );
+
+            }
 
         }
-
-        catch (error) {
-
-            console.error(error);
-
-            alert("Server Error");
-
-        }
-
-    });
+    );
 
 }
 
@@ -223,7 +255,9 @@ if (registerForm) {
 // ====================== LOGIN ======================
 
 const loginForm =
-    document.getElementById("loginForm");
+    document.getElementById(
+        "loginForm"
+    );
 
 
 if (loginForm) {
@@ -260,15 +294,23 @@ if (loginForm) {
                 );
 
 
-                window.location.href =
-                    "customer-dashboard.html";
+                /*
+                 * IMPORTANT:
+                 * replace() removes the login page
+                 * from browser history.
+                 */
 
+                window.location.replace(
+                    "customer-dashboard.html"
+                );
 
             }
 
             catch (error) {
 
-                alert(error.message);
+                alert(
+                    error.message
+                );
 
             }
 
@@ -328,7 +370,9 @@ if (forgotPassword) {
 
             catch (error) {
 
-                alert(error.message);
+                alert(
+                    error.message
+                );
 
             }
 
@@ -340,33 +384,47 @@ if (forgotPassword) {
 
 // ====================== USER LOGOUT ======================
 
-window.logout = async function () {
+window.logout =
+    async function () {
 
-    try {
+        try {
 
-        await signOut(auth);
+            await signOut(auth);
 
-        if (inactivityTimer) {
 
-            clearTimeout(inactivityTimer);
+            if (inactivityTimer) {
 
-            inactivityTimer = null;
+                clearTimeout(
+                    inactivityTimer
+                );
+
+                inactivityTimer = null;
+
+            }
+
+
+            alert(
+                "Logged out successfully!"
+            );
+
+
+            /*
+             * replace() prevents returning to
+             * the authenticated dashboard.
+             */
+
+            window.location.replace(
+                "customer-login.html"
+            );
 
         }
 
-        alert(
-            "Logged out successfully!"
-        );
+        catch (error) {
 
-        window.location.href =
-            "customer-login.html";
+            alert(
+                error.message
+            );
 
-    }
+        }
 
-    catch (error) {
-
-        alert(error.message);
-
-    }
-
-};
+    };

@@ -9,14 +9,13 @@ import {
     doc,
     getDoc,
     getDocs,
-    collection,
-    setDoc
+    collection
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
 // ====================== ADMIN INACTIVITY LOGOUT ======================
 
-const INACTIVITY_TIME = 15 * 60 * 1000; // 15 minutes
+const INACTIVITY_TIME = 15 * 60 * 1000;
 
 let inactivityTimer = null;
 
@@ -39,8 +38,9 @@ function startInactivityTimer() {
                 "You have been logged out due to inactivity."
             );
 
-            window.location.href =
-                "admin-login.html";
+            window.location.replace(
+                "admin-login.html"
+            );
 
         }
 
@@ -97,7 +97,9 @@ auth.onAuthStateChanged((user) => {
 
         startInactivityTimer();
 
-    } else {
+    }
+
+    else {
 
         if (inactivityTimer) {
 
@@ -115,141 +117,185 @@ auth.onAuthStateChanged((user) => {
 // ====================== ADMIN LOGIN ======================
 
 const adminLoginForm =
-    document.getElementById("adminLoginForm");
+    document.getElementById(
+        "adminLoginForm"
+    );
 
 
 if (adminLoginForm) {
 
-    adminLoginForm.addEventListener("submit", async (e) => {
+    adminLoginForm.addEventListener(
+        "submit",
+        async (e) => {
 
-        e.preventDefault();
-
-
-        const email =
-            document.getElementById("adminEmail").value;
-
-        const password =
-            document.getElementById("adminPassword").value;
+            e.preventDefault();
 
 
-        try {
+            const email =
+                document.getElementById(
+                    "adminEmail"
+                ).value;
 
-            const userCredential =
-                await signInWithEmailAndPassword(
-                    auth,
-                    email,
-                    password
+            const password =
+                document.getElementById(
+                    "adminPassword"
+                ).value;
+
+
+            try {
+
+                const userCredential =
+                    await signInWithEmailAndPassword(
+                        auth,
+                        email,
+                        password
+                    );
+
+
+                const user =
+                    userCredential.user;
+
+
+                // ================= CHECK ADMIN ROLE =================
+
+                const docRef =
+                    doc(
+                        db,
+                        "users",
+                        user.uid
+                    );
+
+
+                const docSnap =
+                    await getDoc(
+                        docRef
+                    );
+
+
+                if (
+                    !docSnap.exists() ||
+                    docSnap.data().role !== "admin"
+                ) {
+
+                    alert(
+                        "Access Denied! You are not an Admin."
+                    );
+
+
+                    await signOut(auth);
+
+                    return;
+
+                }
+
+
+                // ================= SEND OTP =================
+
+                const response =
+                    await fetch(
+                        "https://eventsphere-dndh.onrender.com/send-otp",
+                        {
+
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:
+                                JSON.stringify({
+                                    email: email
+                                })
+
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (!data.success) {
+
+                    alert(
+                        data.message
+                    );
+
+
+                    await signOut(auth);
+
+                    return;
+
+                }
+
+
+                localStorage.setItem(
+                    "adminOtpEmail",
+                    email
                 );
 
-
-            const user =
-                userCredential.user;
-
-
-            // Check Admin Role
-
-            const docRef =
-                doc(db, "users", user.uid);
-
-            const docSnap =
-                await getDoc(docRef);
-
-
-            if (
-                !docSnap.exists() ||
-                docSnap.data().role !== "admin"
-            ) {
 
                 alert(
-                    "Access Denied! You are not an Admin."
-                );
-
-                await signOut(auth);
-
-                return;
-
-            }
-
-
-            // Send OTP
-
-            const response =
-                await fetch(
-                    "https://eventsphere-dndh.onrender.com/send-otp",
-                    {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body: JSON.stringify({
-                            email: email
-                        })
-                    }
+                    "OTP sent to your Admin Email."
                 );
 
 
-            const data =
-                await response.json();
+                /*
+                 * IMPORTANT:
+                 * Use replace() so the old
+                 * admin login page is not kept
+                 * in browser history.
+                 */
 
-
-            if (!data.success) {
-
-                alert(data.message);
-
-                await signOut(auth);
-
-                return;
+                window.location.replace(
+                    "admin-otp.html"
+                );
 
             }
 
+            catch (error) {
 
-            localStorage.setItem(
-                "adminOtpEmail",
-                email
-            );
+                alert(
+                    error.message
+                );
 
-
-            alert(
-                "OTP sent to your Admin Email."
-            );
-
-
-            window.location.href =
-                "admin-otp.html";
+            }
 
         }
-
-        catch (error) {
-
-            alert(error.message);
-
-        }
-
-    });
+    );
 
 }
+
 
 // ====================== DASHBOARD STATISTICS ======================
 
 async function loadDashboardStats() {
 
     const totalCustomersElement =
-        document.getElementById("totalCustomers");
+        document.getElementById(
+            "totalCustomers"
+        );
 
     const totalBookingsElement =
-        document.getElementById("totalBookings");
+        document.getElementById(
+            "totalBookings"
+        );
 
     const activeBookingsElement =
-        document.getElementById("activeBookings");
+        document.getElementById(
+            "activeBookings"
+        );
 
     const completedBookingsElement =
-        document.getElementById("completedBookings");
+        document.getElementById(
+            "completedBookings"
+        );
 
     const totalEventsElement =
-        document.getElementById("totalEvents");
+        document.getElementById(
+            "totalEvents"
+        );
 
 
     // Run only on Admin Dashboard
@@ -261,7 +307,9 @@ async function loadDashboardStats() {
         !completedBookingsElement ||
         !totalEventsElement
     ) {
+
         return;
+
     }
 
 
@@ -271,20 +319,35 @@ async function loadDashboardStats() {
 
         const usersSnapshot =
             await getDocs(
-                collection(db, "users")
+                collection(
+                    db,
+                    "users"
+                )
             );
+
 
         let totalCustomers = 0;
 
-        usersSnapshot.forEach((userDoc) => {
 
-            const user = userDoc.data();
+        usersSnapshot.forEach(
+            (userDoc) => {
 
-            if (user.role === "user") {
-                totalCustomers++;
+                const user =
+                    userDoc.data();
+
+
+                if (
+                    user.role ===
+                    "user"
+                ) {
+
+                    totalCustomers++;
+
+                }
+
             }
+        );
 
-        });
 
         totalCustomersElement.textContent =
             totalCustomers;
@@ -294,8 +357,12 @@ async function loadDashboardStats() {
 
         const eventsSnapshot =
             await getDocs(
-                collection(db, "events")
+                collection(
+                    db,
+                    "events"
+                )
             );
+
 
         totalEventsElement.textContent =
             eventsSnapshot.size;
@@ -305,58 +372,68 @@ async function loadDashboardStats() {
 
         const bookingsSnapshot =
             await getDocs(
-                collection(db, "bookings")
+                collection(
+                    db,
+                    "bookings"
+                )
             );
 
-        const now = new Date();
+
+        const now =
+            new Date();
+
 
         let activeBookings = 0;
+
         let completedBookings = 0;
 
 
-        bookingsSnapshot.forEach((bookingDoc) => {
+        bookingsSnapshot.forEach(
+            (bookingDoc) => {
 
-            const booking = bookingDoc.data();
+                const booking =
+                    bookingDoc.data();
 
 
-            // If event date is missing,
-            // don't count it as active/completed
+                if (!booking.eventDate) {
 
-            if (!booking.eventDate) {
-                return;
+                    return;
+
+                }
+
+
+                const eventEndTime =
+                    booking.eventEndTime ||
+                    "20:00";
+
+
+                const eventEnd =
+                    new Date(
+                        `${booking.eventDate}T${eventEndTime}:00`
+                    );
+
+
+                // ================= COMPLETED =================
+
+                if (
+                    now >= eventEnd
+                ) {
+
+                    completedBookings++;
+
+                }
+
+
+                // ================= ACTIVE =================
+
+                else {
+
+                    activeBookings++;
+
+                }
+
             }
-
-
-            // Event end time
-
-            const eventEndTime =
-                booking.eventEndTime || "20:00";
-
-
-            const eventEnd =
-                new Date(
-                    `${booking.eventDate}T${eventEndTime}:00`
-                );
-
-
-            // ================= COMPLETED =================
-
-            if (now >= eventEnd) {
-
-                completedBookings++;
-
-            }
-
-
-            // ================= ACTIVE =================
-
-            else {
-
-                activeBookings++;
-
-            }
-
-        });
+        );
 
 
         // ================= DISPLAY COUNTS =================
@@ -364,12 +441,13 @@ async function loadDashboardStats() {
         totalBookingsElement.textContent =
             bookingsSnapshot.size;
 
+
         activeBookingsElement.textContent =
             activeBookings;
 
+
         completedBookingsElement.textContent =
             completedBookings;
-
 
     }
 
@@ -408,34 +486,50 @@ loadDashboardStats();
 
 // Refresh every 30 seconds
 
-setInterval(() => {
+setInterval(
+    () => {
 
-    loadDashboardStats();
+        loadDashboardStats();
 
-}, 30000);
+    },
+    30000
+);
 
 
 // ====================== LOGOUT ======================
 
-window.logout = async function () {
+window.logout =
+    async function () {
 
-    try {
+        try {
 
-        await signOut(auth);
+            await signOut(
+                auth
+            );
 
-        alert(
-            "Logged out successfully!"
-        );
 
-        window.location.href =
-            "admin-login.html";
+            alert(
+                "Logged out successfully!"
+            );
 
-    }
 
-    catch (error) {
+            /*
+             * Prevent returning to the
+             * admin dashboard using Back.
+             */
 
-        alert(error.message);
+            window.location.replace(
+                "admin-login.html"
+            );
 
-    }
+        }
 
-};
+        catch (error) {
+
+            alert(
+                error.message
+            );
+
+        }
+
+    };
