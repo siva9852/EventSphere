@@ -5,63 +5,91 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>Add Event - EventSphere</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet"
+          href="css/style.css">
 
     <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 </head>
 
+
 <body>
+
 
 <div class="dashboard">
 
-    <!-- SIDEBAR -->
+
+    <!-- ================= SIDEBAR ================= -->
 
     <div class="sidebar">
 
-        <h2>EventSphere</h2>
+        <h2>
+            EventSphere
+        </h2>
+
 
         <ul>
 
             <li>
+
                 <a href="admin-dashboard.html">
                     🏠 Dashboard
                 </a>
+
             </li>
 
+
             <li class="active">
+
                 <a href="add-event.html">
                     ➕ Add Event
                 </a>
+
             </li>
 
+
             <li>
+
                 <a href="view-events.html">
                     🎉 View Events
                 </a>
+
             </li>
 
+
             <li>
+
                 <a href="admin-bookings.html">
                     📅 Bookings
                 </a>
+
             </li>
 
+
             <li>
+
                 <a href="admin-customers.html">
                     👥 Customers
                 </a>
+
             </li>
 
+
             <li>
-                <a href="#" onclick="logout()">
+
+                <a href="#"
+                   onclick="logout()">
+
                     🚪 Logout
+
                 </a>
+
             </li>
 
         </ul>
@@ -69,19 +97,30 @@
     </div>
 
 
-    <!-- MAIN CONTENT -->
+
+    <!-- ================= MAIN CONTENT ================= -->
 
     <div class="dashboard-content add-event-page">
 
+
+        <!-- ================= PAGE HEADING ================= -->
+
         <div class="page-heading">
 
+
             <div class="heading-icon">
+
                 <i class="fa-solid fa-calendar-plus"></i>
+
             </div>
+
 
             <div>
 
-                <h1>Add New Event</h1>
+                <h1>
+                    Add New Event
+                </h1>
+
 
                 <p>
                     Fill in the details below to create a new event.
@@ -92,25 +131,34 @@
         </div>
 
 
-        <!-- EVENT FORM -->
+
+        <!-- ================= EVENT FORM ================= -->
 
         <div class="event-form-card">
 
+
             <form id="eventForm">
+
 
                 <div class="event-form-row">
 
-                    <!-- EVENT NAME -->
+
+                    <!-- ================= EVENT NAME ================= -->
 
                     <div class="event-field">
 
                         <label>
-                            Event Name <span>*</span>
+
+                            Event Name
+                            <span>*</span>
+
                         </label>
+
 
                         <div class="input-box">
 
                             <i class="fa-solid fa-tag"></i>
+
 
                             <input
                                 type="text"
@@ -123,17 +171,23 @@
                     </div>
 
 
-                    <!-- CATEGORY -->
+
+                    <!-- ================= CATEGORY ================= -->
 
                     <div class="event-field">
 
                         <label>
-                            Category <span>*</span>
+
+                            Category
+                            <span>*</span>
+
                         </label>
+
 
                         <div class="input-box">
 
                             <i class="fa-solid fa-list"></i>
+
 
                             <input
                                 type="text"
@@ -146,22 +200,29 @@
                     </div>
 
 
-                    <!-- PRICE -->
+
+                    <!-- ================= PRICE ================= -->
 
                     <div class="event-field">
 
                         <label>
-                            Price <span>*</span>
+
+                            Price
+                            <span>*</span>
+
                         </label>
+
 
                         <div class="input-box">
 
                             <i class="fa-solid fa-indian-rupee-sign"></i>
 
+
                             <input
                                 type="number"
                                 id="price"
                                 placeholder="Enter price"
+                                min="0"
                                 required>
 
                         </div>
@@ -169,42 +230,71 @@
                     </div>
 
 
-                    <!-- IMAGE URL -->
+
+                    <!-- ================= IMAGE PATH ================= -->
 
                     <div class="event-field">
 
                         <label>
-                            Image URL <span>*</span>
+
+                            Image Path
+                            <span>*</span>
+
                         </label>
+
 
                         <div class="input-box">
 
-                            <i class="fa-solid fa-link"></i>
+                            <i class="fa-solid fa-image"></i>
+
 
                             <input
-                                type="url"
+                                type="text"
                                 id="imageUrl"
-                                placeholder="Enter image URL"
+                                placeholder="images/anniversary.jpg"
                                 required>
 
                         </div>
 
                     </div>
 
+
                 </div>
 
 
-                <!-- DESCRIPTION -->
+
+                <!-- ================= IMAGE HELP ================= -->
+
+                <p style="
+                    margin-top: 10px;
+                    color: #64748b;
+                    font-size: 14px;
+                ">
+
+                    Example:
+                    <strong>images/anniversary.jpg</strong>
+
+                </p>
+
+
+
+                <!-- ================= DESCRIPTION ================= -->
 
                 <div class="event-field description-field">
 
+
                     <label>
-                        Description <span>*</span>
+
+                        Description
+                        <span>*</span>
+
                     </label>
+
 
                     <div class="textarea-box">
 
                         <i class="fa-solid fa-file-lines"></i>
+
 
                         <textarea
                             id="description"
@@ -216,32 +306,48 @@
                 </div>
 
 
-                <!-- BUTTON -->
+
+                <!-- ================= BUTTON ================= -->
 
                 <div class="event-button-container">
+
 
                     <button
                         type="submit"
                         class="add-event-button">
 
+
                         <i class="fa-solid fa-plus"></i>
+
 
                         Add Event
 
+
                     </button>
+
 
                 </div>
 
+
             </form>
+
 
         </div>
 
+
     </div>
+
 
 </div>
 
 
-<script type="module" src="js/admin.js"></script>
+
+<!-- ================= ADMIN EVENTS JS ================= -->
+
+<script type="module"
+        src="js/admin-events.js">
+</script>
+
 
 </body>
 

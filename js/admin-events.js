@@ -5,41 +5,129 @@ import {
     addDoc
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-const addEventForm = document.getElementById("addEventForm");
 
-if (addEventForm) {
+const eventForm =
+    document.getElementById("eventForm");
 
-    addEventForm.addEventListener("submit", async (e) => {
 
-        e.preventDefault();
+if (eventForm) {
 
-        const eventName = document.getElementById("eventName").value;
-        const category = document.getElementById("category").value;
-        const price = document.getElementById("price").value;
-        const image = document.getElementById("image").value;
-        const description = document.getElementById("description").value;
+    eventForm.addEventListener(
+        "submit",
+        async (e) => {
 
-        try {
+            e.preventDefault();
 
-            await addDoc(collection(db, "events"), {
-                eventName,
-                category,
-                price: Number(price),
-                image,
-                description,
-                createdAt: new Date()
-            });
 
-            alert("Event Added Successfully!");
-            addEventForm.reset();
+            const eventName =
+                document.getElementById(
+                    "eventName"
+                ).value.trim();
 
-        } catch (error) {
 
-            console.error(error);
-            alert(error.message);
+            const category =
+                document.getElementById(
+                    "category"
+                ).value.trim();
+
+
+            const price =
+                document.getElementById(
+                    "price"
+                ).value;
+
+
+            const imageUrl =
+                document.getElementById(
+                    "imageUrl"
+                ).value.trim();
+
+
+            const description =
+                document.getElementById(
+                    "description"
+                ).value.trim();
+
+
+            // ================= VALIDATION =================
+
+            if (
+                !eventName ||
+                !category ||
+                !price ||
+                !imageUrl ||
+                !description
+            ) {
+
+                alert(
+                    "Please fill in all fields."
+                );
+
+                return;
+
+            }
+
+
+            try {
+
+                // ================= ADD EVENT =================
+
+                await addDoc(
+                    collection(
+                        db,
+                        "events"
+                    ),
+                    {
+
+                        eventName:
+                            eventName,
+
+                        category:
+                            category,
+
+                        price:
+                            Number(price),
+
+                        image:
+                            imageUrl,
+
+                        description:
+                            description,
+
+                        createdAt:
+                            new Date()
+
+                    }
+                );
+
+
+                alert(
+                    "Event Added Successfully!"
+                );
+
+
+                // Clear form
+
+                eventForm.reset();
+
+            }
+
+
+            catch (error) {
+
+                console.error(
+                    "Add Event Error:",
+                    error
+                );
+
+
+                alert(
+                    error.message
+                );
+
+            }
 
         }
-
-    });
+    );
 
 }
