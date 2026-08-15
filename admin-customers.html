@@ -2,84 +2,179 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Customers - EventSphere</title>
 
     <link rel="stylesheet" href="css/style.css">
-
 </head>
 
 <body>
 
-<div class="dashboard">
+<div class="customers-dashboard">
 
-    <div class="sidebar">
+    <!-- SIDEBAR -->
+    <aside class="customers-sidebar">
 
-        <h2>EventSphere</h2>
+        <div class="customers-logo">
+            🎪 <span>Event<span>Sphere</span></span>
+        </div>
 
-        <ul>
+        <nav>
 
-            <li>
-                <a href="admin-dashboard.html">
-                    🏠 Dashboard
-                </a>
-            </li>
+            <a href="admin-dashboard.html">
+                🏠
+                <span>Dashboard</span>
+            </a>
 
-            <li>
-                <a href="add-event.html">
-                    ➕ Add Event
-                </a>
-            </li>
+            <a href="add-event.html">
+                ➕
+                <span>Add Event</span>
+            </a>
 
-            <li>
-                <a href="view-events.html">
-                    🎉 View Events
-                </a>
-            </li>
+            <a href="view-events.html">
+                🎉
+                <span>View Events</span>
+            </a>
 
-            <li>
-                <a href="admin-bookings.html">
-                    📅 Bookings
-                </a>
-            </li>
+            <a href="admin-bookings.html">
+                📅
+                <span>Bookings</span>
+            </a>
 
-            <li>
-                <a href="admin-customers.html">
-                    👥 Customers
-                </a>
-            </li>
+            <a href="admin-customers.html" class="customers-active">
+                👥
+                <span>Customers</span>
+            </a>
 
-            <li>
-                <a href="#" onclick="logout()">
-                    🚪 Logout
-                </a>
-            </li>
+            <a href="#" onclick="logout()">
+                🚪
+                <span>Logout</span>
+            </a>
 
-        </ul>
-
-    </div>
+        </nav>
 
 
-    <div class="dashboard-content">
+        <div class="admin-profile">
 
-        <h1>Registered Customers</h1>
+            <div class="admin-profile-icon">
+                👤
+            </div>
 
-        <div id="customersContainer">
-
-            <p>Loading customers...</p>
+            <div>
+                <strong>Admin</strong>
+                <small>admin@eventsphere.com</small>
+            </div>
 
         </div>
 
-    </div>
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="customers-main">
+
+        <div class="customers-top">
+
+            <div>
+
+                <h1>Registered Customers</h1>
+
+                <div class="customers-title-line"></div>
+
+            </div>
+
+
+            <div class="customer-search">
+
+                🔍
+
+                <input
+                    type="text"
+                    id="customerSearch"
+                    placeholder="Search customers..."
+                >
+
+            </div>
+
+
+            <button
+                class="customer-filter-btn"
+                id="customerFilterBtn">
+
+                ⚱
+
+            </button>
+
+        </div>
+
+
+        <!-- TOTAL CUSTOMERS -->
+
+        <div class="total-customers-card">
+
+            <div class="total-customers-icon">
+                👥
+            </div>
+
+            <div>
+
+                <span>Total Customers</span>
+
+                <strong id="totalCustomers">
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- CUSTOMERS -->
+
+        <div id="customersContainer">
+
+            <p class="customers-loading">
+                Loading customers...
+            </p>
+
+        </div>
+
+
+        <!-- PAGINATION -->
+
+        <div class="customers-pagination">
+
+            <span id="customerShowing">
+                Showing 0 customers
+            </span>
+
+
+            <div class="pagination-buttons">
+
+                <button id="previousPage">
+                    ‹
+                </button>
+
+                <div id="pageNumbers"></div>
+
+                <button id="nextPage">
+                    ›
+                </button>
+
+            </div>
+
+        </div>
+
+    </main>
 
 </div>
 
 
-<script type="module" src="js/admin-customers.js"></script>
+<script type="module"
+        src="js/admin-customers.js">
+</script>
 
 </body>
 

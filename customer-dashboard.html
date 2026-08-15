@@ -5,15 +5,15 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>Customer Dashboard - EventSphere</title>
 
     <link rel="stylesheet" href="css/style.css">
 
-    <!-- Font Awesome -->
     <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 
     <style>
@@ -66,7 +66,6 @@
 
         .dashboard-card-icon i {
             font-size: 48px;
-
             color: #2563eb;
         }
 
@@ -124,8 +123,96 @@
 
         .dashboard-card-content button:hover {
             background: #2563eb;
+            color: white;
+        }
+
+
+        /* ================= CUSTOMER PROFILE ================= */
+
+        .customer-profile-box {
+
+            margin-top: auto;
+
+            padding: 14px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            background: rgba(255,255,255,0.10);
+
+            border-radius: 14px;
 
             color: white;
+
+        }
+
+
+        .customer-profile-icon {
+
+            width: 45px;
+
+            height: 45px;
+
+            min-width: 45px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background: #eef4ff;
+
+            color: #2855c7;
+
+            font-size: 20px;
+
+        }
+
+
+        .customer-profile-info {
+
+            display: flex;
+
+            flex-direction: column;
+
+            min-width: 0;
+
+        }
+
+
+        .customer-profile-info strong {
+
+            font-size: 15px;
+
+            margin-bottom: 4px;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+        }
+
+
+        .customer-profile-info span {
+
+            font-size: 12px;
+
+            color: #d9e5ff;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
         }
 
 
@@ -144,7 +231,6 @@
 
             .dashboard .card {
                 padding: 20px;
-
                 gap: 18px;
             }
 
@@ -152,7 +238,6 @@
             .dashboard-card-icon {
                 width: 70px;
                 height: 70px;
-
                 min-width: 70px;
             }
 
@@ -183,38 +268,74 @@
 
     <div class="sidebar">
 
-        <h2>EventSphere</h2>
+        <h2>🎉 EventSphere</h2>
+
 
         <ul>
 
             <li>
+
                 <a href="customer-dashboard.html">
                     🏠 Dashboard
                 </a>
+
             </li>
 
 
             <li>
+
                 <a href="customer-events.html">
                     🎉 View Events
                 </a>
+
             </li>
 
 
             <li>
+
                 <a href="my-bookings.html">
                     📅 My Bookings
                 </a>
+
             </li>
 
 
             <li>
+
                 <a href="#" onclick="logout()">
                     🚪 Logout
                 </a>
+
             </li>
 
         </ul>
+
+
+        <!-- ================= CUSTOMER PROFILE ================= -->
+
+        <div class="customer-profile-box">
+
+            <div class="customer-profile-icon">
+
+                <i class="fa-solid fa-user"></i>
+
+            </div>
+
+
+            <div class="customer-profile-info">
+
+                <strong id="customerName">
+                    Loading...
+                </strong>
+
+
+                <span id="customerEmail">
+                    Loading...
+                </span>
+
+            </div>
+
+        </div>
 
     </div>
 
@@ -223,7 +344,9 @@
 
     <div class="dashboard-content">
 
-        <h1>Customer Dashboard</h1>
+        <h1>
+            Customer Dashboard
+        </h1>
 
 
         <h2>
@@ -318,9 +441,92 @@
 </div>
 
 
+<!-- ================= CUSTOMER DETAILS ================= -->
+
+<script type="module">
+
+import { auth, db } from "./js/firebase-config.js";
+
+import {
+    doc,
+    getDoc
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+
+auth.onAuthStateChanged(async (user) => {
+
+    if (!user) {
+
+        window.location.href =
+            "customer-login.html";
+
+        return;
+
+    }
+
+
+    const nameElement =
+        document.getElementById("customerName");
+
+    const emailElement =
+        document.getElementById("customerEmail");
+
+
+    /* Show email */
+
+    emailElement.textContent =
+        user.email || "";
+
+
+    /* Get customer name from Firestore */
+
+    try {
+
+        const userDoc =
+            await getDoc(
+                doc(db, "users", user.uid)
+            );
+
+
+        if (
+            userDoc.exists() &&
+            userDoc.data().fullName
+        ) {
+
+            nameElement.textContent =
+                userDoc.data().fullName;
+
+        } else {
+
+            nameElement.textContent =
+                "Customer";
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Error loading customer profile:",
+            error
+        );
+
+        nameElement.textContent =
+            "Customer";
+
+    }
+
+});
+
+</script>
+
+
 <!-- ================= AUTH ================= -->
 
-<script type="module" src="js/auth.js"></script>
+<script type="module"
+        src="js/auth.js">
+</script>
 
 
 </body>

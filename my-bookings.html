@@ -5,61 +5,195 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>My Bookings - EventSphere</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet"
+          href="css/style.css">
 
 </head>
 
+
 <body>
 
-<div class="dashboard">
 
-    <div class="sidebar">
-
-        <h2>EventSphere</h2>
-
-        <ul>
-
-            <li>
-                <a href="customer-dashboard.html">🏠 Dashboard</a>
-            </li>
-
-            <li>
-                <a href="customer-events.html">🎉 Events</a>
-            </li>
-
-            <li>
-                <a href="my-bookings.html">📅 My Bookings</a>
-            </li>
-
-            <li>
-                <a href="#" onclick="logout()">🚪 Logout</a>
-            </li>
-
-        </ul>
-
-    </div>
+<div class="modern-dashboard">
 
 
-    <div class="dashboard-content">
+    <!-- ================= SIDEBAR ================= -->
 
-        <h1>My Bookings</h1>
+    <aside class="modern-sidebar">
 
-        <div id="myBookingsContainer">
 
-            <p>Loading bookings...</p>
+        <div class="sidebar-logo">
+
+            🎪
+
+            <span>
+                Event<span>Sphere</span>
+            </span>
 
         </div>
 
-    </div>
+
+        <nav class="sidebar-nav">
+
+
+            <a href="customer-dashboard.html">
+
+                <span class="nav-icon">
+                    ⌂
+                </span>
+
+                Dashboard
+
+            </a>
+
+
+            <a href="customer-events.html">
+
+                <span class="nav-icon">
+                    🎉
+                </span>
+
+                Events
+
+            </a>
+
+
+            <a href="my-bookings.html"
+               class="sidebar-active">
+
+                <span class="nav-icon">
+                    ▣
+                </span>
+
+                My Bookings
+
+            </a>
+
+
+            <a href="#"
+               onclick="logout()">
+
+                <span class="nav-icon logout-icon">
+                    ⏻
+                </span>
+
+                Logout
+
+            </a>
+
+
+        </nav>
+
+
+        <!-- ================= CUSTOMER PROFILE ================= -->
+
+        <div class="customer-profile">
+
+
+            <div class="profile-avatar">
+
+                👤
+
+            </div>
+
+
+            <div class="profile-info">
+
+                <strong id="customerName">
+                    Customer
+                </strong>
+
+
+                <small id="customerEmail">
+                    Loading...
+                </small>
+
+            </div>
+
+
+            <span class="profile-arrow">
+                ⌄
+            </span>
+
+
+        </div>
+
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="modern-main">
+
+
+        <!-- ================= TOP BAR ================= -->
+
+        <div class="top-bar">
+
+            <div></div>
+
+        </div>
+
+
+        <!-- ================= PAGE HEADING ================= -->
+
+        <div class="page-heading">
+
+
+            <h1>
+                My Bookings
+            </h1>
+
+
+            <p>
+                View and track all your event bookings
+            </p>
+
+
+            <div class="heading-line"></div>
+
+
+        </div>
+
+
+        <!-- ================= BOOKINGS ================= -->
+
+        <div id="myBookingsContainer">
+
+
+            <p class="loading-bookings">
+                Loading bookings...
+            </p>
+
+
+        </div>
+
+
+    </main>
+
 
 </div>
 
 
-<script type="module" src="js/my-bookings.js"></script>
+<!-- ================= AUTH ================= -->
+
+<script type="module"
+        src="js/auth.js">
+</script>
+
+
+<!-- ================= MY BOOKINGS ================= -->
+
+<script type="module"
+        src="js/my-bookings.js">
+</script>
+
 
 </body>
 
