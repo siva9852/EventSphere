@@ -5,46 +5,76 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>Admin Dashboard - EventSphere</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet"
+          href="css/style.css">
 
 </head>
 
+
 <body>
+
 
 <div class="dashboard">
 
+
+    <!-- ================= SIDEBAR ================= -->
+
     <div class="sidebar">
 
-        <h2>EventSphere</h2>
+        <h2>
+            EventSphere
+        </h2>
+
 
         <ul>
 
             <li>
-                <a href="admin-dashboard.html">🏠 Dashboard</a>
+                <a href="admin-dashboard.html">
+                    🏠 Dashboard
+                </a>
             </li>
 
-            <li>
-                <a href="add-event.html">➕ Add Event</a>
-            </li>
 
             <li>
-                <a href="view-events.html">🎉 View Events</a>
+                <a href="add-event.html">
+                    ➕ Add Event
+                </a>
             </li>
 
-            <li>
-                <a href="admin-bookings.html">📅 Bookings</a>
-            </li>
 
             <li>
-                <a href="admin-customers.html">👥 Customers</a>
+                <a href="view-events.html">
+                    🎉 View Events
+                </a>
             </li>
 
+
             <li>
-                <a href="#" onclick="logout()">🚪 Logout</a>
+                <a href="admin-bookings.html">
+                    📅 Bookings
+                </a>
+            </li>
+
+
+            <li>
+                <a href="admin-customers.html">
+                    👥 Customers
+                </a>
+            </li>
+
+
+            <li>
+                <a href="#"
+                   onclick="logout()">
+
+                    🚪 Logout
+
+                </a>
             </li>
 
         </ul>
@@ -52,20 +82,39 @@
     </div>
 
 
+
+    <!-- ================= DASHBOARD CONTENT ================= -->
+
     <div class="dashboard-content">
 
-        <h1>Admin Dashboard</h1>
 
-        <h2>Welcome, Admin 🎉</h2>
+        <h1>
+            Admin Dashboard
+        </h1>
 
-        <p>EventSphere Statistics</p>
+
+        <h2>
+            Welcome, Admin 🎉
+        </h2>
+
+
+        <p>
+            EventSphere Statistics
+        </p>
+
 
 
         <div class="cards">
 
+
+            <!-- TOTAL CUSTOMERS -->
+
             <div class="card">
 
-                <h3>👥 Total Customers</h3>
+                <h3>
+                    👥 Total Customers
+                </h3>
+
 
                 <p id="totalCustomers">
                     Loading...
@@ -74,9 +123,15 @@
             </div>
 
 
+
+            <!-- TOTAL BOOKINGS -->
+
             <div class="card">
 
-                <h3>📅 Total Bookings</h3>
+                <h3>
+                    📅 Total Bookings
+                </h3>
+
 
                 <p id="totalBookings">
                     Loading...
@@ -85,9 +140,15 @@
             </div>
 
 
+
+            <!-- ACTIVE BOOKINGS -->
+
             <div class="card">
 
-                <h3>🟢 Active Bookings</h3>
+                <h3>
+                    🟢 Active Bookings
+                </h3>
+
 
                 <p id="activeBookings">
                     Loading...
@@ -96,9 +157,15 @@
             </div>
 
 
+
+            <!-- COMPLETED BOOKINGS -->
+
             <div class="card">
 
-                <h3>✅ Completed Bookings</h3>
+                <h3>
+                    ✅ Completed Bookings
+                </h3>
+
 
                 <p id="completedBookings">
                     Loading...
@@ -107,15 +174,22 @@
             </div>
 
 
+
+            <!-- TOTAL EVENTS -->
+
             <div class="card">
 
-                <h3>🎉 Total Events</h3>
+                <h3>
+                    🎉 Total Events
+                </h3>
+
 
                 <p id="totalEvents">
                     Loading...
                 </p>
 
             </div>
+
 
         </div>
 
@@ -124,7 +198,88 @@
 </div>
 
 
-<script type="module" src="js/admin.js"></script>
+
+<!-- ================= ADMIN BACK BUTTON PROTECTION ================= -->
+
+<script type="module">
+
+import { auth }
+    from "./js/firebase-config.js";
+
+
+auth.onAuthStateChanged(
+    (user) => {
+
+        /*
+         * If the admin is not logged in,
+         * send them back to admin login.
+         */
+
+        if (!user) {
+
+            window.location.replace(
+                "admin-login.html"
+            );
+
+            return;
+
+        }
+
+
+        /*
+         * Add a history entry so pressing
+         * Chrome Back keeps the admin
+         * inside the dashboard.
+         */
+
+        history.pushState(
+            {
+                adminDashboard: true
+            },
+            "",
+            window.location.href
+        );
+
+    }
+);
+
+
+// ====================== BACK BUTTON ======================
+
+window.addEventListener(
+    "popstate",
+    () => {
+
+        /*
+         * If admin is logged in,
+         * stay on Admin Dashboard.
+         */
+
+        if (auth.currentUser) {
+
+            history.pushState(
+                {
+                    adminDashboard: true
+                },
+                "",
+                window.location.href
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+
+
+<!-- ================= ADMIN JS ================= -->
+
+<script type="module"
+        src="js/admin.js">
+</script>
+
 
 </body>
 

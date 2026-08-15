@@ -10,7 +10,8 @@
 
     <title>Customer Dashboard - EventSphere</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet"
+          href="css/style.css">
 
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -268,7 +269,9 @@
 
     <div class="sidebar">
 
-        <h2>🎉 EventSphere</h2>
+        <h2>
+            🎉 EventSphere
+        </h2>
 
 
         <ul>
@@ -302,8 +305,11 @@
 
             <li>
 
-                <a href="#" onclick="logout()">
+                <a href="#"
+                   onclick="logout()">
+
                     🚪 Logout
+
                 </a>
 
             </li>
@@ -441,11 +447,13 @@
 </div>
 
 
+
 <!-- ================= CUSTOMER DETAILS ================= -->
 
 <script type="module">
 
-import { auth, db } from "./js/firebase-config.js";
+import { auth, db }
+    from "./js/firebase-config.js";
 
 import {
     doc,
@@ -453,23 +461,45 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
+// ====================== AUTHENTICATION ======================
+
 auth.onAuthStateChanged(async (user) => {
 
     if (!user) {
 
-        window.location.href =
-            "customer-login.html";
+        window.location.replace(
+            "customer-login.html"
+        );
 
         return;
 
     }
 
 
+    /*
+     * ================= BACK BUTTON PROTECTION =================
+     *
+     * Keep the customer on the dashboard if they press
+     * Chrome's Back button after logging in.
+     */
+
+    history.pushState(
+        { customerDashboard: true },
+        "",
+        window.location.href
+    );
+
+
     const nameElement =
-        document.getElementById("customerName");
+        document.getElementById(
+            "customerName"
+        );
+
 
     const emailElement =
-        document.getElementById("customerEmail");
+        document.getElementById(
+            "customerEmail"
+        );
 
 
     /* Show email */
@@ -484,7 +514,11 @@ auth.onAuthStateChanged(async (user) => {
 
         const userDoc =
             await getDoc(
-                doc(db, "users", user.uid)
+                doc(
+                    db,
+                    "users",
+                    user.uid
+                )
             );
 
 
@@ -496,7 +530,9 @@ auth.onAuthStateChanged(async (user) => {
             nameElement.textContent =
                 userDoc.data().fullName;
 
-        } else {
+        }
+
+        else {
 
             nameElement.textContent =
                 "Customer";
@@ -519,7 +555,33 @@ auth.onAuthStateChanged(async (user) => {
 
 });
 
+
+// ====================== BACK BUTTON ======================
+
+window.addEventListener(
+    "popstate",
+    () => {
+
+        /*
+         * If the customer presses Back while logged in,
+         * keep them on the dashboard.
+         */
+
+        if (auth.currentUser) {
+
+            history.pushState(
+                { customerDashboard: true },
+                "",
+                window.location.href
+            );
+
+        }
+
+    }
+);
+
 </script>
+
 
 
 <!-- ================= AUTH ================= -->
