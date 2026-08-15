@@ -1,337 +1,791 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>EventSphere</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <!-- Existing CSS -->
+    <link rel="stylesheet"
+          href="css/style.css">
+
+    <!-- ================= PWA ================= -->
+
+    <link rel="manifest"
+          href="manifest.json">
+
+    <meta name="theme-color"
+          content="#09265f">
+
 </head>
+
 
 <body>
 
 
-    <!-- Navigation Bar -->
+    <!-- ================= NAVIGATION BAR ================= -->
+
     <header>
+
         <nav class="navbar">
 
+
             <!-- Logo -->
+
             <div class="logo">
-                <h2>EventSphere</h2>
+
+                <h2>
+                    EventSphere
+                </h2>
+
             </div>
 
+
             <!-- Navigation Links -->
+
             <ul class="nav-links">
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Services</a></li>
-                <li><a href="#">Gallery</a></li>
-                <li><a href="#">Reviews</a></li>
-                <li><a href="#">Contact</a></li>
+
+                <li>
+                    <a href="#">
+                        Home
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        Services
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        Gallery
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        Reviews
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        Contact
+                    </a>
+                </li>
+
             </ul>
+
 
             <!-- Login Buttons -->
-           <div class="login-buttons">
-    <a href="customer-login.html" class="customer-btn">Customer Login</a>
-    <a href="admin-login.html" class="admin-btn">Admin Login</a>
-</div>
+
+            <div class="login-buttons">
+
+                <a href="customer-login.html"
+                   class="customer-btn">
+
+                    Customer Login
+
+                </a>
+
+
+                <a href="admin-login.html"
+                   class="admin-btn">
+
+                    Admin Login
+
+                </a>
+
+            </div>
 
         </nav>
+
     </header>
-    <!-- Hero Section -->
-<section class="hero">
 
-    <div class="hero-content">
 
-        <h1>Create Unforgettable Events</h1>
 
-        <p>
-            Plan your dream event with EventSphere.
-            From weddings and birthdays to corporate events,
-            we make every celebration memorable.
+    <!-- ================= HERO SECTION ================= -->
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <h1>
+                Create Unforgettable Events
+            </h1>
+
+
+            <p>
+
+                Plan your dream event with EventSphere.
+                From weddings and birthdays to corporate events,
+                we make every celebration memorable.
+
+            </p>
+
+
+            <div class="hero-buttons">
+
+                <button class="explore-btn">
+                    Explore Services
+                </button>
+
+
+                <button class="book-btn">
+                    Book Now
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= WHY CHOOSE EVENTSPHERE ================= -->
+
+    <section class="why-us">
+
+        <h2>
+            Why Choose EventSphere?
+        </h2>
+
+
+        <div class="why-container">
+
+
+            <div class="why-card">
+
+                <h3>
+                    🎯 Expert Event Planning
+                </h3>
+
+                <p>
+                    Professional planning for weddings,
+                    birthdays, corporate events, and more.
+                </p>
+
+            </div>
+
+
+            <div class="why-card">
+
+                <h3>
+                    💰 Affordable Packages
+                </h3>
+
+                <p>
+                    Flexible pricing with customized event
+                    packages to fit your budget.
+                </p>
+
+            </div>
+
+
+            <div class="why-card">
+
+                <h3>
+                    📞 24/7 Customer Support
+                </h3>
+
+                <p>
+                    Our team is always available to answer
+                    your questions and assist you.
+                </p>
+
+            </div>
+
+
+            <div class="why-card">
+
+                <h3>
+                    ⭐ Trusted by Customers
+                </h3>
+
+                <p>
+                    Hundreds of successful events with
+                    satisfied customers and excellent reviews.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= OUR SERVICES ================= -->
+
+    <section class="services">
+
+        <h2>
+            Our Services
+        </h2>
+
+
+        <div class="services-container">
+
+
+            <div class="service-card">
+
+                <img src="images/wedding.jpg"
+                     alt="Wedding">
+
+                <h3>
+                    Wedding Events
+                </h3>
+
+                <p>
+                    Beautiful wedding planning with
+                    complete event management.
+                </p>
+
+                <h4>
+                    Starting at ₹50,000
+                </h4>
+
+                <button>
+                    Book Now
+                </button>
+
+            </div>
+
+
+
+            <div class="service-card">
+
+                <img src="images/birthday.jpg"
+                     alt="Birthday">
+
+                <h3>
+                    Birthday Parties
+                </h3>
+
+                <p>
+                    Fun birthday celebrations for
+                    kids and adults.
+                </p>
+
+                <h4>
+                    Starting at ₹10,000
+                </h4>
+
+                <button>
+                    Book Now
+                </button>
+
+            </div>
+
+
+
+            <div class="service-card">
+
+                <img src="images/corporate.jpg"
+                     alt="Corporate">
+
+                <h3>
+                    Corporate Events
+                </h3>
+
+                <p>
+                    Professional conferences,
+                    seminars and office events.
+                </p>
+
+                <h4>
+                    Starting at ₹30,000
+                </h4>
+
+                <button>
+                    Book Now
+                </button>
+
+            </div>
+
+
+
+            <div class="service-card">
+
+                <img src="images/anniversary.jpg"
+                     alt="Anniversary">
+
+                <h3>
+                    Anniversary Events
+                </h3>
+
+                <p>
+                    Celebrate your special day with
+                    elegant decorations.
+                </p>
+
+                <h4>
+                    Starting at ₹15,000
+                </h4>
+
+                <button>
+                    Book Now
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= HOW IT WORKS ================= -->
+
+    <section class="how-it-works">
+
+        <h2>
+            How It Works
+        </h2>
+
+
+        <div class="steps-container">
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    1
+                </div>
+
+                <h3>
+                    Choose a Service
+                </h3>
+
+                <p>
+                    Select your preferred event package
+                    from our wide range of services.
+                </p>
+
+            </div>
+
+
+            <div class="arrow">
+                ➜
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    2
+                </div>
+
+                <h3>
+                    Book Your Event
+                </h3>
+
+                <p>
+                    Fill in your event details and
+                    submit your booking request.
+                </p>
+
+            </div>
+
+
+            <div class="arrow">
+                ➜
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    3
+                </div>
+
+                <h3>
+                    Confirmation
+                </h3>
+
+                <p>
+                    Our team will review and confirm
+                    your booking details.
+                </p>
+
+            </div>
+
+
+            <div class="arrow">
+                ➜
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    4
+                </div>
+
+                <h3>
+                    Enjoy Your Event
+                </h3>
+
+                <p>
+                    Relax while EventSphere makes
+                    your celebration unforgettable.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= GALLERY ================= -->
+
+    <section class="gallery">
+
+        <h2>
+            Our Gallery
+        </h2>
+
+
+        <div class="gallery-container">
+
+            <img src="images/gallery1.jpg"
+                 alt="Gallery 1">
+
+            <img src="images/gallery2.jpg"
+                 alt="Gallery 2">
+
+            <img src="images/gallery3.jpg"
+                 alt="Gallery 3">
+
+            <img src="images/gallery4.jpg"
+                 alt="Gallery 4">
+
+            <img src="images/gallery5.jpg"
+                 alt="Gallery 5">
+
+            <img src="images/gallery6.jpg"
+                 alt="Gallery 6">
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= CUSTOMER REVIEWS ================= -->
+
+    <section class="reviews">
+
+        <h2>
+            What Our Customers Say
+        </h2>
+
+
+        <div class="reviews-container">
+
+
+            <div class="review-card">
+
+                <h3>
+                    ⭐⭐⭐⭐⭐
+                </h3>
+
+                <p>
+                    "EventSphere made our wedding unforgettable.
+                    The decorations were beautiful and everything
+                    was perfectly organized."
+                </p>
+
+                <h4>
+                    — Priya & Rahul
+                </h4>
+
+            </div>
+
+
+            <div class="review-card">
+
+                <h3>
+                    ⭐⭐⭐⭐⭐
+                </h3>
+
+                <p>
+                    "Amazing birthday celebration!
+                    The team handled everything professionally
+                    and on time."
+                </p>
+
+                <h4>
+                    — Anjali
+                </h4>
+
+            </div>
+
+
+            <div class="review-card">
+
+                <h3>
+                    ⭐⭐⭐⭐⭐
+                </h3>
+
+                <p>
+                    "Our corporate event was managed flawlessly.
+                    Highly recommended!"
+                </p>
+
+                <h4>
+                    — Tech Solutions Pvt. Ltd.
+                </h4>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= CONTACT ================= -->
+
+    <section class="contact">
+
+        <h2>
+            Contact Us
+        </h2>
+
+
+        <div class="contact-container">
+
+
+            <!-- Contact Information -->
+
+            <div class="contact-info">
+
+                <h3>
+                    Get In Touch
+                </h3>
+
+
+                <p>
+                    <strong>📍 Address:</strong>
+                    Rajahmundry, Andhra Pradesh, India
+                </p>
+
+
+                <p>
+                    <strong>📞 Phone:</strong>
+                    +91 9876543210
+                </p>
+
+
+                <p>
+                    <strong>📧 Email:</strong>
+                    eventsphere.official2026@gmail.com
+                </p>
+
+
+                <p>
+
+                    We are available 24/7 to help make
+                    your special events memorable.
+                    Feel free to contact us anytime.
+
+                </p>
+
+            </div>
+
+
+            <!-- Contact Form -->
+
+            <div class="contact-form">
+
+                <form>
+
+                    <input type="text"
+                           placeholder="Your Name"
+                           required>
+
+
+                    <input type="email"
+                           placeholder="Your Email"
+                           required>
+
+
+                    <textarea
+                        placeholder="Your Message"
+                        rows="6"
+                        required>
+                    </textarea>
+
+
+                    <button type="submit">
+                        Send Message
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer class="footer">
+
+        <div class="footer-container">
+
+
+            <div class="footer-about">
+
+                <h2>
+                    EventSphere
+                </h2>
+
+                <p>
+
+                    We create unforgettable weddings,
+                    birthdays, corporate events and
+                    celebrations with creativity,
+                    elegance and perfection.
+
+                </p>
+
+            </div>
+
+
+            <div class="footer-links">
+
+                <h3>
+                    Quick Links
+                </h3>
+
+
+                <ul>
+
+                    <li>
+                        <a href="#">
+                            Home
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            Services
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            Gallery
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            Reviews
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            Contact
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <div class="footer-contact">
+
+                <h3>
+                    Contact
+                </h3>
+
+
+                <p>
+                    📍 Rajahmundry, Andhra Pradesh
+                </p>
+
+
+                <p>
+                    📞 +91 9876543210
+                </p>
+
+
+                <p>
+                    📧 eventsphere@gmail.com
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <hr>
+
+
+        <p class="copyright">
+
+            © 2026 EventSphere. All Rights Reserved.
+
         </p>
 
-        <div class="hero-buttons">
-            <button class="explore-btn">Explore Services</button>
-            <button class="book-btn">Book Now</button>
-        </div>
+    </footer>
 
-    </div>
 
-</section>
 
-<!-- Why Choose EventSphere -->
+    <!-- ================= SERVICE WORKER ================= -->
 
-<section class="why-us">
+    <script>
 
-    <h2>Why Choose EventSphere?</h2>
+        if ("serviceWorker" in navigator) {
 
-    <div class="why-container">
+            window.addEventListener(
+                "load",
+                function () {
 
-        <div class="why-card">
-            <h3>🎯 Expert Event Planning</h3>
-            <p>Professional planning for weddings, birthdays, corporate events, and more.</p>
-        </div>
+                    navigator.serviceWorker.register(
+                        "/sw.js"
+                    )
+                    .then(function () {
 
-        <div class="why-card">
-            <h3>💰 Affordable Packages</h3>
-            <p>Flexible pricing with customized event packages to fit your budget.</p>
-        </div>
+                        console.log(
+                            "EventSphere Service Worker registered successfully."
+                        );
 
-        <div class="why-card">
-            <h3>📞 24/7 Customer Support</h3>
-            <p>Our team is always available to answer your questions and assist you.</p>
-        </div>
+                    })
+                    .catch(function (error) {
 
-        <div class="why-card">
-            <h3>⭐ Trusted by Customers</h3>
-            <p>Hundreds of successful events with satisfied customers and excellent reviews.</p>
-        </div>
+                        console.error(
+                            "Service Worker registration failed:",
+                            error
+                        );
 
-    </div>
+                    });
 
-</section>
-<!-- Our Services -->
+                }
+            );
 
-<section class="services">
+        }
 
-    <h2>Our Services</h2>
+    </script>
 
-    <div class="services-container">
-
-        <div class="service-card">
-            <img src="images/wedding.jpg" alt="Wedding">
-            <h3>Wedding Events</h3>
-            <p>Beautiful wedding planning with complete event management.</p>
-            <h4>Starting at ₹50,000</h4>
-            <button>Book Now</button>
-        </div>
-
-        <div class="service-card">
-            <img src="images/birthday.jpg" alt="Birthday">
-            <h3>Birthday Parties</h3>
-            <p>Fun birthday celebrations for kids and adults.</p>
-            <h4>Starting at ₹10,000</h4>
-            <button>Book Now</button>
-        </div>
-
-        <div class="service-card">
-            <img src="images/corporate.jpg" alt="Corporate">
-            <h3>Corporate Events</h3>
-            <p>Professional conferences, seminars and office events.</p>
-            <h4>Starting at ₹30,000</h4>
-            <button>Book Now</button>
-        </div>
-
-        <div class="service-card">
-            <img src="images/anniversary.jpg" alt="Anniversary">
-            <h3>Anniversary Events</h3>
-            <p>Celebrate your special day with elegant decorations.</p>
-            <h4>Starting at ₹15,000</h4>
-            <button>Book Now</button>
-        </div>
-
-    </div>
-
-</section>
-
-<!-- How It Works -->
-
-<section class="how-it-works">
-
-    <h2>How It Works</h2>
-
-    <div class="steps-container">
-
-        <div class="step">
-            <div class="step-number">1</div>
-            <h3>Choose a Service</h3>
-            <p>Select your preferred event package from our wide range of services.</p>
-        </div>
-
-        <div class="arrow">➜</div>
-
-        <div class="step">
-            <div class="step-number">2</div>
-            <h3>Book Your Event</h3>
-            <p>Fill in your event details and submit your booking request.</p>
-        </div>
-
-        <div class="arrow">➜</div>
-
-        <div class="step">
-            <div class="step-number">3</div>
-            <h3>Confirmation</h3>
-            <p>Our team will review and confirm your booking details.</p>
-        </div>
-
-        <div class="arrow">➜</div>
-
-        <div class="step">
-            <div class="step-number">4</div>
-            <h3>Enjoy Your Event</h3>
-            <p>Relax while EventSphere makes your celebration unforgettable.</p>
-        </div>
-
-    </div>
-
-</section>
-</div>
-
-</section>
-
-<!-- Gallery -->
-
-<section class="gallery">
-
-    <h2>Our Gallery</h2>
-
-    <div class="gallery-container">
-
-        <img src="images/gallery1.jpg" alt="Gallery 1">
-        <img src="images/gallery2.jpg" alt="Gallery 2">
-        <img src="images/gallery3.jpg" alt="Gallery 3">
-        <img src="images/gallery4.jpg" alt="Gallery 4">
-        <img src="images/gallery5.jpg" alt="Gallery 5">
-        <img src="images/gallery6.jpg" alt="Gallery 6">
-
-    </div>
-
-</section>
-
-<!-- Customer Reviews -->
-
-<section class="reviews">
-
-    <h2>What Our Customers Say</h2>
-
-    <div class="reviews-container">
-
-        <div class="review-card">
-            <h3>⭐⭐⭐⭐⭐</h3>
-            <p>
-                "EventSphere made our wedding unforgettable. The decorations
-                were beautiful and everything was perfectly organized."
-            </p>
-            <h4>— Priya & Rahul</h4>
-        </div>
-
-        <div class="review-card">
-            <h3>⭐⭐⭐⭐⭐</h3>
-            <p>
-                "Amazing birthday celebration! The team handled everything
-                professionally and on time."
-            </p>
-            <h4>— Anjali</h4>
-        </div>
-
-        <div class="review-card">
-            <h3>⭐⭐⭐⭐⭐</h3>
-            <p>
-                "Our corporate event was managed flawlessly. Highly recommended!"
-            </p>
-            <h4>— Tech Solutions Pvt. Ltd.</h4>
-        </div>
-
-    </div>
-
-</section>
-<!-- Contact Us -->
-
-<section class="contact">
-
-    <h2>Contact Us</h2>
-
-    <div class="contact-container">
-
-        <!-- Contact Information -->
-        <div class="contact-info">
-
-            <h3>Get In Touch</h3>
-
-            <p><strong>📍 Address:</strong> Rajahmundry, Andhra Pradesh, India</p>
-
-            <p><strong>📞 Phone:</strong> +91 9876543210</p>
-
-            <p><strong>📧 Email:</strong> eventsphere.official2026@gmail.com</p>
-
-            <p>
-                We are available 24/7 to help make your special events
-                memorable. Feel free to contact us anytime.
-            </p>
-
-        </div>
-
-        <!-- Contact Form -->
-        <div class="contact-form">
-
-            <form>
-
-                <input type="text" placeholder="Your Name" required>
-
-                <input type="email" placeholder="Your Email" required>
-
-                <textarea placeholder="Your Message" rows="6" required></textarea>
-
-                <button type="submit">Send Message</button>
-
-            </form>
-
-        </div>
-
-    </div>
-
-</section>
-<!-- Footer -->
-
-<footer class="footer">
-
-    <div class="footer-container">
-
-        <div class="footer-about">
-            <h2>EventSphere</h2>
-            <p>
-                We create unforgettable weddings, birthdays,
-                corporate events and celebrations with creativity,
-                elegance and perfection.
-            </p>
-        </div>
-
-        <div class="footer-links">
-            <h3>Quick Links</h3>
-
-            <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Services</a></li>
-                <li><a href="#">Gallery</a></li>
-                <li><a href="#">Reviews</a></li>
-                <li><a href="#">Contact</a></li>
-            </ul>
-
-        </div>
-
-        <div class="footer-contact">
-
-            <h3>Contact</h3>
-
-            <p>📍 Rajahmundry, Andhra Pradesh</p>
-
-            <p>📞 +91 9876543210</p>
-
-            <p>📧 eventsphere@gmail.com</p>
-
-        </div>
-
-    </div>
-
-    <hr>
-
-    <p class="copyright">
-        © 2026 EventSphere. All Rights Reserved.
-    </p>
-
-</footer>
-</body>
-</html>
 
 </body>
+
 </html>
