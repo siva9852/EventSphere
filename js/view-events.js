@@ -8,9 +8,54 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
-const eventsContainer = document.getElementById("eventsContainer");
+const eventsContainer =
+    document.getElementById("eventsContainer");
 
 eventsContainer.className = "events-grid";
+
+
+// ====================== IMAGE PATH ======================
+
+function getImagePath(image) {
+
+    if (!image) {
+
+        return "";
+
+    }
+
+
+    image = image.trim();
+
+
+    // Full online URL
+
+    if (
+        image.startsWith("http://") ||
+        image.startsWith("https://")
+    ) {
+
+        return image;
+
+    }
+
+
+    // Local project image
+
+    if (
+        image.startsWith("images/")
+    ) {
+
+        return image;
+
+    }
+
+
+    // If admin enters only the filename
+
+    return "images/" + image;
+
+}
 
 
 // ====================== LOAD EVENTS ======================
@@ -20,7 +65,13 @@ async function loadEvents() {
     try {
 
         const querySnapshot =
-            await getDocs(collection(db, "events"));
+            await getDocs(
+                collection(
+                    db,
+                    "events"
+                )
+            );
+
 
         eventsContainer.innerHTML = "";
 
@@ -28,84 +79,126 @@ async function loadEvents() {
         if (querySnapshot.empty) {
 
             eventsContainer.innerHTML =
-                `<div class="no-events">
-                    <p>No events found.</p>
-                </div>`;
+                `
+                <div class="no-events">
+
+                    <p>
+                        No events found.
+                    </p>
+
+                </div>
+                `;
 
             return;
 
         }
 
 
-        querySnapshot.forEach((eventDoc) => {
+        querySnapshot.forEach(
+            (eventDoc) => {
 
-            const event = eventDoc.data();
-
-            const eventCard =
-                document.createElement("div");
-
-            eventCard.className = "event-card";
+                const event =
+                    eventDoc.data();
 
 
-            eventCard.innerHTML = `
-
-                <div class="event-image-container">
-
-                    <img
-                        src="${event.image}"
-                        alt="${event.eventName}"
-                        class="event-image">
-
-                </div>
+                const eventCard =
+                    document.createElement(
+                        "div"
+                    );
 
 
-                <div class="event-card-content">
+                eventCard.className =
+                    "event-card";
 
-                    <h2>${event.eventName}</h2>
+
+                const imagePath =
+                    getImagePath(
+                        event.image
+                    );
 
 
-                    <div class="event-info">
+                eventCard.innerHTML = `
 
-                        <p>
-                            <strong>Category:</strong>
-                            ${event.category}
-                        </p>
+                    <div class="event-image-container">
 
-                        <p>
-                            <strong>Price:</strong>
-                            ₹${event.price}
-                        </p>
+                        <img
+                            src="${imagePath}"
+                            alt="${event.eventName || "Event"}"
+                            class="event-image"
+                            onerror="this.onerror=null; this.src='images/family.jpg';">
 
                     </div>
 
 
-                    <p class="event-description">
-                        ${event.description}
-                    </p>
+                    <div class="event-card-content">
+
+                        <h2>
+                            ${event.eventName || "Event"}
+                        </h2>
 
 
-                    <button
-                        class="delete-event-button"
-                        onclick="deleteEvent('${eventDoc.id}')">
+                        <div class="event-info">
 
-                        Delete Event
+                            <p>
 
-                    </button>
+                                <strong>
+                                    Category:
+                                </strong>
 
-                </div>
+                                ${event.category || "Not specified"}
 
-            `;
+                            </p>
 
 
-            eventsContainer.appendChild(eventCard);
+                            <p>
 
-        });
+                                <strong>
+                                    Price:
+                                </strong>
+
+                                ₹${event.price || 0}
+
+                            </p>
+
+                        </div>
+
+
+                        <p class="event-description">
+
+                            ${event.description || ""}
+
+                        </p>
+
+
+                        <button
+                            class="delete-event-button"
+                            onclick="deleteEvent('${eventDoc.id}')">
+
+                            Delete Event
+
+                        </button>
+
+                    </div>
+
+                `;
+
+
+                eventsContainer.appendChild(
+                    eventCard
+                );
+
+            }
+        );
 
     }
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "Error loading events:",
+            error
+        );
+
 
         eventsContainer.innerHTML =
             "<p>Error loading events.</p>";
@@ -117,36 +210,55 @@ async function loadEvents() {
 
 // ====================== DELETE EVENT ======================
 
-window.deleteEvent = async function(eventId) {
+window.deleteEvent =
+    async function(eventId) {
 
-    if (!confirm("Are you sure you want to delete this event?")) {
+        if (
+            !confirm(
+                "Are you sure you want to delete this event?"
+            )
+        ) {
 
-        return;
+            return;
 
-    }
+        }
 
 
-    try {
+        try {
 
-        await deleteDoc(
-            doc(db, "events", eventId)
-        );
+            await deleteDoc(
+                doc(
+                    db,
+                    "events",
+                    eventId
+                )
+            );
 
-        alert("Event Deleted Successfully!");
 
-        loadEvents();
+            alert(
+                "Event Deleted Successfully!"
+            );
 
-    }
 
-    catch (error) {
+            loadEvents();
 
-        console.error(error);
+        }
 
-        alert(error.message);
+        catch (error) {
 
-    }
+            console.error(
+                "Delete Event Error:",
+                error
+            );
 
-};
+
+            alert(
+                error.message
+            );
+
+        }
+
+    };
 
 
 // ====================== START ======================
