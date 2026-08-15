@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Verify Booking - EventSphere</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<div class="customer-otp-page">
+
+    <div class="customer-otp-box">
+
+        <div class="customer-otp-icon">
+            ✉️
+        </div>
+
+        <h1>Verify Booking</h1>
+
+        <p>
+            Enter the 6-digit OTP sent to your email.
+        </p>
+
+        <form id="bookingOtpForm">
+
+            <div class="customer-otp-input">
+
+                <input type="text" maxlength="1" class="otp-box-input" required>
+                <input type="text" maxlength="1" class="otp-box-input" required>
+                <input type="text" maxlength="1" class="otp-box-input" required>
+                <input type="text" maxlength="1" class="otp-box-input" required>
+                <input type="text" maxlength="1" class="otp-box-input" required>
+                <input type="text" maxlength="1" class="otp-box-input" required>
+
+            </div>
+
+            <input type="hidden" id="bookingOtp">
+
+            <button type="submit">
+                Verify Booking
+                <span>➤</span>
+            </button>
+
+        </form>
+
+        <button id="resendBookingOtp"
+                class="customer-resend-button">
+            ↻ &nbsp; Resend OTP
+        </button>
+
+        <p class="otp-timer">
+            Didn't receive the code?
+            <strong>Check your email</strong>
+        </p>
+
+    </div>
+
+</div>
+
+
+<script type="module" src="js/booking-otp.js"></script>
+
+</body>
+
+</html>

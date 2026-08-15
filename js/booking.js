@@ -1,13 +1,8 @@
 import { db, auth } from "./firebase-config.js";
 
 import {
-    collection,
-    addDoc,
     getDoc,
-    doc,
-    serverTimestamp,
-    setDoc,
-    increment
+    doc
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
@@ -76,11 +71,44 @@ bookingForm.addEventListener("submit", async (e) => {
             eventDoc.data();
 
 
-        // ================= CREATE BOOKING =================
+        // ================= SEND OTP =================
 
-        await addDoc(
-            collection(db, "bookings"),
-            {
+        const response =
+            await fetch(
+                "https://eventsphere-dndh.onrender.com/send-otp",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        email: user.email
+                    })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.success) {
+
+            alert(data.message);
+
+            return;
+
+        }
+
+
+        // ================= SAVE BOOKING DATA =================
+
+        localStorage.setItem(
+            "bookingData",
+            JSON.stringify({
 
                 eventId:
                     eventId,
@@ -100,7 +128,6 @@ bookingForm.addEventListener("submit", async (e) => {
                 eventDate:
                     eventDate,
 
-                // Customer selected event end time
                 eventEndTime:
                     eventEndTime,
 
@@ -111,44 +138,19 @@ bookingForm.addEventListener("submit", async (e) => {
                     location,
 
                 requirements:
-                    requirements,
+                    requirements
 
-                status:
-                    "Pending",
-
-                createdAt:
-                    serverTimestamp()
-
-            }
-        );
-
-
-        // ================= UPDATE TOTAL BOOKINGS =================
-
-        await setDoc(
-            doc(db, "statistics", "main"),
-            {
-                totalBookings:
-                    increment(1)
-            },
-            {
-                merge: true
-            }
+            })
         );
 
 
         alert(
-            "Booking Successful! Waiting for admin approval."
-        );
-
-
-        localStorage.removeItem(
-            "selectedEventId"
+            "Verification code has been sent to your email."
         );
 
 
         window.location.href =
-            "customer-dashboard.html";
+            "booking-otp.html";
 
     }
 
@@ -156,7 +158,7 @@ bookingForm.addEventListener("submit", async (e) => {
 
         console.error(error);
 
-        alert(error.message);
+        alert("Unable to send verification code.");
 
     }
 
