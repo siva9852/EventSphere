@@ -13,43 +13,354 @@
     <link rel="stylesheet"
           href="css/style.css">
 
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+    <style>
+
+/* ================= BOOKING PAGE ================= */
+
+.booking-page {
+    background: #f5f7fc;
+    min-height: 100vh;
+    padding: 28px 40px 45px;
+    box-sizing: border-box;
+}
+
+
+/* ================= HEADER ================= */
+
+.booking-header {
+    margin-bottom: 20px;
+}
+
+.booking-header-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.booking-header-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #eaf0ff;
+    color: #2563eb;
+
+    border-radius: 12px;
+
+    font-size: 21px;
+}
+
+.booking-header h1 {
+    margin: 0;
+
+    font-size: 30px;
+
+    color: #18366f;
+
+    font-weight: 750;
+}
+
+.booking-subtitle {
+    margin: 5px 0 0 60px;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+.booking-heading-line {
+    width: 50px;
+    height: 3px;
+
+    background: #2563eb;
+
+    border-radius: 5px;
+
+    margin-top: 12px;
+}
+
+
+/* ================= FORM CARD ================= */
+
+.booking-form-card {
+    width: 100%;
+    max-width: 760px;
+
+    background: white;
+
+    border-radius: 16px;
+
+    padding: 24px 28px;
+
+    box-sizing: border-box;
+
+    box-shadow:
+        0 8px 25px rgba(30, 64, 175, 0.08);
+
+    border: 1px solid #e3e8f2;
+}
+
+
+/* ================= FORM GROUP ================= */
+
+.booking-form-group {
+    margin-bottom: 16px;
+}
+
+.booking-form-group label {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin-bottom: 6px;
+
+    color: #18366f;
+
+    font-size: 14px;
+
+    font-weight: 700;
+}
+
+.booking-form-group label i {
+    width: 27px;
+    height: 27px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 7px;
+
+    background: #eef3ff;
+
+    color: #2563eb;
+
+    font-size: 12px;
+}
+
+
+/* ================= INPUTS ================= */
+
+.booking-form-group input,
+.booking-form-group textarea {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    border: 1px solid #d6deeb;
+
+    border-radius: 8px;
+
+    background: #fbfcff;
+
+    color: #172554;
+
+    font-size: 14px;
+
+    font-family: inherit;
+
+    outline: none;
+
+    transition: 0.2s;
+}
+
+.booking-form-group input {
+    height: 44px;
+
+    padding: 0 12px;
+}
+
+.booking-form-group textarea {
+    height: 90px;
+
+    padding: 11px 12px;
+
+    resize: vertical;
+}
+
+.booking-form-group input::placeholder,
+.booking-form-group textarea::placeholder {
+    color: #94a3b8;
+}
+
+.booking-form-group input:focus,
+.booking-form-group textarea:focus {
+    background: white;
+
+    border-color: #3974ed;
+
+    box-shadow:
+        0 0 0 3px rgba(37,99,235,0.08);
+}
+
+
+/* ================= DATE / TIME ================= */
+
+.booking-form-group input[type="date"],
+.booking-form-group input[type="time"] {
+    cursor: pointer;
+}
+
+.booking-form-group
+input[type="date"]::-webkit-calendar-picker-indicator,
+.booking-form-group
+input[type="time"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+
+    width: 16px;
+    height: 16px;
+
+    opacity: 0.7;
+}
+
+
+/* ================= BUTTON ================= */
+
+.confirm-booking-btn {
+    width: 100%;
+
+    height: 46px;
+
+    margin-top: 3px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #4f46e5
+        );
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+    box-shadow:
+        0 6px 15px
+        rgba(37,99,235,0.18);
+}
+
+.confirm-booking-btn:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 9px 18px
+        rgba(37,99,235,0.25);
+}
+
+.confirm-booking-btn i {
+    margin-right: 7px;
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 700px) {
+
+    .booking-page {
+        padding: 22px 18px 35px;
+    }
+
+    .booking-header h1 {
+        font-size: 26px;
+    }
+
+    .booking-form-card {
+        padding: 20px;
+    }
+
+}
+
+</style>
 </head>
+
 
 <body>
 
+
 <div class="dashboard">
 
-    <!-- SIDEBAR -->
+
+    <!-- ================= SIDEBAR ================= -->
 
     <div class="sidebar">
 
-        <h2>EventSphere</h2>
+        <h2>
+            EventSphere
+        </h2>
+
 
         <ul>
 
             <li>
+
                 <a href="customer-dashboard.html">
-                    🏠 Dashboard
+
+                    <i class="fa-solid fa-house"></i>
+
+                    Dashboard
+
                 </a>
+
             </li>
 
+
             <li>
+
                 <a href="customer-events.html">
-                    🎉 Events
+
+                    <i class="fa-solid fa-calendar-days"></i>
+
+                    Events
+
                 </a>
+
             </li>
 
-            <li>
-                <a href="#">
-                    📅 My Bookings
+
+            <li class="active">
+
+                <a href="my-bookings.html">
+
+                    <i class="fa-solid fa-calendar-check"></i>
+
+                    My Bookings
+
                 </a>
+
             </li>
 
+
             <li>
+
                 <a href="#"
                    onclick="logout()">
-                    🚪 Logout
+
+                    <i class="fa-solid fa-right-from-bracket"></i>
+
+                    Logout
+
                 </a>
+
             </li>
 
         </ul>
@@ -57,133 +368,212 @@
     </div>
 
 
-    <!-- MAIN CONTENT -->
+
+    <!-- ================= MAIN CONTENT ================= -->
 
     <div class="dashboard-content booking-page">
 
-        <h1>Book Event</h1>
 
-        <p class="booking-subtitle">
-            Enter your event details to submit a booking request.
-        </p>
+        <!-- ================= HEADER ================= -->
 
-
-        <div class="booking-form-card">
-
-            <form id="bookingForm">
+        <div class="booking-header">
 
 
-                <!-- EVENT DATE -->
+            <div class="booking-header-top">
 
-                <div class="booking-form-group">
 
-                    <label for="eventDate">
-                        📅 Event Date
-                    </label>
+                <div class="booking-header-icon">
 
-                    <input
-                        type="date"
-                        id="eventDate"
-                        required
-                    >
+                    <i class="fa-solid fa-calendar-plus"></i>
 
                 </div>
 
 
-                <!-- EVENT END TIME -->
+                <h1>
+                    Book Event
+                </h1>
+
+
+            </div>
+
+
+            <p class="booking-subtitle">
+
+                Enter your event details to submit a booking request.
+
+            </p>
+
+
+            <div class="booking-heading-line"></div>
+
+
+        </div>
+
+
+
+        <!-- ================= FORM ================= -->
+
+        <div class="booking-form-card">
+
+
+            <form id="bookingForm">
+
+
+                <!-- ================= DATE ================= -->
 
                 <div class="booking-form-group">
 
-                    <label for="eventEndTime">
-                        🕐 Event End Time
+
+                    <label for="eventDate">
+
+                        <i class="fa-regular fa-calendar"></i>
+
+                        Event Date
+
                     </label>
+
+
+                    <input
+                        type="date"
+                        id="eventDate"
+                        required>
+
+
+                </div>
+
+
+
+                <!-- ================= END TIME ================= -->
+
+                <div class="booking-form-group">
+
+
+                    <label for="eventEndTime">
+
+                        <i class="fa-regular fa-clock"></i>
+
+                        Event End Time
+
+                    </label>
+
 
                     <input
                         type="time"
                         id="eventEndTime"
                         value="20:00"
-                        required
-                    >
+                        required>
+
 
                 </div>
 
 
-                <!-- GUESTS -->
+
+                <!-- ================= GUESTS ================= -->
 
                 <div class="booking-form-group">
 
+
                     <label for="guests">
-                        👥 Number of Guests
+
+                        <i class="fa-solid fa-users"></i>
+
+                        Number of Guests
+
                     </label>
+
 
                     <input
                         type="number"
                         id="guests"
                         min="1"
                         placeholder="Enter number of guests"
-                        required
-                    >
+                        required>
+
 
                 </div>
 
 
-                <!-- LOCATION -->
+
+                <!-- ================= LOCATION ================= -->
 
                 <div class="booking-form-group">
 
+
                     <label for="location">
-                        📍 Location
+
+                        <i class="fa-solid fa-location-dot"></i>
+
+                        Location
+
                     </label>
+
 
                     <input
                         type="text"
                         id="location"
                         placeholder="Enter event location"
-                        required
-                    >
+                        required>
+
 
                 </div>
 
 
-                <!-- REQUIREMENTS -->
+
+                <!-- ================= REQUIREMENTS ================= -->
 
                 <div class="booking-form-group">
 
+
                     <label for="requirements">
-                        📝 Additional Requirements
+
+                        <i class="fa-regular fa-file-lines"></i>
+
+                        Additional Requirements
+
                     </label>
+
 
                     <textarea
                         id="requirements"
                         placeholder="Enter any additional requirements"
-                        rows="5"
-                    ></textarea>
+                        rows="5"></textarea>
+
 
                 </div>
 
 
-                <!-- BUTTON -->
+
+                <!-- ================= BUTTON ================= -->
 
                 <button
                     type="submit"
                     class="confirm-booking-btn">
 
+                    <i class="fa-solid fa-calendar-check"></i>
+
                     Confirm Booking
 
                 </button>
+
 
             </form>
 
         </div>
 
+
     </div>
+
 
 </div>
 
 
+
+<!-- ================= BOOKING JS ================= -->
+
 <script type="module"
         src="js/booking.js">
 </script>
+
 
 </body>
 
