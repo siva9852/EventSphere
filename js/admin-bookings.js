@@ -819,94 +819,358 @@ window.rejectBooking = async function (
     eventName
 ) {
 
-    try {
+    const overlay =
+        document.createElement("div");
 
-        await updateDoc(
-            doc(
-                db,
-                "bookings",
-                bookingId
-            ),
-            {
-                status:
-                    "Rejected"
-            }
+    overlay.id = "adminRejectOverlay";
+
+    overlay.style.cssText = `
+        position:fixed;
+        inset:0;
+        background:rgba(15,23,42,0.55);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+        z-index:9999;
+        backdrop-filter:blur(4px);
+    `;
+
+
+    overlay.innerHTML = `
+
+        <div style="
+            width:100%;
+            max-width:440px;
+            background:#ffffff;
+            border-radius:18px;
+            padding:28px;
+            box-sizing:border-box;
+            box-shadow:0 20px 50px rgba(15,23,42,0.22);
+        ">
+
+            <div style="
+                width:50px;
+                height:50px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                border-radius:14px;
+                background:#fff1f2;
+                color:#dc2626;
+                font-size:21px;
+                margin-bottom:15px;
+            ">
+                ✕
+            </div>
+
+
+            <h2 style="
+                margin:0 0 7px;
+                color:#172554;
+                font-size:23px;
+            ">
+                Reject Booking
+            </h2>
+
+
+            <p style="
+                margin:0 0 20px;
+                color:#64748b;
+                font-size:14px;
+            ">
+                Are you sure you want to reject
+                <strong>${eventName}</strong>?
+            </p>
+
+
+            <label style="
+                display:block;
+                margin-bottom:7px;
+                color:#334155;
+                font-size:14px;
+                font-weight:700;
+            ">
+                Reason for rejection
+                <span style="color:#dc2626;">*</span>
+            </label>
+
+
+            <textarea
+                id="adminRejectReason"
+                placeholder="Please enter the reason for rejecting this booking..."
+                style="
+                    width:100%;
+                    min-height:100px;
+                    padding:12px 13px;
+                    box-sizing:border-box;
+                    border:1px solid #d5dce8;
+                    border-radius:10px;
+                    resize:vertical;
+                    outline:none;
+                    font-family:inherit;
+                    font-size:14px;
+                    color:#172554;
+                    background:#fbfcff;
+                "
+            ></textarea>
+
+
+            <div style="
+                display:flex;
+                justify-content:flex-end;
+                gap:10px;
+                margin-top:20px;
+            ">
+
+                <button
+                    type="button"
+                    id="closeAdminReject"
+                    style="
+                        height:40px;
+                        padding:0 17px;
+                        border:none;
+                        border-radius:8px;
+                        background:#f1f5f9;
+                        color:#475569;
+                        font-size:14px;
+                        font-weight:700;
+                        cursor:pointer;
+                    "
+                >
+                    Keep Booking
+                </button>
+
+
+                <button
+                    type="button"
+                    id="confirmAdminReject"
+                    style="
+                        height:40px;
+                        padding:0 17px;
+                        border:none;
+                        border-radius:8px;
+                        background:#dc2626;
+                        color:#ffffff;
+                        font-size:14px;
+                        font-weight:700;
+                        cursor:pointer;
+                    "
+                >
+                    ✕ Reject Booking
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(overlay);
+
+
+    const reasonInput =
+        document.getElementById(
+            "adminRejectReason"
         );
 
 
-        // ================= SEND EMAIL =================
-
-        const response =
-            await fetch(
-                "https://eventsphere-dndh.onrender.com/booking-status",
-                {
-
-                    method:
-                        "POST",
-
-                    headers: {
-
-                        "Content-Type":
-                            "application/json"
-
-                    },
-
-                    body: JSON.stringify({
-
-                        email:
-                            customerEmail,
-
-                        eventName:
-                            eventName,
-
-                        status:
-                            "Rejected"
-
-                    })
-
-                }
-            );
+    const closeButton =
+        document.getElementById(
+            "closeAdminReject"
+        );
 
 
-        const data =
-            await response.json();
+    const confirmButton =
+        document.getElementById(
+            "confirmAdminReject"
+        );
 
 
-        if (!data.success) {
+    // ================= CLOSE =================
 
-            alert(
-                "Booking rejected, but email could not be sent."
-            );
+    closeButton.addEventListener(
+        "click",
+        () => {
 
-            loadBookings();
-
-            return;
+            overlay.remove();
 
         }
+    );
 
 
-        alert(
-            "Booking Rejected! Email sent to customer."
-        );
+    // ================= CLICK OUTSIDE =================
+
+    overlay.addEventListener(
+        "click",
+        (event) => {
+
+            if (
+                event.target === overlay
+            ) {
+
+                overlay.remove();
+
+            }
+
+        }
+    );
 
 
-        loadBookings();
+    // ================= CONFIRM =================
 
-    }
+    confirmButton.addEventListener(
+        "click",
+        async () => {
 
-    catch (error) {
+            const reason =
+                reasonInput.value.trim();
 
-        console.error(error);
 
-        alert(
-            error.message
-        );
+            if (!reason) {
 
-    }
+                alert(
+                    "Please enter a reason for rejection."
+                );
+
+                reasonInput.focus();
+
+                return;
+
+            }
+
+
+            try {
+
+                confirmButton.disabled = true;
+
+                confirmButton.innerHTML =
+                    "Rejecting...";
+
+
+                // ================= FIRESTORE =================
+
+                await updateDoc(
+
+                    doc(
+                        db,
+                        "bookings",
+                        bookingId
+                    ),
+
+                    {
+
+                        status:
+                            "Rejected",
+
+                        cancelledBy:
+                            "Admin",
+
+                        cancellationReason:
+                            reason,
+
+                        cancelledAt:
+                            new Date()
+
+                    }
+
+                );
+
+
+                // ================= EMAIL =================
+
+                const response =
+                    await fetch(
+                        "https://eventsphere-dndh.onrender.com/booking-status",
+                        {
+
+                            method: "POST",
+
+                            headers: {
+
+                                "Content-Type":
+                                    "application/json"
+
+                            },
+
+                            body:
+                                JSON.stringify({
+
+                                    email:
+                                        customerEmail,
+
+                                    eventName:
+                                        eventName,
+
+                                    status:
+                                        "Rejected",
+
+                                    reason:
+                                        reason
+
+                                })
+
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                overlay.remove();
+
+
+                if (!data.success) {
+
+                    alert(
+                        "Booking rejected, but email could not be sent."
+                    );
+
+                    loadBookings();
+
+                    return;
+
+                }
+
+
+                alert(
+                    "Booking Rejected! Email sent to customer."
+                );
+
+
+                loadBookings();
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Reject Booking Error:",
+                    error
+                );
+
+
+                confirmButton.disabled =
+                    false;
+
+
+                confirmButton.innerHTML =
+                    "✕ Reject Booking";
+
+
+                alert(
+                    error.message ||
+                    "Unable to reject booking."
+                );
+
+            }
+
+        }
+    );
 
 };
-
-
 // ================= FIRST LOAD =================
 
 loadBookings();
