@@ -15,58 +15,73 @@ import {
 
 // ====================== ADMIN INACTIVITY LOGOUT ======================
 
-const INACTIVITY_TIME = 15 * 60 * 1000;
+const INACTIVITY_TIME =
+    15 * 60 * 1000;
 
 let inactivityTimer = null;
 
 
-// Start inactivity timer
+// ====================== START INACTIVITY TIMER ======================
 
 function startInactivityTimer() {
 
     if (inactivityTimer) {
-        clearTimeout(inactivityTimer);
+
+        clearTimeout(
+            inactivityTimer
+        );
+
     }
 
-    inactivityTimer = setTimeout(async () => {
 
-        try {
+    inactivityTimer =
+        setTimeout(
+            async () => {
 
-            await signOut(auth);
+                try {
 
-            sessionStorage.removeItem(
-                "adminOtpVerified"
-            );
+                    await signOut(auth);
 
-            localStorage.removeItem(
-                "adminOtpEmail"
-            );
 
-            alert(
-                "You have been logged out due to inactivity."
-            );
+                    sessionStorage.removeItem(
+                        "adminOtpVerified"
+                    );
 
-            window.location.replace(
-                "admin-login.html"
-            );
 
-        }
+                    localStorage.removeItem(
+                        "adminOtpEmail"
+                    );
 
-        catch (error) {
 
-            console.error(
-                "Automatic Logout Error:",
-                error
-            );
+                    alert(
+                        "You have been logged out due to inactivity."
+                    );
 
-        }
 
-    }, INACTIVITY_TIME);
+                    window.location.replace(
+                        "admin-login.html"
+                    );
+
+                }
+
+
+                catch (error) {
+
+                    console.error(
+                        "Automatic Logout Error:",
+                        error
+                    );
+
+                }
+
+            },
+            INACTIVITY_TIME
+        );
 
 }
 
 
-// Reset inactivity timer
+// ====================== RESET INACTIVITY TIMER ======================
 
 function resetInactivityTimer() {
 
@@ -79,7 +94,7 @@ function resetInactivityTimer() {
 }
 
 
-// Detect admin activity
+// ====================== DETECT ADMIN ACTIVITY ======================
 
 [
     "click",
@@ -87,39 +102,46 @@ function resetInactivityTimer() {
     "keydown",
     "scroll",
     "touchstart"
-].forEach((event) => {
+].forEach(
+    (event) => {
 
-    document.addEventListener(
-        event,
-        resetInactivityTimer
-    );
+        document.addEventListener(
+            event,
+            resetInactivityTimer
+        );
 
-});
+    }
+);
 
 
 // ====================== AUTH STATE ======================
 
-auth.onAuthStateChanged((user) => {
+auth.onAuthStateChanged(
+    (user) => {
 
-    if (user) {
+        if (user) {
 
-        startInactivityTimer();
+            startInactivityTimer();
 
-    }
+        }
 
-    else {
+        else {
 
-        if (inactivityTimer) {
+            if (inactivityTimer) {
 
-            clearTimeout(inactivityTimer);
+                clearTimeout(
+                    inactivityTimer
+                );
 
-            inactivityTimer = null;
+                inactivityTimer =
+                    null;
+
+            }
 
         }
 
     }
-
-});
+);
 
 
 // ====================== ADMIN LOGIN ======================
@@ -153,11 +175,12 @@ if (adminLoginForm) {
 
             try {
 
-                // Clear any old OTP verification
+                // ================= CLEAR OLD OTP =================
 
                 sessionStorage.removeItem(
                     "adminOtpVerified"
                 );
+
 
                 localStorage.removeItem(
                     "adminOtpEmail"
@@ -204,30 +227,42 @@ if (adminLoginForm) {
                     );
 
 
-                    await signOut(auth);
+                    await signOut(
+                        auth
+                    );
+
 
                     return;
 
                 }
 
 
-                // ================= SEND OTP =================
+                // ================= SEND ADMIN OTP =================
 
                 const response =
                     await fetch(
                         "https://eventsphere-dndh.onrender.com/send-otp",
                         {
 
-                            method: "POST",
+                            method:
+                                "POST",
 
                             headers: {
+
                                 "Content-Type":
                                     "application/json"
+
                             },
 
                             body:
                                 JSON.stringify({
-                                    email: email
+
+                                    email:
+                                        email,
+
+                                    loginType:
+                                        "admin"
+
                                 })
 
                         }
@@ -245,14 +280,17 @@ if (adminLoginForm) {
                     );
 
 
-                    await signOut(auth);
+                    await signOut(
+                        auth
+                    );
+
 
                     return;
 
                 }
 
 
-                // Store email for OTP verification
+                // ================= STORE ADMIN EMAIL =================
 
                 localStorage.setItem(
                     "adminOtpEmail",
@@ -261,23 +299,26 @@ if (adminLoginForm) {
 
 
                 alert(
-                    "OTP sent to your Admin Email."
+                    "Admin Login OTP has been sent to your email."
                 );
 
 
                 /*
                  * IMPORTANT:
-                 * Do not set adminOtpVerified here.
                  *
-                 * It will only be set after the
-                 * correct OTP is entered.
+                 * adminOtpVerified is NOT set here.
+                 *
+                 * It will only be set after
+                 * the correct OTP is entered.
                  */
+
 
                 window.location.replace(
                     "admin-otp.html"
                 );
 
             }
+
 
             catch (error) {
 
@@ -333,7 +374,7 @@ async function loadDashboardStats() {
         );
 
 
-    // Run only on Admin Dashboard
+    // ================= RUN ONLY ON ADMIN DASHBOARD =================
 
     if (
         !totalCustomersElement ||
@@ -361,7 +402,8 @@ async function loadDashboardStats() {
             );
 
 
-        let totalCustomers = 0;
+        let totalCustomers =
+            0;
 
 
         usersSnapshot.forEach(
@@ -418,9 +460,12 @@ async function loadDashboardStats() {
             new Date();
 
 
-        let activeBookings = 0;
+        let activeBookings =
+            0;
 
-        let completedBookings = 0;
+
+        let completedBookings =
+            0;
 
 
         bookingsSnapshot.forEach(
@@ -430,7 +475,9 @@ async function loadDashboardStats() {
                     bookingDoc.data();
 
 
-                if (!booking.eventDate) {
+                if (
+                    !booking.eventDate
+                ) {
 
                     return;
 
@@ -486,6 +533,7 @@ async function loadDashboardStats() {
 
     }
 
+
     catch (error) {
 
         console.error(
@@ -523,7 +571,7 @@ async function loadDashboardStats() {
 loadDashboardStats();
 
 
-// Refresh every 30 seconds
+// ====================== REFRESH EVERY 30 SECONDS ======================
 
 setInterval(
     () => {
@@ -542,7 +590,9 @@ window.logout =
 
         try {
 
-            await signOut(auth);
+            await signOut(
+                auth
+            );
 
 
             // Clear admin OTP session
@@ -567,6 +617,7 @@ window.logout =
             );
 
         }
+
 
         catch (error) {
 

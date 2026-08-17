@@ -80,6 +80,7 @@ if (
 
 }
 
+
 else {
 
     console.error(
@@ -107,7 +108,8 @@ app.post(
         try {
 
             const {
-                email
+                email,
+                loginType
             } = req.body;
 
 
@@ -128,11 +130,23 @@ app.post(
             }
 
 
+            // =================================================
+            // OTP TYPE
+            // =================================================
+
+            const type =
+                loginType ||
+                "registration";
+
+
+            // =================================================
+            // GENERATE OTP
+            // =================================================
+
             const otp =
                 Math.floor(
                     100000 +
-                    Math.random() *
-                    900000
+                    Math.random() * 900000
                 );
 
 
@@ -152,6 +166,136 @@ app.post(
                 otp
             );
 
+
+            // =================================================
+            // EMAIL DETAILS
+            // =================================================
+
+            let subject =
+                "";
+
+            let message =
+                "";
+
+
+            // =================================================
+            // CUSTOMER REGISTRATION
+            // =================================================
+
+            if (
+                type ===
+                "registration"
+            ) {
+
+                subject =
+                    "EventSphere Customer Registration OTP";
+
+
+                message =
+`Hello,
+
+Your EventSphere customer registration OTP is:
+
+${otp}
+
+This OTP is valid for 5 minutes.
+
+If you did not request this registration, please ignore this email.
+
+Regards,
+EventSphere Team`;
+
+            }
+
+
+            // =================================================
+            // CUSTOMER LOGIN
+            // =================================================
+
+            else if (
+                type ===
+                "customer"
+            ) {
+
+                subject =
+                    "EventSphere Customer Login OTP";
+
+
+                message =
+`Hello,
+
+Your EventSphere customer login OTP is:
+
+${otp}
+
+This OTP is valid for 5 minutes.
+
+This OTP is required to securely access your EventSphere customer account.
+
+If you did not attempt to login, please ignore this email.
+
+Regards,
+EventSphere Team`;
+
+            }
+
+
+            // =================================================
+            // ADMIN LOGIN
+            // =================================================
+
+            else if (
+                type ===
+                "admin"
+            ) {
+
+                subject =
+                    "EventSphere Admin Login OTP";
+
+
+                message =
+`Hello Admin,
+
+Your EventSphere administrator login OTP is:
+
+${otp}
+
+This OTP is valid for 5 minutes.
+
+This OTP is required for secure administrator access to EventSphere.
+
+If you did not attempt to login to the EventSphere Admin Panel, please ignore this email.
+
+Regards,
+EventSphere Admin Security`;
+
+            }
+
+
+            // =================================================
+            // INVALID TYPE
+            // =================================================
+
+            else {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Invalid OTP type."
+
+                    });
+
+            }
+
+
+            // =================================================
+            // SEND EMAIL THROUGH BREVO
+            // =================================================
 
             await axios.post(
 
@@ -183,11 +327,11 @@ app.post(
 
 
                     subject:
-                        "EventSphere Email Verification OTP",
+                        subject,
 
 
                     textContent:
-                        `Your EventSphere OTP is ${otp}. It is valid for 5 minutes.`
+                        message
 
                 },
 
@@ -211,6 +355,10 @@ app.post(
 
             );
 
+
+            // =================================================
+            // SUCCESS
+            // =================================================
 
             res.json({
 
@@ -266,10 +414,15 @@ app.post(
         const {
 
             email,
+
             otp
 
         } = req.body;
 
+
+        // =================================================
+        // CHECK OTP EXISTS
+        // =================================================
 
         if (
             !otpStore[email]
@@ -289,6 +442,10 @@ app.post(
 
         }
 
+
+        // =================================================
+        // CHECK EXPIRY
+        // =================================================
 
         if (
             Date.now() >
@@ -314,6 +471,10 @@ app.post(
         }
 
 
+        // =================================================
+        // CHECK OTP
+        // =================================================
+
         if (
             Number(otp) !==
             otpStore[email].otp
@@ -333,6 +494,10 @@ app.post(
 
         }
 
+
+        // =================================================
+        // OTP VERIFIED
+        // =================================================
 
         delete otpStore[email];
 
@@ -364,8 +529,11 @@ app.post(
             const {
 
                 email,
+
                 eventName,
+
                 status,
+
                 reason
 
             } = req.body;
@@ -605,13 +773,17 @@ app.post(
             const {
 
                 customerEmail,
+
                 eventName,
+
                 reason
 
             } = req.body;
 
 
-            // ================= VALIDATION =================
+            // =================================================
+            // VALIDATION
+            // =================================================
 
             if (
                 !customerEmail ||
@@ -634,19 +806,25 @@ app.post(
             }
 
 
-            // ================= ADMIN EMAIL =================
+            // =================================================
+            // ADMIN EMAIL
+            // =================================================
 
             const adminEmail =
                 "eventsphere.official2026@gmail.com";
 
 
-            // ================= SUBJECT =================
+            // =================================================
+            // SUBJECT
+            // =================================================
 
             const subject =
                 "EventSphere Booking Cancelled by Customer";
 
 
-            // ================= MESSAGE =================
+            // =================================================
+            // MESSAGE
+            // =================================================
 
             const message =
 `Hello Admin,
@@ -668,7 +846,9 @@ Regards,
 EventSphere Team`;
 
 
-            // ================= SEND EMAIL =================
+            // =================================================
+            // SEND EMAIL
+            // =================================================
 
             await axios.post(
 
@@ -868,6 +1048,7 @@ app.delete(
                     );
 
                 }
+
 
                 else {
 

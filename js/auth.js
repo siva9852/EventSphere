@@ -13,59 +13,82 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
-// ====================== INACTIVITY LOGOUT ======================
+// =========================================================
+// INACTIVITY LOGOUT
+// =========================================================
 
-const INACTIVITY_TIME = 30 * 60 * 1000;
+const INACTIVITY_TIME =
+    30 * 60 * 1000;
 
 let inactivityTimer = null;
 
 
+// =========================================================
+// START INACTIVITY TIMER
+// =========================================================
+
 function startInactivityTimer() {
 
     if (inactivityTimer) {
-        clearTimeout(inactivityTimer);
+
+        clearTimeout(
+            inactivityTimer
+        );
+
     }
 
-    inactivityTimer = setTimeout(async () => {
+    inactivityTimer =
+        setTimeout(
+            async () => {
 
-        try {
+                try {
 
-            await signOut(auth);
+                    await signOut(auth);
 
-            alert(
-                "You have been logged out due to inactivity."
-            );
+                    alert(
+                        "You have been logged out due to inactivity."
+                    );
 
-            window.location.replace(
-                "customer-login.html"
-            );
+                    window.location.replace(
+                        "customer-login.html"
+                    );
 
-        }
+                }
 
-        catch (error) {
+                catch (error) {
 
-            console.error(
-                "Automatic Logout Error:",
-                error
-            );
+                    console.error(
+                        "Automatic Logout Error:",
+                        error
+                    );
 
-        }
+                }
 
-    }, INACTIVITY_TIME);
+            },
+            INACTIVITY_TIME
+        );
 
 }
 
+
+// =========================================================
+// RESET INACTIVITY TIMER
+// =========================================================
 
 function resetInactivityTimer() {
 
     if (auth.currentUser) {
+
         startInactivityTimer();
+
     }
 
 }
 
 
-// Detect user activity
+// =========================================================
+// DETECT USER ACTIVITY
+// =========================================================
 
 [
     "click",
@@ -73,42 +96,52 @@ function resetInactivityTimer() {
     "keydown",
     "scroll",
     "touchstart"
-].forEach((event) => {
+].forEach(
+    (event) => {
 
-    document.addEventListener(
-        event,
-        resetInactivityTimer
-    );
-
-});
-
-
-// Check Firebase login state
-
-auth.onAuthStateChanged((user) => {
-
-    if (user) {
-
-        startInactivityTimer();
+        document.addEventListener(
+            event,
+            resetInactivityTimer
+        );
 
     }
+);
 
-    else {
 
-        if (inactivityTimer) {
+// =========================================================
+// CHECK FIREBASE LOGIN STATE
+// =========================================================
 
-            clearTimeout(inactivityTimer);
+auth.onAuthStateChanged(
+    (user) => {
 
-            inactivityTimer = null;
+        if (user) {
+
+            startInactivityTimer();
+
+        }
+
+        else {
+
+            if (inactivityTimer) {
+
+                clearTimeout(
+                    inactivityTimer
+                );
+
+                inactivityTimer = null;
+
+            }
 
         }
 
     }
+);
 
-});
 
-
-// ====================== REGISTRATION ======================
+// =========================================================
+// CUSTOMER REGISTRATION
+// =========================================================
 
 const registerForm =
     document.getElementById(
@@ -130,20 +163,24 @@ if (registerForm) {
                     "fullName"
                 ).value;
 
+
             const email =
                 document.getElementById(
                     "email"
                 ).value;
+
 
             const phone =
                 document.getElementById(
                     "phone"
                 ).value;
 
+
             const password =
                 document.getElementById(
                     "password"
                 ).value;
+
 
             const confirmPassword =
                 document.getElementById(
@@ -151,7 +188,14 @@ if (registerForm) {
                 ).value;
 
 
-            if (password !== confirmPassword) {
+            // =================================================
+            // PASSWORD CHECK
+            // =================================================
+
+            if (
+                password !==
+                confirmPassword
+            ) {
 
                 alert(
                     "Passwords do not match!"
@@ -164,21 +208,34 @@ if (registerForm) {
 
             try {
 
+                // =================================================
+                // SEND CUSTOMER REGISTRATION OTP
+                // =================================================
+
                 const response =
                     await fetch(
                         "https://eventsphere-dndh.onrender.com/send-otp",
                         {
 
-                            method: "POST",
+                            method:
+                                "POST",
 
                             headers: {
+
                                 "Content-Type":
                                     "application/json"
+
                             },
 
                             body:
                                 JSON.stringify({
-                                    email: email
+
+                                    email:
+                                        email,
+
+                                    loginType:
+                                        "registration"
+
                                 })
 
                         }
@@ -200,7 +257,9 @@ if (registerForm) {
                 }
 
 
-                // Store user details temporarily
+                // =================================================
+                // STORE USER DETAILS TEMPORARILY
+                // =================================================
 
                 localStorage.setItem(
                     "otpEmail",
@@ -213,8 +272,11 @@ if (registerForm) {
                     JSON.stringify({
 
                         fullName,
+
                         email,
+
                         phone,
+
                         password
 
                     })
@@ -222,11 +284,13 @@ if (registerForm) {
 
 
                 alert(
-                    "OTP has been sent to your email."
+                    "Customer Registration OTP has been sent to your email."
                 );
 
 
-                // Replace instead of normal navigation
+                // =================================================
+                // GO TO REGISTRATION OTP
+                // =================================================
 
                 window.location.replace(
                     "otp-verification.html"
@@ -237,6 +301,7 @@ if (registerForm) {
             catch (error) {
 
                 console.error(
+                    "Registration OTP Error:",
                     error
                 );
 
@@ -252,7 +317,9 @@ if (registerForm) {
 }
 
 
-// ====================== LOGIN ======================
+// =========================================================
+// CUSTOMER LOGIN
+// =========================================================
 
 const loginForm =
     document.getElementById(
@@ -274,6 +341,7 @@ if (loginForm) {
                     "loginEmail"
                 ).value;
 
+
             const password =
                 document.getElementById(
                     "loginPassword"
@@ -281,6 +349,10 @@ if (loginForm) {
 
 
             try {
+
+                // =================================================
+                // NORMAL CUSTOMER LOGIN
+                // =================================================
 
                 await signInWithEmailAndPassword(
                     auth,
@@ -294,11 +366,9 @@ if (loginForm) {
                 );
 
 
-                /*
-                 * IMPORTANT:
-                 * replace() removes the login page
-                 * from browser history.
-                 */
+                // =================================================
+                // CUSTOMER DASHBOARD
+                // =================================================
 
                 window.location.replace(
                     "customer-dashboard.html"
@@ -307,6 +377,12 @@ if (loginForm) {
             }
 
             catch (error) {
+
+                console.error(
+                    "Customer Login Error:",
+                    error
+                );
+
 
                 alert(
                     error.message
@@ -320,7 +396,9 @@ if (loginForm) {
 }
 
 
-// ====================== FORGOT PASSWORD ======================
+// =========================================================
+// FORGOT PASSWORD
+// =========================================================
 
 const forgotPassword =
     document.getElementById(
@@ -370,6 +448,12 @@ if (forgotPassword) {
 
             catch (error) {
 
+                console.error(
+                    "Password Reset Error:",
+                    error
+                );
+
+
                 alert(
                     error.message
                 );
@@ -382,14 +466,18 @@ if (forgotPassword) {
 }
 
 
-// ====================== USER LOGOUT ======================
+// =========================================================
+// CUSTOMER LOGOUT
+// =========================================================
 
 window.logout =
     async function () {
 
         try {
 
-            await signOut(auth);
+            await signOut(
+                auth
+            );
 
 
             if (inactivityTimer) {
@@ -408,11 +496,6 @@ window.logout =
             );
 
 
-            /*
-             * replace() prevents returning to
-             * the authenticated dashboard.
-             */
-
             window.location.replace(
                 "customer-login.html"
             );
@@ -420,6 +503,12 @@ window.logout =
         }
 
         catch (error) {
+
+            console.error(
+                "Logout Error:",
+                error
+            );
+
 
             alert(
                 error.message

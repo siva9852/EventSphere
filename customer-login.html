@@ -5,18 +5,22 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>Customer Login - EventSphere</title>
 
-    <link rel="stylesheet"
-          href="css/style.css">
+    <link
+        rel="stylesheet"
+        href="css/style.css">
+
 
     <!-- Font Awesome Eye Icon -->
 
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 </head>
 
@@ -26,7 +30,11 @@
 
 <div class="login-page">
 
+
     <div class="login-box">
+
+
+        <!-- ================= TITLE ================= -->
 
         <h1>
             Customer Login
@@ -38,9 +46,14 @@
         </p>
 
 
-        <form id="loginForm"
-              autocomplete="off">
+        <!-- ================= LOGIN FORM ================= -->
 
+        <form
+            id="loginForm"
+            autocomplete="off">
+
+
+            <!-- EMAIL -->
 
             <input
                 type="email"
@@ -50,9 +63,10 @@
                 required>
 
 
-            <!-- Password -->
+            <!-- PASSWORD -->
 
             <div class="password-box">
+
 
                 <input
                     type="password"
@@ -67,24 +81,31 @@
                     id="toggleLoginPassword">
                 </i>
 
+
             </div>
 
 
-            <!-- Forgot Password -->
+            <!-- FORGOT PASSWORD -->
 
             <div class="forgot-password">
 
-                <a href="#"
-                   id="forgotPassword">
+
+                <a
+                    href="#"
+                    id="forgotPassword">
 
                     Forgot Password?
 
                 </a>
 
+
             </div>
 
 
-            <button type="submit">
+            <!-- LOGIN BUTTON -->
+
+            <button
+                type="submit">
 
                 Login
 
@@ -94,11 +115,14 @@
         </form>
 
 
+        <!-- ================= REGISTER ================= -->
+
         <p class="register-link">
 
             Don't have an account?
 
-            <a href="customer-register.html">
+            <a
+                href="customer-register.html">
 
                 Register Here
 
@@ -106,13 +130,15 @@
 
         </p>
 
+
     </div>
 
 </div>
 
 
-
-<!-- ================= PASSWORD TOGGLE ================= -->
+<!-- =====================================================
+     PASSWORD TOGGLE
+     ===================================================== -->
 
 <script>
 
@@ -175,20 +201,29 @@ toggleLoginPassword.addEventListener(
 </script>
 
 
+<!-- =====================================================
+     FIREBASE
+     ===================================================== -->
 
-<!-- ================= FIREBASE ================= -->
-
-<script type="module"
-        src="js/firebase-config.js">
+<script
+    type="module"
+    src="js/firebase-config.js">
 </script>
 
 
-<script type="module"
-        src="js/auth.js">
+<!-- =====================================================
+     CUSTOMER AUTH
+     ===================================================== -->
+
+<script
+    type="module"
+    src="js/auth.js">
 </script>
 
 
-<!-- ================= PREVENT BACK TO LOGIN ================= -->
+<!-- =====================================================
+     PREVENT BACK TO LOGIN
+     ===================================================== -->
 
 <script type="module">
 
@@ -200,11 +235,6 @@ auth.onAuthStateChanged(
     (user) => {
 
         if (user) {
-
-            /*
-             * If the customer is already logged in,
-             * don't allow the login page to remain visible.
-             */
 
             window.location.replace(
                 "customer-dashboard.html"
