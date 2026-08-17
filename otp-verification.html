@@ -4,104 +4,321 @@
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>Verify OTP - EventSphere</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link
+        rel="stylesheet"
+        href="css/style.css">
 
 </head>
 
+
 <body>
+
 
 <div class="customer-otp-page">
 
+
     <div class="customer-otp-box">
+
 
         <div class="customer-otp-icon">
             ✉️
         </div>
 
-        <h1>Verify OTP</h1>
 
-        <p>Enter the 6-digit OTP sent to your email.</p>
+        <h1>
+            Verify OTP
+        </h1>
 
-        <form id="otpForm">
+
+        <p>
+            Enter the 6-digit OTP sent to your email.
+        </p>
+
+
+        <!-- ================= OTP FORM ================= -->
+
+        <form
+            id="otpForm"
+            autocomplete="off">
+
 
             <div class="customer-otp-input">
 
-                <input type="text" maxlength="1" class="otp-box-input" required>
-                <input type="text" maxlength="1" class="otp-box-input" required>
-                <input type="text" maxlength="1" class="otp-box-input" required>
-                <input type="text" maxlength="1" class="otp-box-input" required>
-                <input type="text" maxlength="1" class="otp-box-input" required>
-                <input type="text" maxlength="1" class="otp-box-input" required>
+
+                <input
+                    type="text"
+                    maxlength="1"
+                    class="otp-box-input"
+                    inputmode="numeric"
+                    autocomplete="one-time-code"
+                    required>
+
+
+                <input
+                    type="text"
+                    maxlength="1"
+                    class="otp-box-input"
+                    inputmode="numeric"
+                    required>
+
+
+                <input
+                    type="text"
+                    maxlength="1"
+                    class="otp-box-input"
+                    inputmode="numeric"
+                    required>
+
+
+                <input
+                    type="text"
+                    maxlength="1"
+                    class="otp-box-input"
+                    inputmode="numeric"
+                    required>
+
+
+                <input
+                    type="text"
+                    maxlength="1"
+                    class="otp-box-input"
+                    inputmode="numeric"
+                    required>
+
+
+                <input
+                    type="text"
+                    maxlength="1"
+                    class="otp-box-input"
+                    inputmode="numeric"
+                    required>
+
 
             </div>
 
-            <!-- Hidden input for existing OTP JS -->
 
-            <input type="hidden" id="otp">
+            <!-- Hidden OTP -->
 
-            <button type="submit">
+            <input
+                type="hidden"
+                id="otp">
+
+
+            <button
+                type="submit">
+
                 Verify OTP
-                <span>➤</span>
+
+                <span>
+                    ➤
+                </span>
+
             </button>
+
 
         </form>
 
-        <button id="resendOtp" class="customer-resend-button">
+
+        <!-- ================= RESEND ================= -->
+
+        <button
+            id="resendOtp"
+            class="customer-resend-button"
+            type="button">
+
             ↻ &nbsp; Resend OTP
+
         </button>
 
+
         <p class="otp-timer">
+
             Didn't receive the code?
-            <strong>Resend in 00:59</strong>
+
+            <strong>
+                Resend in 00:59
+            </strong>
+
         </p>
+
 
     </div>
 
 </div>
 
+
+<!-- =====================================================
+     OTP INPUT HANDLING
+     ===================================================== -->
+
 <script>
 
-const otpBoxes = document.querySelectorAll(".otp-box-input");
-const otpHidden = document.getElementById("otp");
+const otpBoxes =
+    document.querySelectorAll(
+        ".otp-box-input"
+    );
 
-otpBoxes.forEach((box, index) => {
 
-    box.addEventListener("input", () => {
+const otpHidden =
+    document.getElementById(
+        "otp"
+    );
 
-        box.value = box.value.replace(/\D/g, "");
 
-        if (box.value && index < otpBoxes.length - 1) {
-            otpBoxes[index + 1].focus();
-        }
+otpBoxes.forEach(
+    (box, index) => {
+
+
+        box.addEventListener(
+            "input",
+            () => {
+
+
+                box.value =
+                    box.value.replace(
+                        /\D/g,
+                        ""
+                    );
+
+
+                if (
+                    box.value &&
+                    index <
+                    otpBoxes.length - 1
+                ) {
+
+                    otpBoxes[
+                        index + 1
+                    ].focus();
+
+                }
+
+
+                otpHidden.value =
+                    Array.from(
+                        otpBoxes
+                    )
+                    .map(
+                        input =>
+                            input.value
+                    )
+                    .join("");
+
+            }
+        );
+
+
+        box.addEventListener(
+            "keydown",
+            (e) => {
+
+
+                if (
+                    e.key ===
+                    "Backspace" &&
+                    !box.value &&
+                    index > 0
+                ) {
+
+                    otpBoxes[
+                        index - 1
+                    ].focus();
+
+                }
+
+            }
+        );
+
+    }
+);
+
+
+// =========================================================
+// PASTE 6-DIGIT OTP
+// =========================================================
+
+otpBoxes[0].addEventListener(
+    "paste",
+    (e) => {
+
+        e.preventDefault();
+
+
+        const pasted =
+            (
+                e.clipboardData ||
+                window.clipboardData
+            )
+            .getData("text")
+            .replace(/\D/g, "")
+            .slice(0, 6);
+
+
+        pasted
+            .split("")
+            .forEach(
+                (digit, index) => {
+
+                    if (
+                        otpBoxes[index]
+                    ) {
+
+                        otpBoxes[index].value =
+                            digit;
+
+                    }
+
+                }
+            );
+
 
         otpHidden.value =
-            Array.from(otpBoxes)
-            .map(input => input.value)
-            .join("");
+            pasted;
 
-    });
-
-    box.addEventListener("keydown", (e) => {
 
         if (
-            e.key === "Backspace" &&
-            !box.value &&
-            index > 0
+            pasted.length === 6
         ) {
-            otpBoxes[index - 1].focus();
+
+            otpBoxes[5].focus();
+
         }
 
-    });
+    }
+);
 
-});
+
+// =========================================================
+// FIRST BOX FOCUS
+// =========================================================
+
+if (
+    otpBoxes.length > 0
+) {
+
+    otpBoxes[0].focus();
+
+}
 
 </script>
 
-<script type="module" src="js/customer-otp.js"></script>
+
+<!-- =====================================================
+     REGISTRATION OTP JAVASCRIPT
+     ===================================================== -->
+
+<script
+    type="module"
+    src="js/otp.js">
+</script>
+
 
 </body>
 
