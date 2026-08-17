@@ -5,18 +5,26 @@ const cors = require("cors");
 const axios = require("axios");
 const fs = require("fs");
 
-const { initializeApp, cert, getApps } =
-    require("firebase-admin/app");
+const {
+    initializeApp,
+    cert,
+    getApps
+} = require("firebase-admin/app");
 
-const { getAuth } =
-    require("firebase-admin/auth");
+const {
+    getAuth
+} = require("firebase-admin/auth");
 
 
-const app = express();
+const app =
+    express();
 
 
 app.use(cors());
-app.use(express.json());
+
+app.use(
+    express.json()
+);
 
 
 // =========================================================
@@ -27,10 +35,15 @@ const serviceAccountPath =
     "/etc/secrets/firebase-service-account.json";
 
 
-let firebaseAuth = null;
+let firebaseAuth =
+    null;
 
 
-if (fs.existsSync(serviceAccountPath)) {
+if (
+    fs.existsSync(
+        serviceAccountPath
+    )
+) {
 
     const serviceAccount =
         JSON.parse(
@@ -41,12 +54,16 @@ if (fs.existsSync(serviceAccountPath)) {
         );
 
 
-    if (getApps().length === 0) {
+    if (
+        getApps().length === 0
+    ) {
 
         initializeApp({
 
             credential:
-                cert(serviceAccount)
+                cert(
+                    serviceAccount
+                )
 
         });
 
@@ -111,12 +128,11 @@ app.post(
             }
 
 
-            // ================= GENERATE OTP =================
-
             const otp =
                 Math.floor(
                     100000 +
-                    Math.random() * 900000
+                    Math.random() *
+                    900000
                 );
 
 
@@ -136,8 +152,6 @@ app.post(
                 otp
             );
 
-
-            // ================= SEND OTP EMAIL =================
 
             await axios.post(
 
@@ -214,9 +228,12 @@ app.post(
         catch (error) {
 
             console.error(
+
                 "Brevo Error:",
+
                 error.response?.data ||
                 error.message
+
             );
 
 
@@ -254,9 +271,9 @@ app.post(
         } = req.body;
 
 
-        // ================= CHECK OTP EXISTS =================
-
-        if (!otpStore[email]) {
+        if (
+            !otpStore[email]
+        ) {
 
             return res
                 .status(400)
@@ -273,11 +290,10 @@ app.post(
         }
 
 
-        // ================= CHECK EXPIRY =================
-
         if (
             Date.now() >
-            otpStore[email].expiresAt
+            otpStore[email]
+                .expiresAt
         ) {
 
             delete otpStore[email];
@@ -298,8 +314,6 @@ app.post(
         }
 
 
-        // ================= VERIFY OTP =================
-
         if (
             Number(otp) !==
             otpStore[email].otp
@@ -319,8 +333,6 @@ app.post(
 
         }
 
-
-        // ================= DELETE USED OTP =================
 
         delete otpStore[email];
 
@@ -359,8 +371,6 @@ app.post(
             } = req.body;
 
 
-            // ================= VALIDATION =================
-
             if (
                 !email ||
                 !eventName ||
@@ -382,12 +392,15 @@ app.post(
             }
 
 
-            let subject = "";
-            let message = "";
+            let subject =
+                "";
+
+            let message =
+                "";
 
 
             // =================================================
-            // APPROVED BOOKING
+            // APPROVED
             // =================================================
 
             if (
@@ -417,7 +430,7 @@ EventSphere Team`;
 
 
             // =================================================
-            // REJECTED BOOKING
+            // REJECTED
             // =================================================
 
             else if (
@@ -469,7 +482,7 @@ EventSphere Team`;
 
 
             // =================================================
-            // SEND BOOKING EMAIL
+            // SEND EMAIL
             // =================================================
 
             await axios.post(
@@ -552,9 +565,12 @@ EventSphere Team`;
         catch (error) {
 
             console.error(
+
                 "Booking Email Error:",
+
                 error.response?.data ||
                 error.message
+
             );
 
 
@@ -567,6 +583,191 @@ EventSphere Team`;
 
                     message:
                         "Failed to send booking status email."
+
+                });
+
+        }
+
+    }
+);
+
+
+// =========================================================
+// CUSTOMER CANCELLED BOOKING EMAIL
+// =========================================================
+
+app.post(
+    "/customer-cancelled",
+    async (req, res) => {
+
+        try {
+
+            const {
+
+                customerEmail,
+                eventName,
+                reason
+
+            } = req.body;
+
+
+            // ================= VALIDATION =================
+
+            if (
+                !customerEmail ||
+                !eventName ||
+                !reason
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Customer email, event name and reason are required."
+
+                    });
+
+            }
+
+
+            // ================= ADMIN EMAIL =================
+
+            const adminEmail =
+                "eventsphere.official2026@gmail.com";
+
+
+            // ================= SUBJECT =================
+
+            const subject =
+                "EventSphere Booking Cancelled by Customer";
+
+
+            // ================= MESSAGE =================
+
+            const message =
+`Hello Admin,
+
+A customer has cancelled a booking.
+
+Event:
+${eventName}
+
+Customer Email:
+${customerEmail}
+
+Reason for cancellation:
+${reason}
+
+Please login to EventSphere to view the booking details.
+
+Regards,
+EventSphere Team`;
+
+
+            // ================= SEND EMAIL =================
+
+            await axios.post(
+
+                "https://api.brevo.com/v3/smtp/email",
+
+                {
+
+                    sender: {
+
+                        name:
+                            "EventSphere",
+
+                        email:
+                            "eventsphere.official2026@gmail.com"
+
+                    },
+
+
+                    to: [
+
+                        {
+
+                            email:
+                                adminEmail
+
+                        }
+
+                    ],
+
+
+                    subject:
+                        subject,
+
+
+                    textContent:
+                        message
+
+                },
+
+
+                {
+
+                    headers: {
+
+                        accept:
+                            "application/json",
+
+                        "api-key":
+                            process.env.BREVO_API_KEY,
+
+                        "content-type":
+                            "application/json"
+
+                    }
+
+                }
+
+            );
+
+
+            console.log(
+                `Customer cancellation email sent to ${adminEmail}`
+            );
+
+
+            res.json({
+
+                success:
+                    true,
+
+                message:
+                    "Customer cancellation email sent successfully!"
+
+            });
+
+        }
+
+
+        catch (error) {
+
+            console.error(
+
+                "Customer Cancellation Email Error:",
+
+                error.response?.data ||
+                error.message
+
+            );
+
+
+            res
+                .status(500)
+                .json({
+
+                    success:
+                        false,
+
+                    message:
+                        "Failed to send customer cancellation email."
 
                 });
 
@@ -591,8 +792,6 @@ app.delete(
             } = req.body;
 
 
-            // ================= EMAIL CHECK =================
-
             if (!email) {
 
                 return res
@@ -609,8 +808,6 @@ app.delete(
 
             }
 
-
-            // ================= FIREBASE ADMIN CHECK =================
 
             if (!firebaseAuth) {
 
@@ -630,7 +827,7 @@ app.delete(
 
 
             // =================================================
-            // DELETE FIREBASE AUTHENTICATION ACCOUNT
+            // DELETE AUTH ACCOUNT
             // =================================================
 
             try {
@@ -649,7 +846,9 @@ app.delete(
 
 
                 console.log(
+
                     `Customer deleted from Authentication: ${email}`
+
                 );
 
             }
@@ -657,16 +856,15 @@ app.delete(
 
             catch (authError) {
 
-                // If Authentication account does not exist,
-                // continue so Firestore record can still be deleted.
-
                 if (
                     authError.code ===
                     "auth/user-not-found"
                 ) {
 
                     console.log(
+
                         `No Authentication account found for ${email}.`
+
                     );
 
                 }
@@ -679,10 +877,6 @@ app.delete(
 
             }
 
-
-            // =================================================
-            // SUCCESS RESPONSE
-            // =================================================
 
             res.json({
 
@@ -700,8 +894,11 @@ app.delete(
         catch (error) {
 
             console.error(
+
                 "Delete Customer Error:",
+
                 error.message
+
             );
 
 

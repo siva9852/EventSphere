@@ -6,7 +6,8 @@ import {
     query,
     where,
     updateDoc,
-    doc
+    doc,
+    getDoc
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
@@ -26,6 +27,7 @@ async function loadMyBookings() {
 
     const user = auth.currentUser;
 
+
     if (!user) {
 
         window.location.href =
@@ -40,6 +42,7 @@ async function loadMyBookings() {
 
     const emailElement =
         document.getElementById("customerEmail");
+
 
     if (emailElement) {
 
@@ -56,7 +59,6 @@ async function loadMyBookings() {
         const q =
             query(
                 collection(db, "bookings"),
-
                 where(
                     "customerId",
                     "==",
@@ -139,9 +141,6 @@ async function loadMyBookings() {
 
                 <div class="booking-main">
 
-
-                    <!-- BOOKING ID -->
-
                     <div class="booking-id-label">
                         BOOKING ID
                     </div>
@@ -152,20 +151,16 @@ async function loadMyBookings() {
                     </div>
 
 
-                    <!-- EVENT NAME -->
-
                     <h2>
                         ${booking.eventName || "Event"}
                         🎉
                     </h2>
 
 
-                    <!-- DETAILS -->
-
                     <div class="booking-details">
 
 
-                        <!-- DATE -->
+                        <!-- EVENT DATE -->
 
                         <div class="booking-detail">
 
@@ -173,13 +168,11 @@ async function loadMyBookings() {
                                 📅
                             </div>
 
-
                             <div class="booking-detail-content">
 
                                 <small>
                                     Event Date
                                 </small>
-
 
                                 <strong>
                                     ${booking.eventDate || "Not specified"}
@@ -198,13 +191,11 @@ async function loadMyBookings() {
                                 👥
                             </div>
 
-
                             <div class="booking-detail-content">
 
                                 <small>
                                     Guests
                                 </small>
-
 
                                 <strong>
                                     ${booking.guests || 0}
@@ -224,13 +215,11 @@ async function loadMyBookings() {
                                 📍
                             </div>
 
-
                             <div class="booking-detail-content">
 
                                 <small>
                                     Location
                                 </small>
-
 
                                 <strong>
                                     ${booking.location || "Not specified"}
@@ -249,13 +238,11 @@ async function loadMyBookings() {
                                 ₹
                             </div>
 
-
                             <div class="booking-detail-content">
 
                                 <small>
                                     Total Price
                                 </small>
-
 
                                 <strong>
                                     ₹${booking.price || "0"}
@@ -274,13 +261,11 @@ async function loadMyBookings() {
                                 📝
                             </div>
 
-
                             <div class="booking-detail-content">
 
                                 <small>
                                     Requirements
                                 </small>
-
 
                                 <strong>
                                     ${booking.requirements || "None"}
@@ -299,13 +284,11 @@ async function loadMyBookings() {
                                 🕐
                             </div>
 
-
                             <div class="booking-detail-content">
 
                                 <small>
                                     Event End Time
                                 </small>
-
 
                                 <strong>
                                     ${booking.eventEndTime || "Not specified"}
@@ -341,12 +324,10 @@ async function loadMyBookings() {
                 </div>
 
 
-                <!-- BOOKING ACTIONS -->
+                <!-- ACTIONS -->
 
                 <div class="booking-bottom">
 
-
-                    <!-- VIEW DETAILS -->
 
                     <button
                         type="button"
@@ -357,8 +338,6 @@ async function loadMyBookings() {
 
                     </button>
 
-
-                    <!-- CANCEL ONLY PENDING -->
 
                     ${
                         status === "Pending"
@@ -408,11 +387,9 @@ async function loadMyBookings() {
                     ⚠️
                 </div>
 
-
                 <h2>
                     Error Loading Bookings
                 </h2>
-
 
                 <p>
                     ${error.message}
@@ -456,8 +433,6 @@ window.viewBookingDetails =
             return;
         }
 
-
-        // ================= GET VALUES =================
 
         const bookingIdText =
             card.querySelector(
@@ -544,8 +519,6 @@ window.viewBookingDetails =
         });
 
 
-        // ================= GET STATUS =================
-
         const statusElement =
             card.querySelector(
                 ".booking-status"
@@ -584,8 +557,6 @@ window.viewBookingDetails =
         }
 
 
-        // ================= CREATE POPUP =================
-
         const overlay =
             document.createElement("div");
 
@@ -599,8 +570,6 @@ window.viewBookingDetails =
             <div class="booking-details-modal">
 
 
-                <!-- CLOSE -->
-
                 <button
                     type="button"
                     class="close-booking-details"
@@ -610,8 +579,6 @@ window.viewBookingDetails =
 
                 </button>
 
-
-                <!-- ICON -->
 
                 <div class="booking-modal-icon">
                     🎉
@@ -627,8 +594,6 @@ window.viewBookingDetails =
                     ${eventName}
                 </p>
 
-
-                <!-- STATUS -->
 
                 <div class="
                     booking-modal-status
@@ -647,8 +612,6 @@ window.viewBookingDetails =
 
                 </div>
 
-
-                <!-- DETAILS -->
 
                 <div class="booking-modal-grid">
 
@@ -747,8 +710,6 @@ window.viewBookingDetails =
                 </div>
 
 
-                <!-- CLOSE BUTTON -->
-
                 <button
                     type="button"
                     class="close-details-btn"
@@ -769,8 +730,6 @@ window.viewBookingDetails =
         );
 
 
-        // ================= CLOSE X =================
-
         document
             .getElementById(
                 "closeBookingDetails"
@@ -785,8 +744,6 @@ window.viewBookingDetails =
             );
 
 
-        // ================= CLOSE BUTTON =================
-
         document
             .getElementById(
                 "closeDetailsButton"
@@ -800,8 +757,6 @@ window.viewBookingDetails =
                 }
             );
 
-
-        // ================= CLICK OUTSIDE =================
 
         overlay.addEventListener(
             "click",
@@ -828,8 +783,6 @@ window.viewBookingDetails =
 window.cancelCustomerBooking =
     async function (bookingId) {
 
-
-        // ================= CREATE POPUP =================
 
         const overlay =
             document.createElement("div");
@@ -1015,7 +968,6 @@ window.cancelCustomerBooking =
 
                 try {
 
-
                     confirmButton.disabled =
                         true;
 
@@ -1029,7 +981,53 @@ window.cancelCustomerBooking =
                     `;
 
 
-                    // ================= UPDATE FIRESTORE =================
+                    // =================================================
+                    // GET CURRENT BOOKING DATA
+                    // =================================================
+
+                    const bookingSnapshot =
+                        await getDoc(
+                            doc(
+                                db,
+                                "bookings",
+                                bookingId
+                            )
+                        );
+
+
+                    if (
+                        !bookingSnapshot.exists()
+                    ) {
+
+                        throw new Error(
+                            "Booking not found."
+                        );
+
+                    }
+
+
+                    const bookingData =
+                        bookingSnapshot.data();
+
+
+                    const currentUser =
+                        auth.currentUser;
+
+
+                    const eventName =
+                        bookingData.eventName ||
+                        "Event";
+
+
+                    const customerEmail =
+                        currentUser?.email ||
+                        bookingData.customerEmail ||
+                        "Unknown";
+
+
+                    // =================================================
+                    // UPDATE FIRESTORE
+                    // =================================================
 
                     await updateDoc(
 
@@ -1058,6 +1056,77 @@ window.cancelCustomerBooking =
                     );
 
 
+                    // =================================================
+                    // SEND EMAIL TO ADMIN
+                    // =================================================
+
+                    try {
+
+                        const emailResponse =
+                            await fetch(
+
+                                "https://eventsphere-dndh.onrender.com/customer-cancelled",
+
+                                {
+
+                                    method:
+                                        "POST",
+
+                                    headers: {
+
+                                        "Content-Type":
+                                            "application/json"
+
+                                    },
+
+                                    body:
+                                        JSON.stringify({
+
+                                            customerEmail:
+                                                customerEmail,
+
+                                            eventName:
+                                                eventName,
+
+                                            reason:
+                                                reason
+
+                                        })
+
+                                }
+
+                            );
+
+
+                        const emailData =
+                            await emailResponse.json();
+
+
+                        if (
+                            !emailResponse.ok ||
+                            !emailData.success
+                        ) {
+
+                            console.error(
+                                "Admin cancellation email failed:",
+                                emailData.message
+                            );
+
+                        }
+
+                    }
+
+
+                    catch (emailError) {
+
+                        console.error(
+                            "Admin cancellation email error:",
+                            emailError
+                        );
+
+                    }
+
+
                     overlay.remove();
 
 
@@ -1066,7 +1135,9 @@ window.cancelCustomerBooking =
                     );
 
 
-                    // ================= RELOAD =================
+                    // =================================================
+                    // RELOAD BOOKINGS
+                    // =================================================
 
                     await loadMyBookings();
 
@@ -1074,7 +1145,6 @@ window.cancelCustomerBooking =
 
 
                 catch (error) {
-
 
                     console.error(
                         "Cancel Booking Error:",
