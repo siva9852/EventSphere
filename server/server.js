@@ -22,6 +22,7 @@ const app =
 
 app.use(cors());
 
+
 app.use(
     express.json()
 );
@@ -146,7 +147,8 @@ app.post(
             const otp =
                 Math.floor(
                     100000 +
-                    Math.random() * 900000
+                    Math.random() *
+                    900000
                 );
 
 
@@ -412,11 +414,8 @@ app.post(
     (req, res) => {
 
         const {
-
             email,
-
             otp
-
         } = req.body;
 
 
@@ -527,15 +526,10 @@ app.post(
         try {
 
             const {
-
                 email,
-
                 eventName,
-
                 status,
-
                 reason
-
             } = req.body;
 
 
@@ -771,13 +765,9 @@ app.post(
         try {
 
             const {
-
                 customerEmail,
-
                 eventName,
-
                 reason
-
             } = req.body;
 
 
@@ -958,6 +948,210 @@ EventSphere Team`;
 
 
 // =========================================================
+// CONTACT FORM EMAIL
+// =========================================================
+
+app.post(
+    "/contact",
+    async (req, res) => {
+
+        try {
+
+            const {
+                name,
+                email,
+                message
+            } = req.body;
+
+
+            // =================================================
+            // VALIDATION
+            // =================================================
+
+            if (
+                !name ||
+                !email ||
+                !message
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Name, email and message are required."
+
+                    });
+
+            }
+
+
+            // =================================================
+            // ADMIN EMAIL
+            // =================================================
+
+            const adminEmail =
+                "eventsphere.official2026@gmail.com";
+
+
+            // =================================================
+            // SUBJECT
+            // =================================================
+
+            const subject =
+                "EventSphere Contact Form Message";
+
+
+            // =================================================
+            // MESSAGE
+            // =================================================
+
+            const emailMessage =
+`Hello Admin,
+
+You received a new message from the EventSphere website.
+
+Name:
+${name}
+
+Email:
+${email}
+
+Message:
+${message}
+
+Please reply to the customer using the email address provided above.
+
+Regards,
+EventSphere Website`;
+
+
+            // =================================================
+            // SEND EMAIL THROUGH BREVO
+            // =================================================
+
+            await axios.post(
+
+                "https://api.brevo.com/v3/smtp/email",
+
+                {
+
+                    sender: {
+
+                        name:
+                            "EventSphere",
+
+                        email:
+                            "eventsphere.official2026@gmail.com"
+
+                    },
+
+
+                    to: [
+
+                        {
+
+                            email:
+                                adminEmail
+
+                        }
+
+                    ],
+
+
+                    replyTo: {
+
+                        email:
+                            email,
+
+                        name:
+                            name
+
+                    },
+
+
+                    subject:
+                        subject,
+
+
+                    textContent:
+                        emailMessage
+
+                },
+
+
+                {
+
+                    headers: {
+
+                        accept:
+                            "application/json",
+
+                        "api-key":
+                            process.env.BREVO_API_KEY,
+
+                        "content-type":
+                            "application/json"
+
+                    }
+
+                }
+
+            );
+
+
+            console.log(
+                `Contact form email sent to ${adminEmail} from ${email}`
+            );
+
+
+            res.json({
+
+                success:
+                    true,
+
+                message:
+                    "Contact message sent successfully!"
+
+            });
+
+        }
+
+
+        catch (error) {
+
+            console.error(
+
+                "Contact Form Email Error:",
+
+                error.response?.data ||
+                error.message
+
+            );
+
+
+            res
+                .status(500)
+                .json({
+
+                    success:
+                        false,
+
+                    message:
+                        "Failed to send contact message."
+
+                });
+
+        }
+
+    }
+);
+
+
+// =========================================================
 // DELETE CUSTOMER
 // =========================================================
 
@@ -1026,9 +1220,7 @@ app.delete(
 
 
                 console.log(
-
                     `Customer deleted from Authentication: ${email}`
-
                 );
 
             }
@@ -1042,13 +1234,10 @@ app.delete(
                 ) {
 
                     console.log(
-
                         `No Authentication account found for ${email}.`
-
                     );
 
                 }
-
 
                 else {
 

@@ -5,22 +5,15 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <title>EventSphere</title>
+    <title>EventSphere - Event Management</title>
 
-    <!-- Existing CSS -->
-    <link rel="stylesheet"
-          href="css/style.css">
-
-    <!-- ================= PWA ================= -->
-
-    <link rel="manifest"
-          href="manifest.json">
-
-    <meta name="theme-color"
-          content="#09265f">
+    <link
+        rel="stylesheet"
+        href="css/style.css">
 
 </head>
 
@@ -28,762 +21,852 @@
 <body>
 
 
-    <!-- ================= NAVIGATION BAR ================= -->
+<!-- =====================================================
+     NAVIGATION
+     ===================================================== -->
 
-    <header>
+<nav class="navbar">
 
-        <nav class="navbar">
-
-
-            <!-- Logo -->
-
-            <div class="logo">
-
-                <h2>
-                    EventSphere
-                </h2>
-
-            </div>
+    <div class="nav-container">
 
 
-            <!-- Navigation Links -->
+        <div class="logo">
 
-            <ul class="nav-links">
-
-                <li>
-                    <a href="#">
-                        Home
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#">
-                        Services
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#">
-                        Gallery
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#">
-                        Reviews
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#">
-                        Contact
-                    </a>
-                </li>
-
-            </ul>
-
-
-            <!-- Login Buttons -->
-
-            <div class="login-buttons">
-
-                <a href="customer-login.html"
-                   class="customer-btn">
-
-                    Customer Login
-
-                </a>
-
-
-                <a href="admin-login.html"
-                   class="admin-btn">
-
-                    Admin Login
-
-                </a>
-
-            </div>
-
-        </nav>
-
-    </header>
-
-
-
-    <!-- ================= HERO SECTION ================= -->
-
-    <section class="hero">
-
-        <div class="hero-content">
-
-            <h1>
-                Create Unforgettable Events
-            </h1>
-
-
-            <p>
-
-                Plan your dream event with EventSphere.
-                From weddings and birthdays to corporate events,
-                we make every celebration memorable.
-
-            </p>
-
-
-            <div class="hero-buttons">
-
-                <button class="explore-btn">
-                    Explore Services
-                </button>
-
-
-                <button class="book-btn">
-                    Book Now
-                </button>
-
-            </div>
+            EventSphere
 
         </div>
 
-    </section>
 
+        <div class="nav-links">
 
+            <a href="#home">
+                Home
+            </a>
 
-    <!-- ================= WHY CHOOSE EVENTSPHERE ================= -->
+            <a href="#services">
+                Services
+            </a>
 
-    <section class="why-us">
+            <a href="#gallery">
+                Gallery
+            </a>
 
-        <h2>
-            Why Choose EventSphere?
-        </h2>
+            <a href="#reviews">
+                Reviews
+            </a>
 
+            <a href="#contact">
+                Contact
+            </a>
 
-        <div class="why-container">
-
-
-            <div class="why-card">
-
-                <h3>
-                    🎯 Expert Event Planning
-                </h3>
-
-                <p>
-                    Professional planning for weddings,
-                    birthdays, corporate events, and more.
-                </p>
-
-            </div>
-
-
-            <div class="why-card">
-
-                <h3>
-                    💰 Affordable Packages
-                </h3>
-
-                <p>
-                    Flexible pricing with customized event
-                    packages to fit your budget.
-                </p>
-
-            </div>
-
-
-            <div class="why-card">
-
-                <h3>
-                    📞 24/7 Customer Support
-                </h3>
-
-                <p>
-                    Our team is always available to answer
-                    your questions and assist you.
-                </p>
-
-            </div>
-
-
-            <div class="why-card">
-
-                <h3>
-                    ⭐ Trusted by Customers
-                </h3>
-
-                <p>
-                    Hundreds of successful events with
-                    satisfied customers and excellent reviews.
-                </p>
-
-            </div>
+            <a href="customer-login.html">
+                Login
+            </a>
 
         </div>
 
-    </section>
+
+    </div>
+
+</nav>
 
 
 
-    <!-- ================= OUR SERVICES ================= -->
+<!-- =====================================================
+     HOME
+     ===================================================== -->
 
-    <section class="services">
+<section
+    class="hero"
+    id="home">
+
+
+    <div class="hero-content">
+
+
+        <h1>
+            Create Unforgettable Events
+        </h1>
+
+
+        <p>
+            Plan, manage and experience amazing events with EventSphere.
+        </p>
+
+
+        <div class="hero-buttons">
+
+
+            <button
+                class="explore-btn"
+                type="button"
+                onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">
+
+                Explore Services
+
+            </button>
+
+
+            <button
+                class="book-btn"
+                type="button"
+                onclick="window.location.href='customer-login.html'">
+
+                Book Now
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =====================================================
+     SERVICES
+     ===================================================== -->
+
+<section
+    class="services"
+    id="services">
+
+
+    <div class="section-title">
 
         <h2>
             Our Services
         </h2>
 
+        <p>
+            Everything you need to create a successful event.
+        </p>
 
-        <div class="services-container">
+    </div>
 
 
-            <div class="service-card">
+    <div class="services-container">
 
-                <img src="images/wedding.jpg"
-                     alt="Wedding">
 
-                <h3>
-                    Wedding Events
-                </h3>
+        <div class="service-card">
 
-                <p>
-                    Beautiful wedding planning with
-                    complete event management.
-                </p>
-
-                <h4>
-                    Starting at ₹50,000
-                </h4>
-
-                <button>
-                    Book Now
-                </button>
-
+            <div class="service-icon">
+                🎉
             </div>
 
+            <h3>
+                Wedding Events
+            </h3>
 
+            <p>
+                Beautiful and memorable wedding event planning.
+            </p>
 
-            <div class="service-card">
+            <button
+                type="button"
+                onclick="window.location.href='customer-login.html'">
 
-                <img src="images/birthday.jpg"
-                     alt="Birthday">
+                Book Now
 
-                <h3>
-                    Birthday Parties
-                </h3>
-
-                <p>
-                    Fun birthday celebrations for
-                    kids and adults.
-                </p>
-
-                <h4>
-                    Starting at ₹10,000
-                </h4>
-
-                <button>
-                    Book Now
-                </button>
-
-            </div>
-
-
-
-            <div class="service-card">
-
-                <img src="images/corporate.jpg"
-                     alt="Corporate">
-
-                <h3>
-                    Corporate Events
-                </h3>
-
-                <p>
-                    Professional conferences,
-                    seminars and office events.
-                </p>
-
-                <h4>
-                    Starting at ₹30,000
-                </h4>
-
-                <button>
-                    Book Now
-                </button>
-
-            </div>
-
-
-
-            <div class="service-card">
-
-                <img src="images/anniversary.jpg"
-                     alt="Anniversary">
-
-                <h3>
-                    Anniversary Events
-                </h3>
-
-                <p>
-                    Celebrate your special day with
-                    elegant decorations.
-                </p>
-
-                <h4>
-                    Starting at ₹15,000
-                </h4>
-
-                <button>
-                    Book Now
-                </button>
-
-            </div>
+            </button>
 
         </div>
 
-    </section>
+
+        <div class="service-card">
+
+            <div class="service-icon">
+                🎂
+            </div>
+
+            <h3>
+                Birthday Events
+            </h3>
+
+            <p>
+                Fun and creative birthday celebrations.
+            </p>
+
+            <button
+                type="button"
+                onclick="window.location.href='customer-login.html'">
+
+                Book Now
+
+            </button>
+
+        </div>
+
+
+        <div class="service-card">
+
+            <div class="service-icon">
+                💼
+            </div>
+
+            <h3>
+                Corporate Events
+            </h3>
+
+            <p>
+                Professional corporate events and conferences.
+            </p>
+
+            <button
+                type="button"
+                onclick="window.location.href='customer-login.html'">
+
+                Book Now
+
+            </button>
+
+        </div>
+
+
+        <div class="service-card">
+
+            <div class="service-icon">
+                🎵
+            </div>
+
+            <h3>
+                Music Events
+            </h3>
+
+            <p>
+                Concerts and entertainment events.
+            </p>
+
+            <button
+                type="button"
+                onclick="window.location.href='customer-login.html'">
+
+                Book Now
+
+            </button>
+
+        </div>
+
+
+    </div>
+
+
+</section>
 
 
 
-    <!-- ================= HOW IT WORKS ================= -->
+<!-- =====================================================
+     GALLERY
+     ===================================================== -->
 
-    <section class="how-it-works">
+<section
+    class="gallery"
+    id="gallery">
+
+
+    <div class="section-title">
 
         <h2>
-            How It Works
+            Event Gallery
         </h2>
 
+        <p>
+            Explore some of our memorable events.
+        </p>
 
-        <div class="steps-container">
-
-
-            <div class="step">
-
-                <div class="step-number">
-                    1
-                </div>
-
-                <h3>
-                    Choose a Service
-                </h3>
-
-                <p>
-                    Select your preferred event package
-                    from our wide range of services.
-                </p>
-
-            </div>
+    </div>
 
 
-            <div class="arrow">
-                ➜
-            </div>
+    <div class="gallery-container">
 
 
-            <div class="step">
+        <div class="gallery-item">
 
-                <div class="step-number">
-                    2
-                </div>
-
-                <h3>
-                    Book Your Event
-                </h3>
-
-                <p>
-                    Fill in your event details and
-                    submit your booking request.
-                </p>
-
-            </div>
-
-
-            <div class="arrow">
-                ➜
-            </div>
-
-
-            <div class="step">
-
-                <div class="step-number">
-                    3
-                </div>
-
-                <h3>
-                    Confirmation
-                </h3>
-
-                <p>
-                    Our team will review and confirm
-                    your booking details.
-                </p>
-
-            </div>
-
-
-            <div class="arrow">
-                ➜
-            </div>
-
-
-            <div class="step">
-
-                <div class="step-number">
-                    4
-                </div>
-
-                <h3>
-                    Enjoy Your Event
-                </h3>
-
-                <p>
-                    Relax while EventSphere makes
-                    your celebration unforgettable.
-                </p>
-
-            </div>
+            <img
+                src="images/wedding.jpg"
+                alt="Wedding Event">
 
         </div>
 
-    </section>
+
+        <div class="gallery-item">
+
+            <img
+                src="images/birthday.jpg"
+                alt="Birthday Event">
+
+        </div>
+
+
+        <div class="gallery-item">
+
+            <img
+                src="images/corporate.jpg"
+                alt="Corporate Event">
+
+        </div>
+
+
+        <div class="gallery-item">
+
+            <img
+                src="images/music.jpg"
+                alt="Music Event">
+
+        </div>
+
+
+    </div>
+
+
+</section>
 
 
 
-    <!-- ================= GALLERY ================= -->
+<!-- =====================================================
+     REVIEWS
+     ===================================================== -->
 
-    <section class="gallery">
+<section
+    class="reviews"
+    id="reviews">
+
+
+    <div class="section-title">
 
         <h2>
-            Our Gallery
+            Customer Reviews
         </h2>
 
+        <p>
+            What our customers say about EventSphere.
+        </p>
 
-        <div class="gallery-container">
+    </div>
 
-            <img src="images/gallery1.jpg"
-                 alt="Gallery 1">
 
-            <img src="images/gallery2.jpg"
-                 alt="Gallery 2">
+    <div class="reviews-container">
 
-            <img src="images/gallery3.jpg"
-                 alt="Gallery 3">
 
-            <img src="images/gallery4.jpg"
-                 alt="Gallery 4">
+        <div class="review-card">
 
-            <img src="images/gallery5.jpg"
-                 alt="Gallery 5">
+            <div class="stars">
+                ⭐⭐⭐⭐⭐
+            </div>
 
-            <img src="images/gallery6.jpg"
-                 alt="Gallery 6">
+            <p>
+                EventSphere made our wedding planning very easy.
+                Everything was well organized.
+            </p>
+
+            <h3>
+                Happy Customer
+            </h3>
 
         </div>
 
-    </section>
 
+        <div class="review-card">
 
-
-    <!-- ================= CUSTOMER REVIEWS ================= -->
-
-    <section class="reviews">
-
-        <h2>
-            What Our Customers Say
-        </h2>
-
-
-        <div class="reviews-container">
-
-
-            <div class="review-card">
-
-                <h3>
-                    ⭐⭐⭐⭐⭐
-                </h3>
-
-                <p>
-                    "EventSphere made our wedding unforgettable.
-                    The decorations were beautiful and everything
-                    was perfectly organized."
-                </p>
-
-                <h4>
-                    — Priya & Rahul
-                </h4>
-
+            <div class="stars">
+                ⭐⭐⭐⭐⭐
             </div>
 
+            <p>
+                Excellent service and very professional event management.
+            </p>
 
-            <div class="review-card">
-
-                <h3>
-                    ⭐⭐⭐⭐⭐
-                </h3>
-
-                <p>
-                    "Amazing birthday celebration!
-                    The team handled everything professionally
-                    and on time."
-                </p>
-
-                <h4>
-                    — Anjali
-                </h4>
-
-            </div>
-
-
-            <div class="review-card">
-
-                <h3>
-                    ⭐⭐⭐⭐⭐
-                </h3>
-
-                <p>
-                    "Our corporate event was managed flawlessly.
-                    Highly recommended!"
-                </p>
-
-                <h4>
-                    — Tech Solutions Pvt. Ltd.
-                </h4>
-
-            </div>
+            <h3>
+                Happy Customer
+            </h3>
 
         </div>
 
-    </section>
+
+        <div class="review-card">
+
+            <div class="stars">
+                ⭐⭐⭐⭐⭐
+            </div>
+
+            <p>
+                Booking our event was simple and convenient.
+            </p>
+
+            <h3>
+                Happy Customer
+            </h3>
+
+        </div>
+
+
+    </div>
+
+
+</section>
 
 
 
-    <!-- ================= CONTACT ================= -->
+<!-- =====================================================
+     CONTACT
+     ===================================================== -->
 
-    <section class="contact">
+<section
+    class="contact"
+    id="contact">
+
+
+    <div class="section-title">
 
         <h2>
             Contact Us
         </h2>
 
-
-        <div class="contact-container">
-
-
-            <!-- Contact Information -->
-
-            <div class="contact-info">
-
-                <h3>
-                    Get In Touch
-                </h3>
-
-
-                <p>
-                    <strong>📍 Address:</strong>
-                    Rajahmundry, Andhra Pradesh, India
-                </p>
-
-
-                <p>
-                    <strong>📞 Phone:</strong>
-                    +91 9876543210
-                </p>
-
-
-                <p>
-                    <strong>📧 Email:</strong>
-                    eventsphere.official2026@gmail.com
-                </p>
-
-
-                <p>
-
-                    We are available 24/7 to help make
-                    your special events memorable.
-                    Feel free to contact us anytime.
-
-                </p>
-
-            </div>
-
-
-            <!-- Contact Form -->
-
-            <div class="contact-form">
-
-                <form>
-
-                    <input type="text"
-                           placeholder="Your Name"
-                           required>
-
-
-                    <input type="email"
-                           placeholder="Your Email"
-                           required>
-
-
-                    <textarea
-                        placeholder="Your Message"
-                        rows="6"
-                        required>
-                    </textarea>
-
-
-                    <button type="submit">
-                        Send Message
-                    </button>
-
-                </form>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-
-    <!-- ================= FOOTER ================= -->
-
-    <footer class="footer">
-
-        <div class="footer-container">
-
-
-            <div class="footer-about">
-
-                <h2>
-                    EventSphere
-                </h2>
-
-                <p>
-
-                    We create unforgettable weddings,
-                    birthdays, corporate events and
-                    celebrations with creativity,
-                    elegance and perfection.
-
-                </p>
-
-            </div>
-
-
-            <div class="footer-links">
-
-                <h3>
-                    Quick Links
-                </h3>
-
-
-                <ul>
-
-                    <li>
-                        <a href="#">
-                            Home
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#">
-                            Services
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#">
-                            Gallery
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#">
-                            Reviews
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#">
-                            Contact
-                        </a>
-                    </li>
-
-                </ul>
-
-            </div>
-
-
-            <div class="footer-contact">
-
-                <h3>
-                    Contact
-                </h3>
-
-
-                <p>
-                    📍 Rajahmundry, Andhra Pradesh
-                </p>
-
-
-                <p>
-                    📞 +91 9876543210
-                </p>
-
-
-                <p>
-                    📧 eventsphere@gmail.com
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <hr>
-
-
-        <p class="copyright">
-
-            © 2026 EventSphere. All Rights Reserved.
-
+        <p>
+            Have a question? Send us a message.
         </p>
 
-    </footer>
+    </div>
+
+
+    <div class="contact-container">
+
+
+        <!-- ================= CONTACT INFORMATION ================= -->
+
+        <div class="contact-info">
+
+
+            <h3>
+                Get In Touch
+            </h3>
+
+
+            <p>
+                We are here to help you plan your perfect event.
+            </p>
+
+
+            <p>
+                📧 eventsphere.official2026@gmail.com
+            </p>
+
+
+            <p>
+                📞 +91 9876543210
+            </p>
+
+
+        </div>
 
 
 
-    <!-- ================= SERVICE WORKER ================= -->
+        <!-- ================= CONTACT FORM ================= -->
 
-    <script>
+        <div class="contact-form">
 
-        if ("serviceWorker" in navigator) {
 
-            window.addEventListener(
-                "load",
-                function () {
+            <form
+                id="contactForm"
+                autocomplete="off">
 
-                    navigator.serviceWorker.register(
-                        "/sw.js"
-                    )
-                    .then(function () {
 
-                        console.log(
-                            "EventSphere Service Worker registered successfully."
-                        );
+                <input
+                    type="text"
+                    id="contactName"
+                    name="name"
+                    placeholder="Your Name"
+                    required>
 
-                    })
-                    .catch(function (error) {
 
-                        console.error(
-                            "Service Worker registration failed:",
-                            error
-                        );
+                <input
+                    type="email"
+                    id="contactEmail"
+                    name="email"
+                    placeholder="Your Email"
+                    required>
+
+
+                <textarea
+                    id="contactMessage"
+                    name="message"
+                    placeholder="Your Message"
+                    rows="6"
+                    required></textarea>
+
+
+                <button
+                    type="submit"
+                    id="contactSubmitBtn">
+
+                    Send Message
+
+                </button>
+
+
+                <p
+                    id="contactStatus"
+                    style="
+                        margin-top:12px;
+                        font-weight:600;
+                    ">
+
+                </p>
+
+
+            </form>
+
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =====================================================
+     FOOTER
+     ===================================================== -->
+
+<footer>
+
+
+    <div class="footer-container">
+
+
+        <div class="footer-column">
+
+
+            <h3>
+                EventSphere
+            </h3>
+
+
+            <p>
+                Your complete event management solution.
+            </p>
+
+
+        </div>
+
+
+
+        <div class="footer-column">
+
+
+            <h3>
+                Quick Links
+            </h3>
+
+
+            <a href="#home">
+                Home
+            </a>
+
+
+            <a href="#services">
+                Services
+            </a>
+
+
+            <a href="#gallery">
+                Gallery
+            </a>
+
+
+            <a href="#reviews">
+                Reviews
+            </a>
+
+
+            <a href="#contact">
+                Contact
+            </a>
+
+
+        </div>
+
+
+
+        <div class="footer-column">
+
+
+            <h3>
+                Account
+            </h3>
+
+
+            <a href="customer-login.html">
+                Customer Login
+            </a>
+
+
+            <a href="customer-register.html">
+                Register
+            </a>
+
+
+            <a href="admin-login.html">
+                Admin Login
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+    <div class="footer-bottom">
+
+        <p>
+            © 2026 EventSphere. All Rights Reserved.
+        </p>
+
+    </div>
+
+
+</footer>
+
+
+
+<!-- =====================================================
+     CONTACT FORM JAVASCRIPT
+     ===================================================== -->
+
+<script>
+
+const contactForm =
+    document.getElementById(
+        "contactForm"
+    );
+
+
+const contactStatus =
+    document.getElementById(
+        "contactStatus"
+    );
+
+
+const contactSubmitBtn =
+    document.getElementById(
+        "contactSubmitBtn"
+    );
+
+
+if (contactForm) {
+
+    contactForm.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            const name =
+                document.getElementById(
+                    "contactName"
+                ).value.trim();
+
+
+            const email =
+                document.getElementById(
+                    "contactEmail"
+                ).value.trim();
+
+
+            const message =
+                document.getElementById(
+                    "contactMessage"
+                ).value.trim();
+
+
+            if (
+                !name ||
+                !email ||
+                !message
+            ) {
+
+                contactStatus.textContent =
+                    "Please fill in all fields.";
+
+                return;
+
+            }
+
+
+            contactSubmitBtn.disabled =
+                true;
+
+
+            contactSubmitBtn.textContent =
+                "Sending...";
+
+
+            contactStatus.textContent =
+                "";
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "https://eventsphere-dndh.onrender.com/contact",
+                        {
+
+                            method:
+                                "POST",
+
+                            headers: {
+
+                                "Content-Type":
+                                    "application/json"
+
+                            },
+
+                            body:
+                                JSON.stringify({
+
+                                    name:
+                                        name,
+
+                                    email:
+                                        email,
+
+                                    message:
+                                        message
+
+                                })
+
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+
+                    throw new Error(
+                        data.message ||
+                        "Unable to send message."
+                    );
+
+                }
+
+
+                contactStatus.textContent =
+                    "Message sent successfully! We will contact you soon.";
+
+
+                contactForm.reset();
+
+
+            }
+
+
+            catch (error) {
+
+                console.error(
+                    "Contact Form Error:",
+                    error
+                );
+
+
+                contactStatus.textContent =
+                    "Unable to send the message right now. Please try again.";
+
+            }
+
+
+            finally {
+
+                contactSubmitBtn.disabled =
+                    false;
+
+
+                contactSubmitBtn.textContent =
+                    "Send Message";
+
+            }
+
+        }
+    );
+
+}
+
+</script>
+
+
+
+<!-- =====================================================
+     SMOOTH SCROLL
+     ===================================================== -->
+
+<script>
+
+document.querySelectorAll(
+    'a[href^="#"]'
+).forEach(
+    (link) => {
+
+        link.addEventListener(
+            "click",
+            function (event) {
+
+                const targetId =
+                    this.getAttribute(
+                        "href"
+                    );
+
+
+                if (
+                    targetId === "#"
+                ) {
+
+                    return;
+
+                }
+
+
+                const target =
+                    document.querySelector(
+                        targetId
+                    );
+
+
+                if (target) {
+
+                    event.preventDefault();
+
+
+                    target.scrollIntoView({
+
+                        behavior:
+                            "smooth"
 
                     });
 
                 }
-            );
 
-        }
+            }
+        );
 
-    </script>
+    }
+);
+
+</script>
 
 
 </body>
