@@ -5805,3 +5805,976 @@ body{
     }
 
 }
+
+/* =====================================================
+   LOGIN BUTTONS - HOME PAGE
+   ===================================================== */
+
+.customer-login-btn,
+.admin-login-btn {
+    display: inline-block;
+    padding: 10px 22px;
+    border-radius: 6px;
+    text-decoration: none !important;
+    font-weight: 700;
+    margin-left: 8px;
+    transition: 0.3s ease;
+}
+
+
+/* Customer Login */
+
+.customer-login-btn {
+    background: #ffffff;
+    color: #23439b !important;
+    border: 2px solid #ffffff;
+}
+
+
+/* Admin Login */
+
+.admin-login-btn {
+    background: #ffd400;
+    color: #111111 !important;
+    border: 2px solid #ffd400;
+}
+
+
+/* Hover */
+
+.customer-login-btn:hover {
+    background: #eaf0ff;
+    transform: translateY(-2px);
+}
+
+
+.admin-login-btn:hover {
+    background: #ffbf00;
+    transform: translateY(-2px);
+}
+
+
+/* Keep normal navigation links */
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+
+/* Mobile */
+
+@media (max-width: 768px) {
+
+    .nav-links {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .customer-login-btn,
+    .admin-login-btn {
+        padding: 8px 14px;
+        margin-left: 0;
+    }
+
+}
+
+/* =====================================================
+   EVENTSPHERE HOME PAGE DESIGN
+   ===================================================== */
+
+
+/* =====================================================
+   NAVBAR
+   ===================================================== */
+
+.navbar {
+
+    width: 100%;
+
+    min-height: 110px;
+
+    background: #06245f;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 16px 45px;
+
+    box-sizing: border-box;
+
+    position: relative;
+
+    z-index: 1000;
+
+}
+
+
+/* =====================================================
+   LEFT SIDE
+   ===================================================== */
+
+.navbar-left {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 14px;
+
+}
+
+
+/* =====================================================
+   LOGO
+   ===================================================== */
+
+.logo {
+
+    color: #ffffff;
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+    text-decoration: none;
+
+}
+
+
+/* =====================================================
+   NAVIGATION LINKS
+   ===================================================== */
+
+.nav-links {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 32px;
+
+}
+
+
+.nav-links a {
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    font-size: 19px;
+
+    font-weight: 600;
+
+    transition: 0.3s ease;
+
+}
+
+
+.nav-links a:hover {
+
+    color: #ffd000;
+
+}
+
+
+/* =====================================================
+   RIGHT SIDE LOGIN BUTTONS
+   ===================================================== */
+
+.navbar-right {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 30px;
+
+    margin-left: auto;
+
+}
+
+
+/* =====================================================
+   CUSTOMER LOGIN
+   ===================================================== */
+
+.customer-login-btn {
+
+    display: inline-block;
+
+    background: #ffffff;
+
+    color: #173b8f !important;
+
+    border: 2px solid #ffffff;
+
+    padding: 13px 27px;
+
+    border-radius: 6px;
+
+    text-decoration: none;
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    transition: 0.3s ease;
+
+}
+
+
+.customer-login-btn:hover {
+
+    background: #eaf0ff;
+
+    transform: translateY(-2px);
+
+}
+
+
+/* =====================================================
+   ADMIN LOGIN
+   ===================================================== */
+
+.admin-login-btn {
+
+    display: inline-block;
+
+    background: #ffd000;
+
+    color: #111111 !important;
+
+    border: 2px solid #ffd000;
+
+    padding: 13px 29px;
+
+    border-radius: 6px;
+
+    text-decoration: none;
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    transition: 0.3s ease;
+
+}
+
+
+.admin-login-btn:hover {
+
+    background: #ffbd00;
+
+    transform: translateY(-2px);
+
+}
+
+
+/* =====================================================
+   HERO
+   ===================================================== */
+
+.hero {
+
+    min-height: 760px;
+
+    height: calc(100vh - 110px);
+
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    background-size: cover;
+
+    background-position: center;
+
+    background-repeat: no-repeat;
+
+    overflow: hidden;
+
+}
+
+
+/* =====================================================
+   IMPORTANT:
+   PUT YOUR EXISTING BACKGROUND IMAGE HERE
+   ===================================================== */
+
+/*
+   Example:
+
+   background-image:
+       url("../images/event.jpg");
+
+   Replace event.jpg with the EXACT filename
+   of your existing EventSphere background image.
+*/
+
+.hero {
+    background-image:
+        url("../images/gallery1.jpg");
+}
+
+
+/* =====================================================
+   DARK OVERLAY
+   ===================================================== */
+
+.hero-overlay {
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        rgba(0, 0, 0, 0.45);
+
+    z-index: 1;
+
+}
+
+
+/* =====================================================
+   HERO CONTENT
+   ===================================================== */
+
+.hero-content {
+
+    position: relative;
+
+    z-index: 2;
+
+    width: 90%;
+
+    max-width: 1100px;
+
+    color: #ffffff;
+
+    margin-top: -20px;
+
+}
+
+
+/* =====================================================
+   HERO TITLE
+   ===================================================== */
+
+.hero-content h1 {
+
+    font-size: 54px;
+
+    line-height: 1.15;
+
+    margin: 0 0 20px;
+
+    font-weight: 800;
+
+    text-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.7);
+
+}
+
+
+/* =====================================================
+   HERO DESCRIPTION
+   ===================================================== */
+
+.hero-content p {
+
+    font-size: 22px;
+
+    line-height: 1.5;
+
+    margin: 0 auto 32px;
+
+    max-width: 850px;
+
+    color: #ffffff;
+
+    text-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.7);
+
+}
+
+
+/* =====================================================
+   HERO BUTTONS
+   ===================================================== */
+
+.hero-buttons {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 20px;
+
+}
+
+
+/* =====================================================
+   EXPLORE SERVICES
+   ===================================================== */
+
+.explore-btn {
+
+    background: #ffd000;
+
+    color: #173b8f;
+
+    border: none;
+
+    padding: 14px 30px;
+
+    border-radius: 6px;
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.3s ease;
+
+}
+
+
+.explore-btn:hover {
+
+    background: #ffbd00;
+
+    transform: translateY(-2px);
+
+}
+
+
+/* =====================================================
+   BOOK NOW
+   ===================================================== */
+
+.book-btn {
+
+    background: #ffffff;
+
+    color: #173b8f;
+
+    border: none;
+
+    padding: 14px 34px;
+
+    border-radius: 6px;
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.3s ease;
+
+}
+
+
+.book-btn:hover {
+
+    background: #eeeeee;
+
+    transform: translateY(-2px);
+
+}
+
+
+/* =====================================================
+   CONTENT SECTIONS
+   ===================================================== */
+
+.content-section {
+
+    min-height: 400px;
+
+    padding: 90px 8%;
+
+    text-align: center;
+
+    background: #ffffff;
+
+}
+
+
+.content-section h2 {
+
+    color: #173b8f;
+
+    font-size: 42px;
+
+    margin-bottom: 20px;
+
+}
+
+
+.content-section p {
+
+    font-size: 18px;
+
+    color: #555555;
+
+}
+
+
+/* =====================================================
+   CONTACT
+   ===================================================== */
+
+.contact-section {
+
+    padding: 90px 6%;
+
+    background: #f7f7f7;
+
+}
+
+
+.contact-container {
+
+    max-width: 1200px;
+
+    margin: auto;
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 70px;
+
+}
+
+
+.contact-info h2 {
+
+    color: #173b8f;
+
+    font-size: 42px;
+
+}
+
+
+.contact-info h3 {
+
+    color: #173b8f;
+
+    font-size: 28px;
+
+}
+
+
+.contact-info p {
+
+    font-size: 18px;
+
+    margin: 22px 0;
+
+    color: #444444;
+
+}
+
+
+.contact-form input,
+.contact-form textarea {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 17px;
+
+    margin-bottom: 18px;
+
+    border: 1px solid #d0d0d0;
+
+    border-radius: 7px;
+
+    font-size: 17px;
+
+    font-family: inherit;
+
+}
+
+
+.contact-form textarea {
+
+    resize: vertical;
+
+}
+
+
+.contact-form button {
+
+    background: #173b8f;
+
+    color: #ffffff;
+
+    border: none;
+
+    padding: 16px 30px;
+
+    border-radius: 7px;
+
+    font-size: 17px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+}
+
+
+.contact-form button:hover {
+
+    background: #0e2b70;
+
+}
+
+
+#contactStatus {
+
+    margin-top: 15px;
+
+    font-weight: 700;
+
+}
+
+
+#contactStatus.success {
+
+    color: green;
+
+}
+
+
+#contactStatus.error {
+
+    color: red;
+
+}
+
+
+/* =====================================================
+   FOOTER
+   ===================================================== */
+
+footer {
+
+    background: #173b8f;
+
+    color: #ffffff;
+
+}
+
+
+.footer-content {
+
+    max-width: 1300px;
+
+    margin: auto;
+
+    padding: 60px 6%;
+
+    display: grid;
+
+    grid-template-columns: 2fr 1fr 1.5fr;
+
+    gap: 50px;
+
+}
+
+
+.footer-content h2,
+.footer-content h3 {
+
+    margin-bottom: 20px;
+
+}
+
+
+.footer-content p {
+
+    line-height: 1.7;
+
+}
+
+
+.footer-content a {
+
+    display: block;
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    margin: 10px 0;
+
+}
+
+
+.footer-content a:hover {
+
+    color: #ffd000;
+
+}
+
+
+.footer-bottom {
+
+    text-align: center;
+
+    padding: 20px;
+
+    border-top:
+        1px solid rgba(255, 255, 255, 0.2);
+
+}
+
+
+/* =====================================================
+   TABLET
+   ===================================================== */
+
+@media (max-width: 1000px) {
+
+    .navbar {
+
+        min-height: auto;
+
+        padding: 16px 25px;
+
+    }
+
+
+    .navbar-left {
+
+        gap: 12px;
+
+    }
+
+
+    .nav-links {
+
+        gap: 18px;
+
+        flex-wrap: wrap;
+
+    }
+
+
+    .nav-links a {
+
+        font-size: 16px;
+
+    }
+
+
+    .navbar-right {
+
+        gap: 10px;
+
+    }
+
+
+    .customer-login-btn,
+    .admin-login-btn {
+
+        padding: 10px 15px;
+
+        font-size: 15px;
+
+    }
+
+
+    .hero {
+
+        min-height: 650px;
+
+    }
+
+
+    .hero-content h1 {
+
+        font-size: 46px;
+
+    }
+
+
+    .hero-content p {
+
+        font-size: 20px;
+
+    }
+
+}
+
+
+/* =====================================================
+   MOBILE
+   ===================================================== */
+
+@media (max-width: 768px) {
+
+    .navbar {
+
+        flex-direction: column;
+
+        align-items: center;
+
+        gap: 18px;
+
+    }
+
+
+    .navbar-left {
+
+        align-items: center;
+
+    }
+
+
+    .nav-links {
+
+        justify-content: center;
+
+        gap: 14px;
+
+    }
+
+
+    .navbar-right {
+
+        justify-content: center;
+
+        margin-left: 0;
+
+    }
+
+
+    .hero {
+
+        min-height: 600px;
+
+        height: auto;
+
+    }
+
+
+    .hero-content {
+
+        padding: 40px 20px;
+
+    }
+
+
+    .hero-content h1 {
+
+        font-size: 38px;
+
+    }
+
+
+    .hero-content p {
+
+        font-size: 18px;
+
+    }
+
+
+    .hero-buttons {
+
+        flex-direction: column;
+
+    }
+
+
+    .explore-btn,
+    .book-btn {
+
+        width: 220px;
+
+    }
+
+
+    .contact-container {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .footer-content {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+
+/* =====================================================
+   SMALL MOBILE
+   ===================================================== */
+
+@media (max-width: 480px) {
+
+    .hero-content h1 {
+
+        font-size: 31px;
+
+    }
+
+
+    .hero-content p {
+
+        font-size: 16px;
+
+    }
+
+
+    .nav-links {
+
+        gap: 10px;
+
+    }
+
+
+    .nav-links a {
+
+        font-size: 14px;
+
+    }
+
+
+    .customer-login-btn,
+    .admin-login-btn {
+
+        font-size: 14px;
+
+        padding: 9px 12px;
+
+    }
+
+}
