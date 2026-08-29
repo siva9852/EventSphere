@@ -4,6 +4,8 @@ const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
 const fs = require("fs");
+const crypto = require("crypto");
+const Razorpay = require("razorpay");
 
 const {
     initializeApp,
@@ -15,13 +17,15 @@ const {
     getAuth
 } = require("firebase-admin/auth");
 
+const {
+    getFirestore,
+    FieldValue
+} = require("firebase-admin/firestore");
 
-const app =
-    express();
 
+const app = express();
 
 app.use(cors());
-
 
 app.use(
     express.json()
@@ -35,9 +39,8 @@ app.use(
 const serviceAccountPath =
     "/etc/secrets/firebase-service-account.json";
 
-
-let firebaseAuth =
-    null;
+let firebaseAuth = null;
+let firebaseDb = null;
 
 
 if (
@@ -60,12 +63,10 @@ if (
     ) {
 
         initializeApp({
-
             credential:
                 cert(
                     serviceAccount
                 )
-
         });
 
     }
@@ -74,6 +75,9 @@ if (
     firebaseAuth =
         getAuth();
 
+    firebaseDb =
+        getFirestore();
+
 
     console.log(
         "Firebase Admin initialized."
@@ -81,11 +85,49 @@ if (
 
 }
 
-
 else {
 
     console.error(
         "Firebase service account file not found."
+    );
+
+}
+
+
+// =========================================================
+// RAZORPAY TEST MODE
+// =========================================================
+
+let razorpay = null;
+
+
+if (
+    process.env.RAZORPAY_KEY_ID &&
+    process.env.RAZORPAY_KEY_SECRET
+) {
+
+    razorpay =
+        new Razorpay({
+
+            key_id:
+                process.env.RAZORPAY_KEY_ID,
+
+            key_secret:
+                process.env.RAZORPAY_KEY_SECRET
+
+        });
+
+
+    console.log(
+        "Razorpay initialized."
+    );
+
+}
+
+else {
+
+    console.error(
+        "Razorpay environment variables are missing."
     );
 
 }
@@ -131,10 +173,6 @@ app.post(
             }
 
 
-            // =================================================
-            // OTP TYPE
-            // =================================================
-
             const type =
                 loginType ||
                 "registration";
@@ -147,8 +185,7 @@ app.post(
             const otp =
                 Math.floor(
                     100000 +
-                    Math.random() *
-                    900000
+                    Math.random() * 900000
                 );
 
 
@@ -315,7 +352,6 @@ EventSphere Admin Security`;
 
                     },
 
-
                     to: [
 
                         {
@@ -327,16 +363,13 @@ EventSphere Admin Security`;
 
                     ],
 
-
                     subject:
                         subject,
-
 
                     textContent:
                         message
 
                 },
-
 
                 {
 
@@ -357,10 +390,6 @@ EventSphere Admin Security`;
 
             );
 
-
-            // =================================================
-            // SUCCESS
-            // =================================================
 
             res.json({
 
@@ -418,10 +447,6 @@ app.post(
             otp
         } = req.body;
 
-
-        // =================================================
-        // CHECK OTP EXISTS
-        // =================================================
 
         if (
             !otpStore[email]
@@ -493,10 +518,6 @@ app.post(
 
         }
 
-
-        // =================================================
-        // OTP VERIFIED
-        // =================================================
 
         delete otpStore[email];
 
@@ -610,6 +631,7 @@ EventSphere Team`;
 Your booking for "${eventName}" has been rejected by the EventSphere admin.
 
 Reason for rejection:
+
 ${reason || "No reason was provided."}
 
 You can login to EventSphere and check your booking details in the My Bookings section.
@@ -663,7 +685,6 @@ EventSphere Team`;
 
                     },
 
-
                     to: [
 
                         {
@@ -675,16 +696,13 @@ EventSphere Team`;
 
                     ],
 
-
                     subject:
                         subject,
-
 
                     textContent:
                         message
 
                 },
-
 
                 {
 
@@ -771,10 +789,6 @@ app.post(
             } = req.body;
 
 
-            // =================================================
-            // VALIDATION
-            // =================================================
-
             if (
                 !customerEmail ||
                 !eventName ||
@@ -796,25 +810,13 @@ app.post(
             }
 
 
-            // =================================================
-            // ADMIN EMAIL
-            // =================================================
-
             const adminEmail =
                 "eventsphere.official2026@gmail.com";
 
 
-            // =================================================
-            // SUBJECT
-            // =================================================
-
             const subject =
                 "EventSphere Booking Cancelled by Customer";
 
-
-            // =================================================
-            // MESSAGE
-            // =================================================
 
             const message =
 `Hello Admin,
@@ -836,10 +838,6 @@ Regards,
 EventSphere Team`;
 
 
-            // =================================================
-            // SEND EMAIL
-            // =================================================
-
             await axios.post(
 
                 "https://api.brevo.com/v3/smtp/email",
@@ -856,7 +854,6 @@ EventSphere Team`;
 
                     },
 
-
                     to: [
 
                         {
@@ -868,16 +865,13 @@ EventSphere Team`;
 
                     ],
 
-
                     subject:
                         subject,
-
 
                     textContent:
                         message
 
                 },
-
 
                 {
 
@@ -938,210 +932,6 @@ EventSphere Team`;
 
                     message:
                         "Failed to send customer cancellation email."
-
-                });
-
-        }
-
-    }
-);
-
-
-// =========================================================
-// CONTACT FORM EMAIL
-// =========================================================
-
-app.post(
-    "/contact",
-    async (req, res) => {
-
-        try {
-
-            const {
-                name,
-                email,
-                message
-            } = req.body;
-
-
-            // =================================================
-            // VALIDATION
-            // =================================================
-
-            if (
-                !name ||
-                !email ||
-                !message
-            ) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        success:
-                            false,
-
-                        message:
-                            "Name, email and message are required."
-
-                    });
-
-            }
-
-
-            // =================================================
-            // ADMIN EMAIL
-            // =================================================
-
-            const adminEmail =
-                "eventsphere.official2026@gmail.com";
-
-
-            // =================================================
-            // SUBJECT
-            // =================================================
-
-            const subject =
-                "EventSphere Contact Form Message";
-
-
-            // =================================================
-            // MESSAGE
-            // =================================================
-
-            const emailMessage =
-`Hello Admin,
-
-You received a new message from the EventSphere website.
-
-Name:
-${name}
-
-Email:
-${email}
-
-Message:
-${message}
-
-Please reply to the customer using the email address provided above.
-
-Regards,
-EventSphere Website`;
-
-
-            // =================================================
-            // SEND EMAIL THROUGH BREVO
-            // =================================================
-
-            await axios.post(
-
-                "https://api.brevo.com/v3/smtp/email",
-
-                {
-
-                    sender: {
-
-                        name:
-                            "EventSphere",
-
-                        email:
-                            "eventsphere.official2026@gmail.com"
-
-                    },
-
-
-                    to: [
-
-                        {
-
-                            email:
-                                adminEmail
-
-                        }
-
-                    ],
-
-
-                    replyTo: {
-
-                        email:
-                            email,
-
-                        name:
-                            name
-
-                    },
-
-
-                    subject:
-                        subject,
-
-
-                    textContent:
-                        emailMessage
-
-                },
-
-
-                {
-
-                    headers: {
-
-                        accept:
-                            "application/json",
-
-                        "api-key":
-                            process.env.BREVO_API_KEY,
-
-                        "content-type":
-                            "application/json"
-
-                    }
-
-                }
-
-            );
-
-
-            console.log(
-                `Contact form email sent to ${adminEmail} from ${email}`
-            );
-
-
-            res.json({
-
-                success:
-                    true,
-
-                message:
-                    "Contact message sent successfully!"
-
-            });
-
-        }
-
-
-        catch (error) {
-
-            console.error(
-
-                "Contact Form Email Error:",
-
-                error.response?.data ||
-                error.message
-
-            );
-
-
-            res
-                .status(500)
-                .json({
-
-                    success:
-                        false,
-
-                    message:
-                        "Failed to send contact message."
 
                 });
 
@@ -1281,6 +1071,614 @@ app.delete(
 
                     message:
                         "Failed to delete customer."
+
+                });
+
+        }
+
+    }
+);
+
+
+// =========================================================
+// RAZORPAY - CREATE PAYMENT ORDER
+// =========================================================
+
+app.post(
+    "/create-payment-order",
+    async (req, res) => {
+
+        try {
+
+            if (!razorpay) {
+
+                return res
+                    .status(500)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Razorpay is not configured."
+
+                    });
+
+            }
+
+
+            if (!firebaseAuth || !firebaseDb) {
+
+                return res
+                    .status(500)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Firebase Admin is not initialized."
+
+                    });
+
+            }
+
+
+            const {
+                bookingId
+            } = req.body;
+
+
+            const authHeader =
+                req.headers.authorization || "";
+
+
+            if (
+                !authHeader.startsWith(
+                    "Bearer "
+                )
+            ) {
+
+                return res
+                    .status(401)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Authentication required."
+
+                    });
+
+            }
+
+
+            const idToken =
+                authHeader.substring(
+                    7
+                );
+
+
+            const decodedToken =
+                await firebaseAuth
+                    .verifyIdToken(
+                        idToken
+                    );
+
+
+            const bookingRef =
+                firebaseDb
+                    .collection("bookings")
+                    .doc(bookingId);
+
+
+            const bookingSnapshot =
+                await bookingRef.get();
+
+
+            if (
+                !bookingSnapshot.exists
+            ) {
+
+                return res
+                    .status(404)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Booking not found."
+
+                    });
+
+            }
+
+
+            const booking =
+                bookingSnapshot.data();
+
+
+            // =================================================
+            // CUSTOMER SECURITY CHECK
+            // =================================================
+
+            if (
+                booking.customerId !==
+                decodedToken.uid
+            ) {
+
+                return res
+                    .status(403)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "You cannot pay for this booking."
+
+                    });
+
+            }
+
+
+            // =================================================
+            // APPROVAL CHECK
+            // =================================================
+
+            if (
+                booking.status !==
+                "Approved"
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Payment is available only for approved bookings."
+
+                    });
+
+            }
+
+
+            // =================================================
+            // ALREADY PAID CHECK
+            // =================================================
+
+            if (
+                booking.paymentStatus ===
+                "Paid"
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "This booking has already been paid."
+
+                    });
+
+            }
+
+
+            const amount =
+                Number(
+                    booking.price
+                );
+
+
+            if (
+                !Number.isFinite(amount) ||
+                amount <= 0
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Invalid booking amount."
+
+                    });
+
+            }
+
+
+            // =================================================
+            // CREATE RAZORPAY ORDER
+            // =================================================
+
+            const order =
+                await razorpay.orders.create({
+
+                    amount:
+                        Math.round(
+                            amount * 100
+                        ),
+
+                    currency:
+                        "INR",
+
+                    receipt:
+                        `ES_${bookingId.substring(0, 20)}`,
+
+                    notes: {
+
+                        bookingId:
+                            bookingId,
+
+                        customerId:
+                            decodedToken.uid
+
+                    }
+
+                });
+
+
+            // =================================================
+            // SAVE ORDER ID
+            // =================================================
+
+            await bookingRef.update({
+
+                razorpayOrderId:
+                    order.id,
+
+                paymentStatus:
+                    "Payment Initiated"
+
+            });
+
+
+            res.json({
+
+                success:
+                    true,
+
+                keyId:
+                    process.env.RAZORPAY_KEY_ID,
+
+                orderId:
+                    order.id,
+
+                amount:
+                    order.amount,
+
+                currency:
+                    order.currency,
+
+                bookingId:
+                    bookingId
+
+            });
+
+        }
+
+
+        catch (error) {
+
+            console.error(
+
+                "Create Razorpay Order Error:",
+
+                error
+
+            );
+
+
+            res
+                .status(500)
+                .json({
+
+                    success:
+                        false,
+
+                    message:
+                        "Unable to create payment order."
+
+                });
+
+        }
+
+    }
+);
+
+
+// =========================================================
+// RAZORPAY - VERIFY PAYMENT
+// =========================================================
+
+app.post(
+    "/verify-payment",
+    async (req, res) => {
+
+        try {
+
+            if (!firebaseAuth || !firebaseDb) {
+
+                return res
+                    .status(500)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Firebase Admin is not initialized."
+
+                    });
+
+            }
+
+
+            const {
+                bookingId,
+                razorpay_order_id,
+                razorpay_payment_id,
+                razorpay_signature
+            } = req.body;
+
+
+            if (
+                !bookingId ||
+                !razorpay_order_id ||
+                !razorpay_payment_id ||
+                !razorpay_signature
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Payment verification details are incomplete."
+
+                    });
+
+            }
+
+
+            const authHeader =
+                req.headers.authorization || "";
+
+
+            if (
+                !authHeader.startsWith(
+                    "Bearer "
+                )
+            ) {
+
+                return res
+                    .status(401)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Authentication required."
+
+                    });
+
+            }
+
+
+            const idToken =
+                authHeader.substring(
+                    7
+                );
+
+
+            const decodedToken =
+                await firebaseAuth
+                    .verifyIdToken(
+                        idToken
+                    );
+
+
+            const bookingRef =
+                firebaseDb
+                    .collection("bookings")
+                    .doc(bookingId);
+
+
+            const bookingSnapshot =
+                await bookingRef.get();
+
+
+            if (
+                !bookingSnapshot.exists
+            ) {
+
+                return res
+                    .status(404)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Booking not found."
+
+                    });
+
+            }
+
+
+            const booking =
+                bookingSnapshot.data();
+
+
+            // =================================================
+            // CUSTOMER SECURITY CHECK
+            // =================================================
+
+            if (
+                booking.customerId !==
+                decodedToken.uid
+            ) {
+
+                return res
+                    .status(403)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "You cannot verify this payment."
+
+                    });
+
+            }
+
+
+            // =================================================
+            // ORDER CHECK
+            // =================================================
+
+            if (
+                booking.razorpayOrderId !==
+                razorpay_order_id
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Payment order does not match the booking."
+
+                    });
+
+            }
+
+
+            // =================================================
+            // VERIFY SIGNATURE
+            // =================================================
+
+            const generatedSignature =
+                crypto
+                    .createHmac(
+                        "sha256",
+                        process.env.RAZORPAY_KEY_SECRET
+                    )
+                    .update(
+                        razorpay_order_id +
+                        "|" +
+                        razorpay_payment_id
+                    )
+                    .digest(
+                        "hex"
+                    );
+
+
+            const signatureIsValid =
+                crypto.timingSafeEqual(
+
+                    Buffer.from(
+                        generatedSignature
+                    ),
+
+                    Buffer.from(
+                        razorpay_signature
+                    )
+
+                );
+
+
+            if (!signatureIsValid) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Payment verification failed."
+
+                    });
+
+            }
+
+
+            // =================================================
+            // PAYMENT SUCCESS
+            // =================================================
+
+            await bookingRef.update({
+
+                paymentStatus:
+                    "Paid",
+
+                razorpayPaymentId:
+                    razorpay_payment_id,
+
+                razorpaySignature:
+                    razorpay_signature,
+
+                paidAt:
+                    FieldValue.serverTimestamp()
+
+            });
+
+
+            res.json({
+
+                success:
+                    true,
+
+                message:
+                    "Payment verified successfully."
+
+            });
+
+        }
+
+
+        catch (error) {
+
+            console.error(
+
+                "Verify Razorpay Payment Error:",
+
+                error
+
+            );
+
+
+            res
+                .status(500)
+                .json({
+
+                    success:
+                        false,
+
+                    message:
+                        "Unable to verify payment."
 
                 });
 

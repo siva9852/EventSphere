@@ -25,9 +25,7 @@ const container =
 
 async function loadMyBookings() {
 
-    const user =
-        auth.currentUser;
-
+    const user = auth.currentUser;
 
     if (!user) {
 
@@ -38,8 +36,6 @@ async function loadMyBookings() {
 
     }
 
-
-    // ================= CUSTOMER EMAIL =================
 
     const emailElement =
         document.getElementById("customerEmail");
@@ -55,15 +51,9 @@ async function loadMyBookings() {
 
     try {
 
-        // ================= GET BOOKINGS =================
-
         const q =
             query(
-                collection(
-                    db,
-                    "bookings"
-                ),
-
+                collection(db, "bookings"),
                 where(
                     "customerId",
                     "==",
@@ -79,7 +69,9 @@ async function loadMyBookings() {
         container.innerHTML = "";
 
 
-        // ================= NO BOOKINGS =================
+        // =====================================================
+        // NO BOOKINGS
+        // =====================================================
 
         if (snapshot.empty) {
 
@@ -108,306 +100,386 @@ async function loadMyBookings() {
         }
 
 
-        // ================= DISPLAY BOOKINGS =================
+        // =====================================================
+        // DISPLAY BOOKINGS
+        // =====================================================
 
-        snapshot.forEach(
-            (bookingDoc) => {
+        snapshot.forEach((bookingDoc) => {
 
-                const booking =
-                    bookingDoc.data();
+            const booking =
+                bookingDoc.data();
 
 
-                const status =
-                    booking.status ||
-                    "Pending";
+            const status =
+                booking.status || "Pending";
 
 
-                const bookingId =
-                    "#BK-" +
-                    bookingDoc.id
-                        .substring(0, 6)
-                        .toUpperCase();
+            const bookingId =
+                "#BK-" +
+                bookingDoc.id
+                    .substring(0, 6)
+                    .toUpperCase();
 
 
-                const card =
-                    document.createElement(
-                        "div"
-                    );
+            const card =
+                document.createElement("div");
 
 
-                card.className =
-                    "modern-booking-card";
+            card.className =
+                "modern-booking-card";
 
 
-                card.innerHTML = `
+            // =================================================
+            // PAYMENT BUTTON
+            // =================================================
 
-                    <img
-                        src="images/hero.jpg"
-                        class="booking-event-image"
-                        alt="Event"
-                    >
+            let paymentButton = "";
 
 
-                    <div class="booking-main">
+            if (
+                status === "Approved" &&
+                booking.paymentStatus !== "Paid"
+            ) {
 
+                paymentButton = `
 
-                        <!-- BOOKING ID -->
+                    <button
+                        type="button"
+                        class="pay-now-btn"
+                        onclick="payForBooking('${bookingDoc.id}')">
 
-                        <div class="booking-id-label">
-                            BOOKING ID
-                        </div>
+                        <i class="fa-solid fa-credit-card"></i>
 
+                        Pay Now
 
-                        <div class="booking-id-value">
-                            ${bookingId}
-                        </div>
-
-
-                        <!-- EVENT NAME -->
-
-                        <h2>
-
-                            ${booking.eventName || "Event"}
-
-                            🎉
-
-                        </h2>
-
-
-                        <!-- DETAILS -->
-
-                        <div class="booking-details">
-
-
-                            <!-- DATE -->
-
-                            <div class="booking-detail">
-
-                                <div class="booking-detail-icon">
-                                    📅
-                                </div>
-
-
-                                <div class="booking-detail-content">
-
-                                    <small>
-                                        Event Date
-                                    </small>
-
-
-                                    <strong>
-                                        ${booking.eventDate || "Not specified"}
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-
-                            <!-- GUESTS -->
-
-                            <div class="booking-detail">
-
-                                <div class="booking-detail-icon">
-                                    👥
-                                </div>
-
-
-                                <div class="booking-detail-content">
-
-                                    <small>
-                                        Guests
-                                    </small>
-
-
-                                    <strong>
-                                        ${booking.guests || 0}
-                                        People
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-
-                            <!-- LOCATION -->
-
-                            <div class="booking-detail">
-
-                                <div class="booking-detail-icon">
-                                    📍
-                                </div>
-
-
-                                <div class="booking-detail-content">
-
-                                    <small>
-                                        Location
-                                    </small>
-
-
-                                    <strong>
-                                        ${booking.location || "Not specified"}
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-
-                            <!-- PRICE -->
-
-                            <div class="booking-detail">
-
-                                <div class="booking-detail-icon">
-                                    ₹
-                                </div>
-
-
-                                <div class="booking-detail-content">
-
-                                    <small>
-                                        Total Price
-                                    </small>
-
-
-                                    <strong>
-                                        ₹${booking.price || "0"}
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-
-                            <!-- REQUIREMENTS -->
-
-                            <div class="booking-detail">
-
-                                <div class="booking-detail-icon">
-                                    📝
-                                </div>
-
-
-                                <div class="booking-detail-content">
-
-                                    <small>
-                                        Requirements
-                                    </small>
-
-
-                                    <strong>
-                                        ${booking.requirements || "None"}
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-
-                            <!-- END TIME -->
-
-                            <div class="booking-detail">
-
-                                <div class="booking-detail-icon">
-                                    🕐
-                                </div>
-
-
-                                <div class="booking-detail-content">
-
-                                    <small>
-                                        Event End Time
-                                    </small>
-
-
-                                    <strong>
-                                        ${booking.eventEndTime || "Not specified"}
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- STATUS -->
-
-                    <div class="
-                        booking-status
-                        ${status.toLowerCase()}
-                    ">
-
-                        ${
-                            status === "Pending"
-                                ? "◷ Pending"
-
-                                : status === "Approved"
-                                ? "✓ Approved"
-
-                                : status === "Cancelled"
-                                ? "✕ Cancelled"
-
-                                : "✕ Rejected"
-                        }
-
-                    </div>
-
-
-                    <!-- ACTIONS -->
-
-                    <div class="booking-bottom">
-
-
-                        <!-- VIEW DETAILS -->
-
-                        <button
-                            type="button"
-                            class="view-details-btn"
-                            onclick="viewBookingDetails('${bookingDoc.id}')">
-
-                            👁 View Details
-
-                        </button>
-
-
-                        <!-- CANCEL -->
-
-                        ${
-                            status === "Pending"
-                                ? `
-
-                                    <button
-                                        type="button"
-                                        class="customer-cancel-booking-btn"
-                                        onclick="cancelCustomerBooking('${bookingDoc.id}')">
-
-                                        <i class="fa-solid fa-xmark"></i>
-
-                                        Cancel Booking
-
-                                    </button>
-
-                                  `
-                                : ""
-                        }
-
-
-                    </div>
+                    </button>
 
                 `;
 
+            }
 
-                container.appendChild(
-                    card
-                );
+
+            // =================================================
+            // PAID LABEL
+            // =================================================
+
+            let paidLabel = "";
+
+
+            if (
+                booking.paymentStatus ===
+                "Paid"
+            ) {
+
+                paidLabel = `
+
+                    <span class="booking-paid-label">
+
+                        <i class="fa-solid fa-circle-check"></i>
+
+                        Paid
+
+                    </span>
+
+                `;
 
             }
-        );
+
+
+            // =================================================
+            // STATUS
+            // =================================================
+
+            let statusText =
+                "◷ Pending";
+
+
+            if (
+                status === "Approved"
+            ) {
+
+                statusText =
+                    "✓ Approved";
+
+            }
+
+            else if (
+                status === "Cancelled"
+            ) {
+
+                statusText =
+                    "✕ Cancelled";
+
+            }
+
+            else if (
+                status === "Rejected"
+            ) {
+
+                statusText =
+                    "✕ Rejected";
+
+            }
+
+
+            // =================================================
+            // CARD
+            // =================================================
+
+            card.innerHTML = `
+
+                <img
+                    src="${booking.eventImage || "images/hero.jpg"}"
+                    class="booking-event-image"
+                    alt="Event"
+                    onerror="this.src='images/hero.jpg'"
+                >
+
+
+                <div class="booking-main">
+
+
+                    <!-- BOOKING ID -->
+
+                    <div class="booking-id-label">
+                        BOOKING ID
+                    </div>
+
+
+                    <div class="booking-id-value">
+                        ${bookingId}
+                    </div>
+
+
+                    <!-- EVENT NAME -->
+
+                    <h2>
+
+                        ${booking.eventName || "Event"}
+
+                        🎉
+
+                    </h2>
+
+
+                    <!-- DETAILS -->
+
+                    <div class="booking-details">
+
+
+                        <!-- DATE -->
+
+                        <div class="booking-detail">
+
+                            <div class="booking-detail-icon">
+                                📅
+                            </div>
+
+                            <div class="booking-detail-content">
+
+                                <small>
+                                    Event Date
+                                </small>
+
+                                <strong>
+                                    ${booking.eventDate || "Not specified"}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- GUESTS -->
+
+                        <div class="booking-detail">
+
+                            <div class="booking-detail-icon">
+                                👥
+                            </div>
+
+                            <div class="booking-detail-content">
+
+                                <small>
+                                    Guests
+                                </small>
+
+                                <strong>
+                                    ${booking.guests || 0}
+                                    People
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- LOCATION -->
+
+                        <div class="booking-detail">
+
+                            <div class="booking-detail-icon">
+                                📍
+                            </div>
+
+                            <div class="booking-detail-content">
+
+                                <small>
+                                    Location
+                                </small>
+
+                                <strong>
+                                    ${booking.location || "Not specified"}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- PRICE -->
+
+                        <div class="booking-detail">
+
+                            <div class="booking-detail-icon">
+                                ₹
+                            </div>
+
+                            <div class="booking-detail-content">
+
+                                <small>
+                                    Total Price
+                                </small>
+
+                                <strong>
+                                    ₹${booking.price || "0"}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- REQUIREMENTS -->
+
+                        <div class="booking-detail">
+
+                            <div class="booking-detail-icon">
+                                📝
+                            </div>
+
+                            <div class="booking-detail-content">
+
+                                <small>
+                                    Requirements
+                                </small>
+
+                                <strong>
+                                    ${booking.requirements || "None"}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- END TIME -->
+
+                        <div class="booking-detail">
+
+                            <div class="booking-detail-icon">
+                                🕐
+                            </div>
+
+                            <div class="booking-detail-content">
+
+                                <small>
+                                    Event End Time
+                                </small>
+
+                                <strong>
+                                    ${booking.eventEndTime || "Not specified"}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- STATUS -->
+
+                <div class="
+                    booking-status
+                    ${status.toLowerCase()}
+                ">
+
+                    ${statusText}
+
+                </div>
+
+
+                <!-- ACTIONS -->
+
+                <div class="booking-bottom">
+
+
+                    <!-- VIEW DETAILS -->
+
+                    <button
+                        type="button"
+                        class="view-details-btn"
+                        onclick="viewBookingDetails('${bookingDoc.id}')">
+
+                        👁 View Details
+
+                    </button>
+
+
+                    <!-- CANCEL -->
+
+                    ${
+                        status === "Pending"
+                        ? `
+
+                            <button
+                                type="button"
+                                class="customer-cancel-booking-btn"
+                                onclick="cancelCustomerBooking('${bookingDoc.id}')">
+
+                                <i class="fa-solid fa-xmark"></i>
+
+                                Cancel Booking
+
+                            </button>
+
+                        `
+                        : ""
+                    }
+
+
+                    <!-- PAY NOW -->
+
+                    ${paymentButton}
+
+
+                    <!-- PAID -->
+
+                    ${paidLabel}
+
+
+                </div>
+
+            `;
+
+
+            container.appendChild(card);
+
+        });
 
     }
 
@@ -428,11 +500,9 @@ async function loadMyBookings() {
                     ⚠️
                 </div>
 
-
                 <h2>
                     Error Loading Bookings
                 </h2>
-
 
                 <p>
                     ${error.message}
@@ -448,6 +518,141 @@ async function loadMyBookings() {
 
 
 // =========================================================
+// PAY FOR BOOKING
+// =========================================================
+
+window.payForBooking =
+    async function (bookingId) {
+
+        try {
+
+            const user =
+                auth.currentUser;
+
+
+            if (!user) {
+
+                alert(
+                    "Please login first."
+                );
+
+                window.location.href =
+                    "customer-login.html";
+
+                return;
+
+            }
+
+
+            const bookingSnapshot =
+                await getDoc(
+                    doc(
+                        db,
+                        "bookings",
+                        bookingId
+                    )
+                );
+
+
+            if (
+                !bookingSnapshot.exists()
+            ) {
+
+                alert(
+                    "Booking not found."
+                );
+
+                return;
+
+            }
+
+
+            const booking =
+                bookingSnapshot.data();
+
+
+            // =================================================
+            // CHECK CUSTOMER
+            // =================================================
+
+            if (
+                booking.customerId !==
+                user.uid
+            ) {
+
+                alert(
+                    "You cannot pay for this booking."
+                );
+
+                return;
+
+            }
+
+
+            // =================================================
+            // CHECK APPROVAL
+            // =================================================
+
+            if (
+                booking.status !==
+                "Approved"
+            ) {
+
+                alert(
+                    "Payment is available only after admin approval."
+                );
+
+                return;
+
+            }
+
+
+            // =================================================
+            // ALREADY PAID
+            // =================================================
+
+            if (
+                booking.paymentStatus ===
+                "Paid"
+            ) {
+
+                alert(
+                    "This booking has already been paid."
+                );
+
+                return;
+
+            }
+
+
+            // =================================================
+            // OPEN PAYMENT PAGE WITH BOOKING ID
+            // =================================================
+
+            window.location.href =
+                `payment.html?bookingId=${encodeURIComponent(bookingId)}`;
+
+        }
+
+
+        catch (error) {
+
+            console.error(
+                "Payment Error:",
+                error
+            );
+
+
+            alert(
+                "Unable to open payment page."
+            );
+
+        }
+
+    };
+
+
+// =========================================================
 // VIEW BOOKING DETAILS
 // =========================================================
 
@@ -455,8 +660,6 @@ window.viewBookingDetails =
     async function (bookingId) {
 
         try {
-
-            // ================= GET BOOKING =================
 
             const bookingSnapshot =
                 await getDoc(
@@ -484,8 +687,6 @@ window.viewBookingDetails =
             const booking =
                 bookingSnapshot.data();
 
-
-            // ================= DETAILS =================
 
             const eventName =
                 booking.eventName ||
@@ -527,6 +728,11 @@ window.viewBookingDetails =
                 "Pending";
 
 
+            const paymentStatus =
+                booking.paymentStatus ||
+                "Unpaid";
+
+
             const cancellationReason =
                 booking.cancellationReason ||
                 "";
@@ -545,8 +751,6 @@ window.viewBookingDetails =
                     .toUpperCase();
 
 
-            // ================= STATUS CLASS =================
-
             let statusClass =
                 "pending";
 
@@ -560,7 +764,6 @@ window.viewBookingDetails =
 
             }
 
-
             else if (
                 status === "Cancelled"
             ) {
@@ -569,7 +772,6 @@ window.viewBookingDetails =
                     "cancelled";
 
             }
-
 
             else if (
                 status === "Rejected"
@@ -580,8 +782,6 @@ window.viewBookingDetails =
 
             }
 
-
-            // ================= STATUS TEXT =================
 
             let statusText =
                 "◷ Pending";
@@ -596,7 +796,6 @@ window.viewBookingDetails =
 
             }
 
-
             else if (
                 status === "Cancelled"
             ) {
@@ -605,7 +804,6 @@ window.viewBookingDetails =
                     "✕ Cancelled";
 
             }
-
 
             else if (
                 status === "Rejected"
@@ -616,8 +814,6 @@ window.viewBookingDetails =
 
             }
 
-
-            // ================= POPUP =================
 
             const overlay =
                 document.createElement(
@@ -634,8 +830,6 @@ window.viewBookingDetails =
                 <div class="booking-details-modal">
 
 
-                    <!-- CLOSE -->
-
                     <button
                         type="button"
                         class="close-booking-details"
@@ -645,8 +839,6 @@ window.viewBookingDetails =
 
                     </button>
 
-
-                    <!-- ICON -->
 
                     <div class="booking-modal-icon">
                         🎉
@@ -663,8 +855,6 @@ window.viewBookingDetails =
                     </p>
 
 
-                    <!-- STATUS -->
-
                     <div class="
                         booking-modal-status
                         ${statusClass}
@@ -675,8 +865,6 @@ window.viewBookingDetails =
                     </div>
 
 
-                    <!-- DETAILS -->
-
                     <div class="booking-modal-grid">
 
 
@@ -685,7 +873,6 @@ window.viewBookingDetails =
                             <span>
                                 Booking ID
                             </span>
-
 
                             <strong>
                                 ${bookingIdText}
@@ -700,7 +887,6 @@ window.viewBookingDetails =
                                 Event Date
                             </span>
 
-
                             <strong>
                                 ${eventDate}
                             </strong>
@@ -713,7 +899,6 @@ window.viewBookingDetails =
                             <span>
                                 Event End Time
                             </span>
-
 
                             <strong>
                                 ${endTime}
@@ -728,7 +913,6 @@ window.viewBookingDetails =
                                 Guests
                             </span>
 
-
                             <strong>
                                 ${guests}
                             </strong>
@@ -741,7 +925,6 @@ window.viewBookingDetails =
                             <span>
                                 Location
                             </span>
-
 
                             <strong>
                                 ${location}
@@ -756,9 +939,21 @@ window.viewBookingDetails =
                                 Total Price
                             </span>
 
-
                             <strong>
                                 ₹${price}
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Payment Status
+                            </span>
+
+                            <strong>
+                                ${paymentStatus}
                             </strong>
 
                         </div>
@@ -770,7 +965,6 @@ window.viewBookingDetails =
                                 Requirements
                             </span>
 
-
                             <strong>
                                 ${requirements}
                             </strong>
@@ -780,58 +974,54 @@ window.viewBookingDetails =
 
                         ${
                             status === "Cancelled"
-                                ? `
+                            ? `
 
-                                    <div class="full-width">
+                                <div class="full-width">
 
-                                        <span>
-                                            Cancellation Reason
-                                        </span>
+                                    <span>
+                                        Cancellation Reason
+                                    </span>
 
+                                    <strong>
+                                        ${
+                                            cancellationReason ||
+                                            "No reason provided."
+                                        }
+                                    </strong>
 
-                                        <strong>
-                                            ${
-                                                cancellationReason ||
-                                                "No reason provided."
-                                            }
-                                        </strong>
+                                </div>
 
-                                    </div>
-
-                                  `
-                                : ""
+                            `
+                            : ""
                         }
 
 
                         ${
                             status === "Rejected"
-                                ? `
+                            ? `
 
-                                    <div class="full-width">
+                                <div class="full-width">
 
-                                        <span>
-                                            Rejection Reason
-                                        </span>
+                                    <span>
+                                        Rejection Reason
+                                    </span>
 
+                                    <strong>
+                                        ${
+                                            rejectionReason ||
+                                            "No reason provided."
+                                        }
+                                    </strong>
 
-                                        <strong>
-                                            ${
-                                                rejectionReason ||
-                                                "No reason provided."
-                                            }
-                                        </strong>
+                                </div>
 
-                                    </div>
-
-                                  `
-                                : ""
+                            `
+                            : ""
                         }
 
 
                     </div>
 
-
-                    <!-- CLOSE BUTTON -->
 
                     <button
                         type="button"
@@ -853,8 +1043,6 @@ window.viewBookingDetails =
             );
 
 
-            // ================= CLOSE X =================
-
             document
                 .getElementById(
                     "closeBookingDetails"
@@ -868,8 +1056,6 @@ window.viewBookingDetails =
                     }
                 );
 
-
-            // ================= CLOSE BUTTON =================
 
             document
                 .getElementById(
@@ -885,14 +1071,13 @@ window.viewBookingDetails =
                 );
 
 
-            // ================= CLICK OUTSIDE =================
-
             overlay.addEventListener(
                 "click",
                 (event) => {
 
                     if (
-                        event.target === overlay
+                        event.target ===
+                        overlay
                     ) {
 
                         overlay.remove();
@@ -928,9 +1113,6 @@ window.viewBookingDetails =
 
 window.cancelCustomerBooking =
     async function (bookingId) {
-
-
-        // ================= CREATE POPUP =================
 
         const overlay =
             document.createElement(
@@ -1049,8 +1231,6 @@ window.cancelCustomerBooking =
             );
 
 
-        // ================= CLOSE =================
-
         closeButton.addEventListener(
             "click",
             () => {
@@ -1061,14 +1241,13 @@ window.cancelCustomerBooking =
         );
 
 
-        // ================= CLICK OUTSIDE =================
-
         overlay.addEventListener(
             "click",
             (event) => {
 
                 if (
-                    event.target === overlay
+                    event.target ===
+                    overlay
                 ) {
 
                     overlay.remove();
@@ -1079,12 +1258,9 @@ window.cancelCustomerBooking =
         );
 
 
-        // ================= CONFIRM =================
-
         confirmButton.addEventListener(
             "click",
             async () => {
-
 
                 const reason =
                     reasonInput.value.trim();
@@ -1131,8 +1307,6 @@ window.cancelCustomerBooking =
                     `;
 
 
-                    // ================= GET BOOKING =================
-
                     const bookingSnapshot =
                         await getDoc(
                             doc(
@@ -1169,8 +1343,6 @@ window.cancelCustomerBooking =
                         "";
 
 
-                    // ================= FIRESTORE =================
-
                     await updateDoc(
 
                         doc(
@@ -1197,8 +1369,6 @@ window.cancelCustomerBooking =
 
                     );
 
-
-                    // ================= ADMIN EMAIL =================
 
                     try {
 
@@ -1266,8 +1436,6 @@ window.cancelCustomerBooking =
 
                     }
 
-
-                    // ================= SUCCESS =================
 
                     overlay.remove();
 

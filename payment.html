@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Payment - EventSphere</title>
+
+    <link rel="stylesheet"
+          href="css/style.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+
+        .payment-page {
+
+            min-height: 100vh;
+
+            background: #f5f7fc;
+
+            padding: 35px 40px;
+
+            box-sizing: border-box;
+
+        }
+
+
+        .payment-header {
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .payment-header-top {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+        }
+
+
+        .payment-header-icon {
+
+            width: 48px;
+
+            height: 48px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: #eaf0ff;
+
+            color: #2563eb;
+
+            border-radius: 12px;
+
+            font-size: 21px;
+
+        }
+
+
+        .payment-header h1 {
+
+            margin: 0;
+
+            color: #18366f;
+
+            font-size: 30px;
+
+            font-weight: 750;
+
+        }
+
+
+        .payment-subtitle {
+
+            margin: 6px 0 0 60px;
+
+            color: #64748b;
+
+            font-size: 14px;
+
+        }
+
+
+        .payment-heading-line {
+
+            width: 50px;
+
+            height: 3px;
+
+            background: #2563eb;
+
+            border-radius: 5px;
+
+            margin-top: 12px;
+
+        }
+
+
+        .payment-card {
+
+            width: 100%;
+
+            max-width: 700px;
+
+            background: white;
+
+            border: 1px solid #e3e8f2;
+
+            border-radius: 16px;
+
+            padding: 28px;
+
+            box-sizing: border-box;
+
+            box-shadow:
+                0 8px 25px
+                rgba(30, 64, 175, 0.08);
+
+        }
+
+
+        .booking-summary {
+
+            background: #f8faff;
+
+            border: 1px solid #e1e8f7;
+
+            border-radius: 12px;
+
+            padding: 20px;
+
+            margin-bottom: 22px;
+
+        }
+
+
+        .booking-summary h2 {
+
+            margin: 0 0 16px;
+
+            color: #18366f;
+
+            font-size: 19px;
+
+        }
+
+
+        .summary-row {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 20px;
+
+            padding: 9px 0;
+
+            border-bottom: 1px solid #e8edf6;
+
+            font-size: 14px;
+
+        }
+
+
+        .summary-row:last-child {
+
+            border-bottom: none;
+
+        }
+
+
+        .summary-label {
+
+            color: #64748b;
+
+            font-weight: 600;
+
+        }
+
+
+        .summary-value {
+
+            color: #172554;
+
+            font-weight: 700;
+
+            text-align: right;
+
+        }
+
+
+        .summary-price {
+
+            color: #2563eb;
+
+            font-size: 21px;
+
+        }
+
+
+        .payment-info {
+
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 13px;
+
+            background: #eff6ff;
+
+            border: 1px solid #dbeafe;
+
+            border-radius: 12px;
+
+            padding: 16px;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .payment-info i {
+
+            color: #2563eb;
+
+            font-size: 20px;
+
+            margin-top: 2px;
+
+        }
+
+
+        .payment-info strong {
+
+            display: block;
+
+            color: #18366f;
+
+            margin-bottom: 4px;
+
+        }
+
+
+        .payment-info p {
+
+            margin: 0;
+
+            color: #64748b;
+
+            font-size: 13px;
+
+            line-height: 1.5;
+
+        }
+
+
+        .pay-button {
+
+            width: 100%;
+
+            height: 48px;
+
+            border: none;
+
+            border-radius: 9px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #4f46e5
+                );
+
+            color: white;
+
+            font-size: 15px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
+            box-shadow:
+                0 6px 15px
+                rgba(37, 99, 235, 0.18);
+
+        }
+
+
+        .pay-button:hover {
+
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 9px 18px
+                rgba(37, 99, 235, 0.25);
+
+        }
+
+
+        .pay-button:disabled {
+
+            opacity: 0.7;
+
+            cursor: not-allowed;
+
+            transform: none;
+
+        }
+
+
+        .pay-button i {
+
+            margin-right: 7px;
+
+        }
+
+
+        .back-button {
+
+            width: 100%;
+
+            height: 44px;
+
+            margin-top: 12px;
+
+            border: 1px solid #d8e0ed;
+
+            border-radius: 9px;
+
+            background: white;
+
+            color: #475569;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+        }
+
+
+        .back-button:hover {
+
+            background: #f8fafc;
+
+        }
+
+
+        .secure-note {
+
+            text-align: center;
+
+            margin-top: 17px;
+
+            color: #64748b;
+
+            font-size: 12px;
+
+        }
+
+
+        .secure-note i {
+
+            color: #16a34a;
+
+            margin-right: 5px;
+
+        }
+
+
+        @media (max-width: 700px) {
+
+            .payment-page {
+
+                padding: 22px 18px 35px;
+
+            }
+
+
+            .payment-header h1 {
+
+                font-size: 26px;
+
+            }
+
+
+            .payment-card {
+
+                padding: 20px;
+
+            }
+
+
+            .summary-row {
+
+                align-items: flex-start;
+
+                flex-direction: column;
+
+                gap: 3px;
+
+            }
+
+
+            .summary-value {
+
+                text-align: left;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="dashboard">
+
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <div class="sidebar">
+
+        <h2>
+            EventSphere
+        </h2>
+
+
+        <ul>
+
+            <li>
+
+                <a href="customer-dashboard.html">
+
+                    🏠 Dashboard
+
+                </a>
+
+            </li>
+
+
+            <li>
+
+                <a href="customer-events.html">
+
+                    🎉 Events
+
+                </a>
+
+            </li>
+
+
+            <li class="active">
+
+                <a href="my-bookings.html">
+
+                    📅 My Bookings
+
+                </a>
+
+            </li>
+
+
+            <li>
+
+                <a href="#"
+                   onclick="logout()">
+
+                    🚪 Logout
+
+                </a>
+
+            </li>
+
+        </ul>
+
+    </div>
+
+
+    <!-- ================= MAIN CONTENT ================= -->
+
+    <div class="dashboard-content payment-page">
+
+
+        <!-- ================= HEADER ================= -->
+
+        <div class="payment-header">
+
+            <div class="payment-header-top">
+
+                <div class="payment-header-icon">
+
+                    <i class="fa-solid fa-credit-card"></i>
+
+                </div>
+
+
+                <h1>
+                    Secure Payment
+                </h1>
+
+            </div>
+
+
+            <p class="payment-subtitle">
+
+                Complete your payment securely using Razorpay.
+
+            </p>
+
+
+            <div class="payment-heading-line"></div>
+
+        </div>
+
+
+        <!-- ================= PAYMENT CARD ================= -->
+
+        <div class="payment-card">
+
+
+            <!-- ================= BOOKING SUMMARY ================= -->
+
+            <div class="booking-summary">
+
+                <h2>
+                    Booking Summary
+                </h2>
+
+
+                <div class="summary-row">
+
+                    <span class="summary-label">
+                        Event
+                    </span>
+
+                    <span
+                        class="summary-value"
+                        id="eventName">
+                        Loading...
+                    </span>
+
+                </div>
+
+
+                <div class="summary-row">
+
+                    <span class="summary-label">
+                        Event Date
+                    </span>
+
+                    <span
+                        class="summary-value"
+                        id="eventDate">
+                        Loading...
+                    </span>
+
+                </div>
+
+
+                <div class="summary-row">
+
+                    <span class="summary-label">
+                        Guests
+                    </span>
+
+                    <span
+                        class="summary-value"
+                        id="guestCount">
+                        Loading...
+                    </span>
+
+                </div>
+
+
+                <div class="summary-row">
+
+                    <span class="summary-label">
+                        Location
+                    </span>
+
+                    <span
+                        class="summary-value"
+                        id="eventLocation">
+                        Loading...
+                    </span>
+
+                </div>
+
+
+                <div class="summary-row">
+
+                    <span class="summary-label">
+                        Amount
+                    </span>
+
+                    <span
+                        class="summary-value summary-price"
+                        id="eventPrice">
+                        ₹0
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= PAYMENT INFORMATION ================= -->
+
+            <div class="payment-info">
+
+                <i class="fa-solid fa-shield-halved"></i>
+
+
+                <div>
+
+                    <strong>
+                        Secure Razorpay Checkout
+                    </strong>
+
+                    <p>
+                        You will be redirected to Razorpay's secure
+                        checkout to complete your payment.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= PAY BUTTON ================= -->
+
+            <button
+                type="button"
+                id="payButton"
+                class="pay-button">
+
+                <i class="fa-solid fa-lock"></i>
+
+                Pay Now
+
+            </button>
+
+
+            <!-- ================= BACK ================= -->
+
+            <button
+                type="button"
+                class="back-button"
+                onclick="window.location.href='my-bookings.html'">
+
+                ← Back to My Bookings
+
+            </button>
+
+
+            <!-- ================= TEST MODE NOTE ================= -->
+
+            <div class="secure-note">
+
+                <i class="fa-solid fa-circle-check"></i>
+
+                Razorpay Test Mode — No real money will be charged.
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= RAZORPAY CHECKOUT ================= -->
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+
+<!-- ================= AUTH ================= -->
+
+<script
+    type="module"
+    src="js/auth.js">
+</script>
+
+
+<!-- ================= PAYMENT JS ================= -->
+
+<script
+    type="module"
+    src="js/payment.js">
+</script>
+
+
+</body>
+
+</html>
