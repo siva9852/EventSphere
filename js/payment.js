@@ -50,15 +50,19 @@ function loadRazorpayScript() {
         };
 
         script.onerror = () => {
+
             reject(
                 new Error(
                     "Unable to load Razorpay Checkout."
                 )
             );
+
         };
 
         document.head.appendChild(script);
+
     });
+
 }
 
 
@@ -72,9 +76,12 @@ function setElementText(id, value) {
         document.getElementById(id);
 
     if (element) {
+
         element.textContent =
             value ?? "Not specified";
+
     }
+
 }
 
 
@@ -87,19 +94,47 @@ async function loadPaymentBooking() {
     const user =
         auth.currentUser;
 
+
     if (!user) {
 
         window.location.href =
             "customer-login.html";
 
         return;
+
     }
 
 
+    // =====================================================
+    // GET BOOKING ID FROM URL FIRST
+    // =====================================================
+
+    const urlParams =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    const urlBookingId =
+        urlParams.get("bookingId");
+
+
     const bookingId =
+        urlBookingId ||
         localStorage.getItem(
             "paymentBookingId"
         );
+
+
+    // Save URL booking ID for the payment process
+    if (urlBookingId) {
+
+        localStorage.setItem(
+            "paymentBookingId",
+            urlBookingId
+        );
+
+    }
 
 
     if (!bookingId) {
@@ -112,6 +147,7 @@ async function loadPaymentBooking() {
             "my-bookings.html";
 
         return;
+
     }
 
 
@@ -141,6 +177,7 @@ async function loadPaymentBooking() {
                 "my-bookings.html";
 
             return;
+
         }
 
 
@@ -165,6 +202,7 @@ async function loadPaymentBooking() {
                 "my-bookings.html";
 
             return;
+
         }
 
 
@@ -185,6 +223,7 @@ async function loadPaymentBooking() {
                 "my-bookings.html";
 
             return;
+
         }
 
 
@@ -205,6 +244,7 @@ async function loadPaymentBooking() {
                 "my-bookings.html";
 
             return;
+
         }
 
 
@@ -263,12 +303,15 @@ async function loadPaymentBooking() {
 
             payButton.dataset.bookingId =
                 bookingId;
+
         }
+
 
         if (paymentForm) {
 
             paymentForm.dataset.bookingId =
                 bookingId;
+
         }
 
     }
@@ -280,13 +323,17 @@ async function loadPaymentBooking() {
             error
         );
 
+
         alert(
             "Unable to load payment details."
         );
 
+
         window.location.href =
             "my-bookings.html";
+
     }
+
 }
 
 
@@ -303,20 +350,28 @@ async function createPaymentOrder(
         await fetch(
             `${API_BASE_URL}/create-payment-order`,
             {
-                method: "POST",
+
+                method:
+                    "POST",
 
                 headers: {
+
                     "Content-Type":
                         "application/json",
 
                     "Authorization":
                         `Bearer ${idToken}`
+
                 },
 
-                body: JSON.stringify({
-                    bookingId:
-                        bookingId
-                })
+                body:
+                    JSON.stringify({
+
+                        bookingId:
+                            bookingId
+
+                    })
+
             }
         );
 
@@ -331,6 +386,7 @@ async function createPaymentOrder(
 
 
     let data;
+
 
     try {
 
@@ -348,9 +404,11 @@ async function createPaymentOrder(
             responseText
         );
 
+
         throw new Error(
             `Server error (${response.status}).`
         );
+
     }
 
 
@@ -360,6 +418,7 @@ async function createPaymentOrder(
             data.message ||
             `Payment order failed (${response.status}).`
         );
+
     }
 
 
@@ -369,10 +428,12 @@ async function createPaymentOrder(
             data.message ||
             "Unable to create payment order."
         );
+
     }
 
 
     return data;
+
 }
 
 
@@ -390,33 +451,40 @@ async function verifyPayment(
         await fetch(
             `${API_BASE_URL}/verify-payment`,
             {
-                method: "POST",
+
+                method:
+                    "POST",
 
                 headers: {
+
                     "Content-Type":
                         "application/json",
 
                     "Authorization":
                         `Bearer ${idToken}`
+
                 },
 
-                body: JSON.stringify({
+                body:
+                    JSON.stringify({
 
-                    bookingId:
-                        bookingId,
+                        bookingId:
+                            bookingId,
 
-                    razorpay_order_id:
-                        paymentResponse
-                            .razorpay_order_id,
+                        razorpay_order_id:
+                            paymentResponse
+                                .razorpay_order_id,
 
-                    razorpay_payment_id:
-                        paymentResponse
-                            .razorpay_payment_id,
+                        razorpay_payment_id:
+                            paymentResponse
+                                .razorpay_payment_id,
 
-                    razorpay_signature:
-                        paymentResponse
-                            .razorpay_signature
-                })
+                        razorpay_signature:
+                            paymentResponse
+                                .razorpay_signature
+
+                    })
+
             }
         );
 
@@ -426,6 +494,7 @@ async function verifyPayment(
 
 
     let data;
+
 
     try {
 
@@ -443,9 +512,11 @@ async function verifyPayment(
             responseText
         );
 
+
         throw new Error(
             `Payment verification server error (${response.status}).`
         );
+
     }
 
 
@@ -455,6 +526,7 @@ async function verifyPayment(
             data.message ||
             `Payment verification failed (${response.status}).`
         );
+
     }
 
 
@@ -464,10 +536,12 @@ async function verifyPayment(
             data.message ||
             "Payment verification failed."
         );
+
     }
 
 
     return data;
+
 }
 
 
@@ -487,16 +561,21 @@ async function startPayment() {
             "Please login first."
         );
 
+
         window.location.href =
             "customer-login.html";
 
         return;
+
     }
 
 
     const bookingId =
         payButton?.dataset.bookingId ||
         paymentForm?.dataset.bookingId ||
+        new URLSearchParams(
+            window.location.search
+        ).get("bookingId") ||
         localStorage.getItem(
             "paymentBookingId"
         );
@@ -509,6 +588,7 @@ async function startPayment() {
         );
 
         return;
+
     }
 
 
@@ -523,9 +603,11 @@ async function startPayment() {
             payButton.disabled =
                 true;
 
+
             payButton.innerHTML = `
                 🔄 Processing Payment...
             `;
+
         }
 
 
@@ -570,17 +652,23 @@ async function startPayment() {
             key:
                 orderData.keyId,
 
+
             amount:
                 orderData.amount,
 
+
             currency:
-                orderData.currency || "INR",
+                orderData.currency ||
+                "INR",
+
 
             name:
                 "EventSphere",
 
+
             description:
                 "Event Booking Payment",
+
 
             order_id:
                 orderData.orderId,
@@ -596,9 +684,11 @@ async function startPayment() {
                     user.displayName ||
                     "",
 
+
                 email:
                     user.email ||
                     ""
+
             },
 
 
@@ -610,6 +700,7 @@ async function startPayment() {
 
                 color:
                     "#2563eb"
+
             },
 
 
@@ -629,6 +720,7 @@ async function startPayment() {
                             payButton.innerHTML = `
                                 🔄 Verifying Payment...
                             `;
+
                         }
 
 
@@ -700,11 +792,15 @@ async function startPayment() {
                             payButton.disabled =
                                 false;
 
+
                             payButton.innerHTML = `
                                 🔒 Pay Now
                             `;
+
                         }
+
                     }
+
                 },
 
 
@@ -727,12 +823,17 @@ async function startPayment() {
                             payButton.disabled =
                                 false;
 
+
                             payButton.innerHTML = `
                                 🔒 Pay Now
                             `;
+
                         }
+
                     }
+
             }
+
         };
 
 
@@ -767,10 +868,13 @@ async function startPayment() {
                     payButton.disabled =
                         false;
 
+
                     payButton.innerHTML = `
                         🔒 Pay Now
                     `;
+
                 }
+
             }
         );
 
@@ -798,11 +902,15 @@ async function startPayment() {
             payButton.disabled =
                 false;
 
+
             payButton.innerHTML = `
                 🔒 Pay Now
             `;
+
         }
+
     }
+
 }
 
 
@@ -819,8 +927,10 @@ if (payButton) {
             event.preventDefault();
 
             startPayment();
+
         }
     );
+
 }
 
 
@@ -839,8 +949,10 @@ if (paymentForm) {
             event.preventDefault();
 
             startPayment();
+
         }
     );
+
 }
 
 
@@ -861,6 +973,8 @@ auth.onAuthStateChanged(
 
             window.location.href =
                 "customer-login.html";
+
         }
+
     }
 );
