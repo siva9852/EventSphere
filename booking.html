@@ -575,6 +575,80 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 </script>
 
 
+<!-- ================= DISABLE PAST DATES ================= -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const eventDate =
+            document.getElementById("eventDate");
+
+        if (!eventDate) {
+            return;
+        }
+
+
+        // Get today's date
+        const today =
+            new Date();
+
+
+        const year =
+            today.getFullYear();
+
+
+        const month =
+            String(
+                today.getMonth() + 1
+            ).padStart(2, "0");
+
+
+        const day =
+            String(
+                today.getDate()
+            ).padStart(2, "0");
+
+
+        // YYYY-MM-DD
+        const todayString =
+            `${year}-${month}-${day}`;
+
+
+        // Disable all dates before today
+        eventDate.min =
+            todayString;
+
+
+        // Extra protection
+        eventDate.addEventListener(
+            "change",
+            function () {
+
+                if (
+                    eventDate.value &&
+                    eventDate.value < todayString
+                ) {
+
+                    alert(
+                        "Please select today or a future date."
+                    );
+
+                    eventDate.value = "";
+
+                }
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+
 </body>
 
 </html>

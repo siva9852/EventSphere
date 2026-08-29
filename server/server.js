@@ -1397,9 +1397,8 @@ app.post(
     }
 );
 
-
 // =========================================================
-// RAZORPAY - VERIFY PAYMENT
+// RAZORPAY - VERIFY PAYMENT + SEND RECEIPT EMAIL
 // =========================================================
 
 app.post(
@@ -1413,13 +1412,11 @@ app.post(
                 return res
                     .status(500)
                     .json({
-
                         success:
                             false,
 
                         message:
                             "Firebase Admin is not initialized."
-
                     });
 
             }
@@ -1433,6 +1430,10 @@ app.post(
             } = req.body;
 
 
+            // =================================================
+            // CHECK PAYMENT DETAILS
+            // =================================================
+
             if (
                 !bookingId ||
                 !razorpay_order_id ||
@@ -1443,17 +1444,19 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
                         success:
                             false,
 
                         message:
                             "Payment verification details are incomplete."
-
                     });
 
             }
 
+
+            // =================================================
+            // CHECK AUTHENTICATION
+            // =================================================
 
             const authHeader =
                 req.headers.authorization || "";
@@ -1468,30 +1471,29 @@ app.post(
                 return res
                     .status(401)
                     .json({
-
                         success:
                             false,
 
                         message:
                             "Authentication required."
-
                     });
 
             }
 
 
             const idToken =
-                authHeader.substring(
-                    7
-                );
+                authHeader.substring(7);
 
 
             const decodedToken =
-                await firebaseAuth
-                    .verifyIdToken(
-                        idToken
-                    );
+                await firebaseAuth.verifyIdToken(
+                    idToken
+                );
 
+
+            // =================================================
+            // GET BOOKING
+            // =================================================
 
             const bookingRef =
                 firebaseDb
@@ -1510,13 +1512,11 @@ app.post(
                 return res
                     .status(404)
                     .json({
-
                         success:
                             false,
 
                         message:
                             "Booking not found."
-
                     });
 
             }
@@ -1538,13 +1538,11 @@ app.post(
                 return res
                     .status(403)
                     .json({
-
                         success:
                             false,
 
                         message:
                             "You cannot verify this payment."
-
                     });
 
             }
@@ -1562,20 +1560,18 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
                         success:
                             false,
 
                         message:
                             "Payment order does not match the booking."
-
                     });
 
             }
 
 
             // =================================================
-            // VERIFY SIGNATURE
+            // VERIFY RAZORPAY SIGNATURE
             // =================================================
 
             const generatedSignature =
@@ -1589,9 +1585,25 @@ app.post(
                         "|" +
                         razorpay_payment_id
                     )
-                    .digest(
-                        "hex"
-                    );
+                    .digest("hex");
+
+
+            if (
+                generatedSignature.length !==
+                razorpay_signature.length
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+                        success:
+                            false,
+
+                        message:
+                            "Payment verification failed."
+                    });
+
+            }
 
 
             const signatureIsValid =
@@ -1613,13 +1625,11 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
                         success:
                             false,
 
                         message:
                             "Payment verification failed."
-
                     });
 
             }
@@ -1646,6 +1656,190 @@ app.post(
             });
 
 
+            // =================================================
+            // SEND PAYMENT RECEIPT EMAIL
+            // =================================================
+
+            try {
+
+                const customerEmail =
+                    booking.customerEmail ||
+                    decodedToken.email ||
+                    "";
+
+
+                const eventName =
+                    booking.eventName ||
+                    "Event";
+
+
+                const eventDate =
+                    booking.eventDate ||
+                    "Not specified";
+
+
+                const amount =
+                    Number(
+                        booking.price || 0
+                    );
+
+
+                const receiptBookingId =
+                    "BK-" +
+                    bookingId
+                        .substring(0, 8)
+                        .toUpperCase();
+
+
+                const paymentDate =
+                    new Date().toLocaleString(
+                        "en-IN",
+                        {
+                            timeZone:
+                                "Asia/Kolkata"
+                        }
+                    );
+
+
+                if (customerEmail) {
+
+                    const subject =
+                        "EventSphere Payment Receipt - " +
+                        receiptBookingId;
+
+
+                    const message =
+`Hello,
+
+Your payment for EventSphere has been successfully received.
+
+================================
+       PAYMENT RECEIPT
+================================
+
+Booking ID:
+${receiptBookingId}
+
+Event:
+${eventName}
+
+Event Date:
+${eventDate}
+
+Amount Paid:
+₹${amount.toLocaleString("en-IN")}
+
+Payment ID:
+${razorpay_payment_id}
+
+Payment Date:
+${paymentDate}
+
+Payment Status:
+PAID
+
+================================
+
+Your payment has been successfully verified.
+
+You can login to EventSphere and view your booking in the My Bookings section.
+
+Thank you for choosing EventSphere.
+
+Regards,
+EventSphere Team`;
+
+
+                    await axios.post(
+
+                        "https://api.brevo.com/v3/smtp/email",
+
+                        {
+
+                            sender: {
+
+                                name:
+                                    "EventSphere",
+
+                                email:
+                                    "eventsphere.official2026@gmail.com"
+
+                            },
+
+                            to: [
+
+                                {
+
+                                    email:
+                                        customerEmail
+
+                                }
+
+                            ],
+
+                            subject:
+                                subject,
+
+                            textContent:
+                                message
+
+                        },
+
+                        {
+
+                            headers: {
+
+                                accept:
+                                    "application/json",
+
+                                "api-key":
+                                    process.env.BREVO_API_KEY,
+
+                                "content-type":
+                                    "application/json"
+
+                            }
+
+                        }
+
+                    );
+
+
+                    console.log(
+                        `Payment receipt email sent to ${customerEmail}`
+                    );
+
+                }
+
+                else {
+
+                    console.log(
+                        "Payment successful but customer email was not available."
+                    );
+
+                }
+
+            }
+
+
+            catch (emailError) {
+
+                // Payment is already successful.
+                // Email failure must not make the payment fail.
+
+                console.error(
+                    "Payment receipt email failed:",
+                    emailError.response?.data ||
+                    emailError.message
+                );
+
+            }
+
+
+            // =================================================
+            // SUCCESS RESPONSE
+            // =================================================
+
             res.json({
 
                 success:
@@ -1662,11 +1856,8 @@ app.post(
         catch (error) {
 
             console.error(
-
                 "Verify Razorpay Payment Error:",
-
                 error
-
             );
 
 
