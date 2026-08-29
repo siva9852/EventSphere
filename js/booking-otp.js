@@ -3,12 +3,16 @@ import { db, auth } from "./firebase-config.js";
 import {
     collection,
     addDoc,
-    doc,
     serverTimestamp,
+    doc,
     setDoc,
     increment
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
+
+// =========================================================
+// OTP ELEMENTS
+// =========================================================
 
 const otpInputs =
     document.querySelectorAll(".otp-box-input");
@@ -17,7 +21,9 @@ const hiddenOtp =
     document.getElementById("bookingOtp");
 
 
-// ================= OTP BOXES =================
+// =========================================================
+// OTP BOXES
+// =========================================================
 
 otpInputs.forEach((input, index) => {
 
@@ -60,7 +66,9 @@ otpInputs.forEach((input, index) => {
 });
 
 
-// ================= VERIFY OTP =================
+// =========================================================
+// VERIFY BOOKING OTP
+// =========================================================
 
 document
     .getElementById("bookingOtpForm")
@@ -69,11 +77,19 @@ document
         e.preventDefault();
 
 
+        // =====================================================
+        // GET OTP
+        // =====================================================
+
         const otp =
             Array.from(otpInputs)
                 .map(input => input.value)
                 .join("");
 
+
+        // =====================================================
+        // CHECK LOGIN
+        // =====================================================
 
         const user =
             auth.currentUser;
@@ -81,7 +97,9 @@ document
 
         if (!user) {
 
-            alert("Please login first.");
+            alert(
+                "Please login first."
+            );
 
             window.location.href =
                 "customer-login.html";
@@ -90,6 +108,10 @@ document
 
         }
 
+
+        // =====================================================
+        // CHECK OTP LENGTH
+        // =====================================================
 
         if (otp.length !== 6) {
 
@@ -102,13 +124,17 @@ document
         }
 
 
-        const bookingData =
-            JSON.parse(
-                localStorage.getItem("bookingData")
+        // =====================================================
+        // GET BOOKING DATA
+        // =====================================================
+
+        const savedBookingData =
+            localStorage.getItem(
+                "bookingData"
             );
 
 
-        if (!bookingData) {
+        if (!savedBookingData) {
 
             alert(
                 "Booking information not found."
@@ -122,19 +148,51 @@ document
         }
 
 
+        let bookingData;
+
+
         try {
 
-            // ================= VERIFY OTP =================
+            bookingData =
+                JSON.parse(
+                    savedBookingData
+                );
 
-            const response =
+        }
+
+        catch (error) {
+
+            console.error(
+                "Booking data error:",
+                error
+            );
+
+            alert(
+                "Invalid booking information. Please create the booking again."
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            // =================================================
+            // STEP 1 — VERIFY OTP WITH SERVER
+            // =================================================
+
+            const otpResponse =
                 await fetch(
                     "https://eventsphere-dndh.onrender.com/verify-otp",
                     {
                         method: "POST",
 
                         headers: {
+
                             "Content-Type":
                                 "application/json"
+
                         },
 
                         body: JSON.stringify({
@@ -146,95 +204,174 @@ document
                                 otp
 
                         })
+
                     }
                 );
 
 
-            const data =
-                await response.json();
+            const otpData =
+                await otpResponse.json();
 
 
-            if (!data.success) {
+            console.log(
+                "OTP verification response:",
+                otpData
+            );
 
-                alert(data.message);
+
+            if (
+                !otpResponse.ok ||
+                !otpData.success
+            ) {
+
+                alert(
+                    otpData.message ||
+                    "Incorrect or expired OTP."
+                );
 
                 return;
 
             }
 
 
-            // ================= CREATE BOOKING =================
+            // =================================================
+            // STEP 2 — CREATE BOOKING
+            // =================================================
 
-            await addDoc(
-                collection(db, "bookings"),
-                {
+            const bookingRef =
+                await addDoc(
 
-                    eventId:
-                        bookingData.eventId,
+                    collection(
+                        db,
+                        "bookings"
+                    ),
 
-                    eventName:
-                        bookingData.eventName,
+                    {
 
-                    price:
-                        bookingData.price,
+                        eventId:
+                            bookingData.eventId,
 
-                    customerId:
-                        user.uid,
+                        eventName:
+                            bookingData.eventName,
 
-                    customerEmail:
-                        user.email,
+                        price:
+                            Number(
+                                bookingData.price || 0
+                            ),
 
-                    eventDate:
-                        bookingData.eventDate,
+                        customerId:
+                            user.uid,
 
-                    eventEndTime:
-                        bookingData.eventEndTime,
+                        customerEmail:
+                            user.email,
 
-                    guests:
-                        bookingData.guests,
+                        eventDate:
+                            bookingData.eventDate,
 
-                    location:
-                        bookingData.location,
+                        eventEndTime:
+                            bookingData.eventEndTime,
 
-                    requirements:
-                        bookingData.requirements,
+                        guests:
+                            bookingData.guests,
 
-                    status:
-                        "Pending",
+                        location:
+                            bookingData.location,
 
-                    createdAt:
-                        serverTimestamp()
+                        requirements:
+                            bookingData.requirements,
 
-                }
+                        status:
+                            "Pending",
+
+                        paymentStatus:
+                            "Unpaid",
+
+                        createdAt:
+                            serverTimestamp()
+
+                    }
+
+                );
+
+
+            console.log(
+                "Booking created:",
+                bookingRef.id
             );
 
 
-            // ================= UPDATE TOTAL BOOKINGS =================
+            // =================================================
+            // STEP 3 — UPDATE STATISTICS
+            // =================================================
+            //
+            // This is kept separate.
+            // If statistics update fails, the booking
+            // should NOT be treated as a failed booking.
+            // =================================================
 
-            await setDoc(
-                doc(db, "statistics", "main"),
-                {
+            try {
 
-                    totalBookings:
-                        increment(1)
+                await setDoc(
 
-                },
-                {
-                    merge: true
-                }
-            );
+                    doc(
+                        db,
+                        "statistics",
+                        "main"
+                    ),
+
+                    {
+
+                        totalBookings:
+                            increment(1)
+
+                    },
+
+                    {
+
+                        merge:
+                            true
+
+                    }
+
+                );
 
 
-            // ================= CLEAR DATA =================
+                console.log(
+                    "Statistics updated successfully."
+                );
+
+            }
+
+            catch (statisticsError) {
+
+                console.error(
+                    "Statistics update failed:",
+                    statisticsError
+                );
+
+                // Do NOT fail the booking because
+                // only the statistics update failed.
+
+            }
+
+
+            // =================================================
+            // STEP 4 — CLEAR TEMPORARY DATA
+            // =================================================
 
             localStorage.removeItem(
                 "bookingData"
             );
 
+
             localStorage.removeItem(
                 "selectedEventId"
             );
 
+
+            // =================================================
+            // STEP 5 — SUCCESS
+            // =================================================
 
             alert(
                 "Booking verified successfully! Waiting for admin approval."
@@ -246,12 +383,23 @@ document
 
         }
 
+
         catch (error) {
 
-            console.error(error);
+            console.error(
+                "BOOKING VERIFICATION ERROR:",
+                error
+            );
+
+
+            // =================================================
+            // SHOW ACTUAL ERROR
+            // =================================================
 
             alert(
-                "Booking verification failed."
+                "Booking could not be completed.\n\n" +
+                (error.message ||
+                "Please try again.")
             );
 
         }
@@ -259,7 +407,9 @@ document
     });
 
 
-// ================= RESEND OTP =================
+// =========================================================
+// RESEND OTP
+// =========================================================
 
 document
     .getElementById("resendBookingOtp")
@@ -271,7 +421,9 @@ document
 
         if (!user) {
 
-            alert("Please login first.");
+            alert(
+                "Please login first."
+            );
 
             return;
 
@@ -284,11 +436,15 @@ document
                 await fetch(
                     "https://eventsphere-dndh.onrender.com/send-otp",
                     {
-                        method: "POST",
+
+                        method:
+                            "POST",
 
                         headers: {
+
                             "Content-Type":
                                 "application/json"
+
                         },
 
                         body: JSON.stringify({
@@ -297,6 +453,7 @@ document
                                 user.email
 
                         })
+
                     }
                 );
 
@@ -305,15 +462,23 @@ document
                 await response.json();
 
 
-            if (data.success) {
+            if (
+                response.ok &&
+                data.success
+            ) {
 
                 alert(
                     "New OTP has been sent to your email."
                 );
 
-            } else {
+            }
 
-                alert(data.message);
+            else {
+
+                alert(
+                    data.message ||
+                    "Unable to resend OTP."
+                );
 
             }
 
@@ -321,10 +486,14 @@ document
 
         catch (error) {
 
-            console.error(error);
+            console.error(
+                "Resend OTP Error:",
+                error
+            );
+
 
             alert(
-                "Unable to resend OTP."
+                "Unable to resend OTP. Please try again."
             );
 
         }
