@@ -1,265 +1,421 @@
 import {
-    adminAuth,
+    auth,
     db
 } from "./firebase-config.js";
 
-
 import {
-    signInWithEmailAndPassword,
     signOut
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 
-
 import {
     doc,
-    getDoc,
-    getDocs,
-    collection
+    getDoc
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
 // =====================================================
-// ADMIN INACTIVITY LOGOUT
+// BACKEND
 // =====================================================
 
-const INACTIVITY_TIME =
-    15 * 60 * 1000;
-
-
-let inactivityTimer = null;
+const API_BASE_URL =
+    "https://eventsphere-dndh.onrender.com";
 
 
 // =====================================================
-// START INACTIVITY TIMER
+// HTML ELEMENTS
 // =====================================================
 
-function startInactivityTimer() {
-
-    if (inactivityTimer) {
-
-        clearTimeout(
-            inactivityTimer
-        );
-
-    }
-
-
-    inactivityTimer =
-        setTimeout(
-            async () => {
-
-                try {
-
-                    // ONLY ADMIN AUTH
-                    await signOut(
-                        adminAuth
-                    );
-
-
-                    sessionStorage.removeItem(
-                        "adminOtpVerified"
-                    );
-
-
-                    localStorage.removeItem(
-                        "adminOtpEmail"
-                    );
-
-
-                    alert(
-                        "You have been logged out due to inactivity."
-                    );
-
-
-                    window.location.replace(
-                        "admin-login.html"
-                    );
-
-                }
-
-                catch (error) {
-
-                    console.error(
-                        "Automatic Admin Logout Error:",
-                        error
-                    );
-
-                }
-
-            },
-            INACTIVITY_TIME
-        );
-
-}
-
-
-// =====================================================
-// RESET INACTIVITY TIMER
-// =====================================================
-
-function resetInactivityTimer() {
-
-    if (
-        adminAuth.currentUser
-    ) {
-
-        startInactivityTimer();
-
-    }
-
-}
-
-
-// =====================================================
-// DETECT ADMIN ACTIVITY
-// =====================================================
-
-[
-    "click",
-    "mousemove",
-    "keydown",
-    "scroll",
-    "touchstart"
-].forEach(
-    (event) => {
-
-        document.addEventListener(
-            event,
-            resetInactivityTimer
-        );
-
-    }
-);
-
-
-// =====================================================
-// ADMIN AUTH STATE
-// =====================================================
-
-adminAuth.onAuthStateChanged(
-    (user) => {
-
-        if (user) {
-
-            startInactivityTimer();
-
-        }
-
-        else {
-
-            if (inactivityTimer) {
-
-                clearTimeout(
-                    inactivityTimer
-                );
-
-
-                inactivityTimer =
-                    null;
-
-            }
-
-        }
-
-    }
-);
-
-
-// =====================================================
-// ADMIN LOGIN
-// =====================================================
-
-const adminLoginForm =
+const adminOtpForm =
     document.getElementById(
-        "adminLoginForm"
+        "adminOtpForm"
+    );
+
+const otpInputs =
+    document.querySelectorAll(
+        ".otp-digit"
+    );
+
+const hiddenOtp =
+    document.getElementById(
+        "adminOtp"
+    );
+
+const resendButton =
+    document.getElementById(
+        "resendAdminOtp"
     );
 
 
-if (adminLoginForm) {
+// =====================================================
+// UPDATE HIDDEN OTP
+// =====================================================
 
-    adminLoginForm.addEventListener(
+function updateHiddenOtp() {
+
+    if (!hiddenOtp) {
+        return;
+    }
+
+
+    hiddenOtp.value =
+        Array.from(otpInputs)
+            .map(
+                input =>
+                    input.value
+            )
+            .join("");
+
+}
+
+
+// =====================================================
+// OTP INPUT HANDLING
+// =====================================================
+
+otpInputs.forEach(
+    (input, index) => {
+
+        input.addEventListener(
+            "input",
+            () => {
+
+                input.value =
+                    input.value.replace(
+                        /\D/g,
+                        ""
+                    );
+
+
+                if (
+                    input.value &&
+                    index <
+                    otpInputs.length - 1
+                ) {
+
+                    otpInputs[
+                        index + 1
+                    ].focus();
+
+                }
+
+
+                updateHiddenOtp();
+
+            }
+        );
+
+
+        input.addEventListener(
+            "keydown",
+            (event) => {
+
+                if (
+                    event.key ===
+                        "Backspace" &&
+                    !input.value &&
+                    index > 0
+                ) {
+
+                    otpInputs[
+                        index - 1
+                    ].focus();
+
+                }
+
+            }
+        );
+
+    }
+);
+
+
+// =====================================================
+// GET OTP
+// =====================================================
+
+function getOtp() {
+
+    updateHiddenOtp();
+
+
+    return (
+        hiddenOtp?.value.trim() ||
+        ""
+    );
+
+}
+
+
+// =====================================================
+// VERIFY ADMIN OTP
+// =====================================================
+
+if (adminOtpForm) {
+
+    adminOtpForm.addEventListener(
         "submit",
-        async (e) => {
+        async (event) => {
 
-            e.preventDefault();
+            event.preventDefault();
+
+
+            const otp =
+                getOtp();
 
 
             const email =
-                document.getElementById(
-                    "adminEmail"
-                ).value.trim();
+                localStorage.getItem(
+                    "adminOtpEmail"
+                );
 
 
-            const password =
-                document.getElementById(
-                    "adminPassword"
-                ).value;
+            console.log(
+                "Admin OTP:",
+                otp
+            );
+
+
+            console.log(
+                "Admin Email:",
+                email
+            );
+
+
+            // =================================================
+            // CHECK EMAIL
+            // =================================================
+
+            if (!email) {
+
+                alert(
+                    "Admin login session expired. Please login again."
+                );
+
+
+                window.location.replace(
+                    "admin-login.html"
+                );
+
+
+                return;
+
+            }
+
+
+            // =================================================
+            // CHECK OTP
+            // =================================================
+
+            if (
+                otp.length !== 6
+            ) {
+
+                alert(
+                    "Please enter the complete 6-digit OTP."
+                );
+
+
+                return;
+
+            }
+
+
+            const verifyButton =
+                adminOtpForm.querySelector(
+                    "button[type='submit']"
+                );
 
 
             try {
 
                 // =================================================
-                // CLEAR OLD OTP
+                // LOADING
                 // =================================================
 
-                sessionStorage.removeItem(
-                    "adminOtpVerified"
+                if (verifyButton) {
+
+                    verifyButton.disabled =
+                        true;
+
+                    verifyButton.textContent =
+                        "Verifying...";
+
+                }
+
+
+                // =================================================
+                // VERIFY OTP ON SERVER
+                // =================================================
+
+                const response =
+                    await fetch(
+                        `${API_BASE_URL}/verify-otp`,
+                        {
+
+                            method:
+                                "POST",
+
+                            headers: {
+
+                                "Content-Type":
+                                    "application/json"
+
+                            },
+
+                            body:
+                                JSON.stringify({
+
+                                    email:
+                                        email,
+
+                                    otp:
+                                        otp,
+
+                                    loginType:
+                                        "admin"
+
+                                })
+
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "OTP Response:",
+                    data
                 );
 
 
-                localStorage.removeItem(
-                    "adminOtpEmail"
-                );
-
-
                 // =================================================
-                // ADMIN LOGIN
+                // OTP FAILED
                 // =================================================
-                // IMPORTANT:
-                // Admin uses adminAuth, NOT customer auth.
-
-                const userCredential =
-                    await signInWithEmailAndPassword(
-                        adminAuth,
-                        email,
-                        password
-                    );
-
-
-                const user =
-                    userCredential.user;
-
-
-                // =================================================
-                // CHECK ADMIN ROLE
-                // =================================================
-
-                const docRef =
-                    doc(
-                        db,
-                        "users",
-                        user.uid
-                    );
-
-
-                const docSnap =
-                    await getDoc(
-                        docRef
-                    );
-
 
                 if (
-                    !docSnap.exists() ||
-                    docSnap.data().role !== "admin"
+                    !response.ok ||
+                    !data.success
                 ) {
 
                     alert(
-                        "Access Denied! You are not an Admin."
+                        data.message ||
+                        "Invalid OTP."
                     );
 
 
+                    if (verifyButton) {
+
+                        verifyButton.disabled =
+                            false;
+
+                        verifyButton.textContent =
+                            "Verify OTP";
+
+                    }
+
+
+                    return;
+
+                }
+
+
+                // =================================================
+                // OTP SUCCESS
+                // =================================================
+
+                console.log(
+                    "Admin OTP verified successfully."
+                );
+
+
+                // =================================================
+                // GET ADMIN UID SAVED DURING ADMIN LOGIN
+                // =================================================
+
+                const adminUid =
+                    sessionStorage.getItem(
+                        "adminUid"
+                    );
+
+
+                console.log(
+                    "Saved Admin UID:",
+                    adminUid
+                );
+
+
+                // =================================================
+                // UID NOT FOUND
+                // =================================================
+
+                if (!adminUid) {
+
+                    alert(
+                        "Admin login session expired. Please login again."
+                    );
+
+
+                    if (verifyButton) {
+
+                        verifyButton.disabled =
+                            false;
+
+                        verifyButton.textContent =
+                            "Verify OTP";
+
+                    }
+
+
+                    return;
+
+                }
+
+
+                // =================================================
+                // CHECK FIRESTORE ADMIN ACCOUNT
+                // =================================================
+
+                const userRef =
+                    doc(
+                        db,
+                        "users",
+                        adminUid
+                    );
+
+
+                const userSnapshot =
+                    await getDoc(
+                        userRef
+                    );
+
+
+                // =================================================
+                // ADMIN DOCUMENT NOT FOUND
+                // =================================================
+
+                if (
+                    !userSnapshot.exists()
+                ) {
+
                     await signOut(
-                        adminAuth
+                        auth
+                    );
+
+
+                    sessionStorage.removeItem(
+                        "adminUid"
+                    );
+
+
+                    alert(
+                        "Admin account not found."
+                    );
+
+
+                    window.location.replace(
+                        "admin-login.html"
                     );
 
 
@@ -269,12 +425,162 @@ if (adminLoginForm) {
 
 
                 // =================================================
-                // SEND ADMIN OTP
+                // CHECK ADMIN ROLE
                 // =================================================
+
+                const userData =
+                    userSnapshot.data();
+
+
+                if (
+                    userData.role !==
+                    "admin"
+                ) {
+
+                    await signOut(
+                        auth
+                    );
+
+
+                    sessionStorage.removeItem(
+                        "adminUid"
+                    );
+
+
+                    alert(
+                        "Access denied. This account is not an admin."
+                    );
+
+
+                    window.location.replace(
+                        "admin-login.html"
+                    );
+
+
+                    return;
+
+                }
+
+
+                // =================================================
+                // ADMIN OTP COMPLETED
+                // =================================================
+
+                sessionStorage.setItem(
+                    "adminOtpVerified",
+                    "true"
+                );
+
+
+                sessionStorage.setItem(
+                    "adminOtpEmail",
+                    email
+                );
+
+
+                // =================================================
+                // REMOVE TEMPORARY OTP EMAIL
+                // =================================================
+
+                localStorage.removeItem(
+                    "adminOtpEmail"
+                );
+
+
+                console.log(
+                    "ADMIN LOGIN SUCCESSFUL"
+                );
+
+
+                // =================================================
+                // OPEN ADMIN DASHBOARD
+                // =================================================
+
+                window.location.replace(
+                    "admin-dashboard.html"
+                );
+
+            }
+
+
+            catch (error) {
+
+                console.error(
+                    "Admin OTP Error:",
+                    error
+                );
+
+
+                alert(
+                    error.message ||
+                    "Unable to verify OTP. Please try again."
+                );
+
+
+                if (verifyButton) {
+
+                    verifyButton.disabled =
+                        false;
+
+                    verifyButton.textContent =
+                        "Verify OTP";
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+
+// =====================================================
+// RESEND ADMIN OTP
+// =====================================================
+
+if (resendButton) {
+
+    resendButton.addEventListener(
+        "click",
+        async () => {
+
+            const email =
+                localStorage.getItem(
+                    "adminOtpEmail"
+                );
+
+
+            if (!email) {
+
+                alert(
+                    "Admin login session expired. Please login again."
+                );
+
+
+                window.location.replace(
+                    "admin-login.html"
+                );
+
+
+                return;
+
+            }
+
+
+            try {
+
+                resendButton.disabled =
+                    true;
+
+
+                resendButton.textContent =
+                    "Sending...";
+
 
                 const response =
                     await fetch(
-                        "https://eventsphere-dndh.onrender.com/send-otp",
+                        `${API_BASE_URL}/send-otp`,
                         {
 
                             method:
@@ -307,17 +613,22 @@ if (adminLoginForm) {
 
 
                 if (
+                    !response.ok ||
                     !data.success
                 ) {
 
                     alert(
-                        data.message
+                        data.message ||
+                        "Unable to resend OTP."
                     );
 
 
-                    await signOut(
-                        adminAuth
-                    );
+                    resendButton.disabled =
+                        false;
+
+
+                    resendButton.textContent =
+                        "Resend OTP";
 
 
                     return;
@@ -326,37 +637,69 @@ if (adminLoginForm) {
 
 
                 // =================================================
-                // SAVE ADMIN OTP EMAIL
+                // CLEAR OTP BOXES
                 // =================================================
 
-                localStorage.setItem(
-                    "adminOtpEmail",
-                    email
+                otpInputs.forEach(
+                    input => {
+
+                        input.value =
+                            "";
+
+                    }
                 );
+
+
+                updateHiddenOtp();
+
+
+                // =================================================
+                // FOCUS FIRST BOX
+                // =================================================
+
+                if (
+                    otpInputs.length > 0
+                ) {
+
+                    otpInputs[0].focus();
+
+                }
 
 
                 alert(
-                    "Admin Login OTP has been sent to your email."
+                    "A new Admin OTP has been sent to your email."
                 );
 
 
-                window.location.replace(
-                    "admin-otp.html"
-                );
+                resendButton.disabled =
+                    false;
+
+
+                resendButton.textContent =
+                    "Resend OTP";
 
             }
+
 
             catch (error) {
 
                 console.error(
-                    "Admin Login Error:",
+                    "Resend OTP Error:",
                     error
                 );
 
 
                 alert(
-                    error.message
+                    "Unable to resend OTP. Please try again."
                 );
+
+
+                resendButton.disabled =
+                    false;
+
+
+                resendButton.textContent =
+                    "Resend OTP";
 
             }
 
@@ -367,369 +710,19 @@ if (adminLoginForm) {
 
 
 // =====================================================
-// DASHBOARD STATISTICS
+// CHECK OTP PAGE
 // =====================================================
 
-async function loadDashboardStats() {
+const adminOtpEmail =
+    localStorage.getItem(
+        "adminOtpEmail"
+    );
 
-    const totalCustomersElement =
-        document.getElementById(
-            "totalCustomers"
-        );
 
+if (!adminOtpEmail) {
 
-    const totalBookingsElement =
-        document.getElementById(
-            "totalBookings"
-        );
-
-
-    const activeBookingsElement =
-        document.getElementById(
-            "activeBookings"
-        );
-
-
-    const completedBookingsElement =
-        document.getElementById(
-            "completedBookings"
-        );
-
-
-    const totalEventsElement =
-        document.getElementById(
-            "totalEvents"
-        );
-
-
-    // =====================================================
-    // RUN ONLY ON ADMIN DASHBOARD
-    // =====================================================
-
-    if (
-        !totalCustomersElement ||
-        !totalBookingsElement ||
-        !activeBookingsElement ||
-        !completedBookingsElement ||
-        !totalEventsElement
-    ) {
-
-        return;
-
-    }
-
-
-    // =====================================================
-    // ADMIN MUST BE LOGGED IN
-    // =====================================================
-
-    const adminUser =
-        adminAuth.currentUser;
-
-
-    if (!adminUser) {
-
-        return;
-
-    }
-
-
-    try {
-
-        // =================================================
-        // VERIFY ADMIN
-        // =================================================
-
-        const adminSnapshot =
-            await getDoc(
-                doc(
-                    db,
-                    "users",
-                    adminUser.uid
-                )
-            );
-
-
-        if (
-            !adminSnapshot.exists() ||
-            adminSnapshot.data().role !== "admin"
-        ) {
-
-            return;
-
-        }
-
-
-        // =================================================
-        // CUSTOMERS
-        // =================================================
-
-        const usersSnapshot =
-            await getDocs(
-                collection(
-                    db,
-                    "users"
-                )
-            );
-
-
-        let totalCustomers =
-            0;
-
-
-        usersSnapshot.forEach(
-            (userDoc) => {
-
-                const user =
-                    userDoc.data();
-
-
-                if (
-                    user.role === "user" ||
-                    user.role === "customer"
-                ) {
-
-                    totalCustomers++;
-
-                }
-
-            }
-        );
-
-
-        totalCustomersElement.textContent =
-            totalCustomers;
-
-
-        // =================================================
-        // EVENTS
-        // =================================================
-
-        const eventsSnapshot =
-            await getDocs(
-                collection(
-                    db,
-                    "events"
-                )
-            );
-
-
-        totalEventsElement.textContent =
-            eventsSnapshot.size;
-
-
-        // =================================================
-        // BOOKINGS
-        // =================================================
-
-        const bookingsSnapshot =
-            await getDocs(
-                collection(
-                    db,
-                    "bookings"
-                )
-            );
-
-
-        const now =
-            new Date();
-
-
-        let activeBookings =
-            0;
-
-
-        let completedBookings =
-            0;
-
-
-        bookingsSnapshot.forEach(
-            (bookingDoc) => {
-
-                const booking =
-                    bookingDoc.data();
-
-
-                if (
-                    !booking.eventDate
-                ) {
-
-                    return;
-
-                }
-
-
-                const endTime =
-                    booking.eventEndTime ||
-                    "20:00";
-
-
-                const eventEnd =
-                    new Date(
-                        `${booking.eventDate}T${endTime}:00`
-                    );
-
-
-                // =================================================
-                // COMPLETED
-                // =================================================
-
-                if (
-                    now >= eventEnd
-                ) {
-
-                    completedBookings++;
-
-                }
-
-
-                // =================================================
-                // ACTIVE
-                // =================================================
-
-                else {
-
-                    activeBookings++;
-
-                }
-
-            }
-        );
-
-
-        // =================================================
-        // DISPLAY COUNTS
-        // =================================================
-
-        totalBookingsElement.textContent =
-            bookingsSnapshot.size;
-
-
-        activeBookingsElement.textContent =
-            activeBookings;
-
-
-        completedBookingsElement.textContent =
-            completedBookings;
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Dashboard Statistics Error:",
-            error
-        );
-
-
-        totalCustomersElement.textContent =
-            "Error";
-
-
-        totalBookingsElement.textContent =
-            "Error";
-
-
-        activeBookingsElement.textContent =
-            "Error";
-
-
-        completedBookingsElement.textContent =
-            "Error";
-
-
-        totalEventsElement.textContent =
-            "Error";
-
-    }
+    window.location.replace(
+        "admin-login.html"
+    );
 
 }
-
-
-// =====================================================
-// LOAD DASHBOARD
-// =====================================================
-
-loadDashboardStats();
-
-
-// =====================================================
-// REFRESH EVERY 30 SECONDS
-// =====================================================
-
-setInterval(
-    () => {
-
-        loadDashboardStats();
-
-    },
-    30000
-);
-
-
-// =====================================================
-// ADMIN LOGOUT
-// =====================================================
-
-window.logout =
-    async function () {
-
-        try {
-
-            // IMPORTANT:
-            // ONLY ADMIN AUTH IS SIGNED OUT.
-
-            await signOut(
-                adminAuth
-            );
-
-
-            if (inactivityTimer) {
-
-                clearTimeout(
-                    inactivityTimer
-                );
-
-
-                inactivityTimer =
-                    null;
-
-            }
-
-
-            sessionStorage.removeItem(
-                "adminOtpVerified"
-            );
-
-
-            localStorage.removeItem(
-                "adminOtpEmail"
-            );
-
-
-            alert(
-                "Logged out successfully!"
-            );
-
-
-            window.location.replace(
-                "admin-login.html"
-            );
-
-        }
-
-        catch (error) {
-
-            console.error(
-                "Admin Logout Error:",
-                error
-            );
-
-
-            alert(
-                error.message
-            );
-
-        }
-
-    };

@@ -4,7 +4,8 @@ import {
 
 import {
     initializeAuth,
-    browserSessionPersistence
+    browserSessionPersistence,
+    browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 
 import {
@@ -39,7 +40,7 @@ const firebaseConfig = {
 
 
 // =====================================================
-// CUSTOMER FIREBASE APP
+// CUSTOMER APP
 // =====================================================
 
 const customerApp =
@@ -49,13 +50,7 @@ const customerApp =
 
 
 // =====================================================
-// ADMIN FIREBASE APP
-// =====================================================
-//
-// This is a separate Firebase App instance.
-// Therefore Admin Auth is completely separate
-// from Customer Auth.
-//
+// ADMIN APP
 // =====================================================
 
 const adminApp =
@@ -68,6 +63,7 @@ const adminApp =
 // =====================================================
 // CUSTOMER AUTH
 // =====================================================
+// Customer stays session based.
 
 export const auth =
     initializeAuth(
@@ -82,13 +78,15 @@ export const auth =
 // =====================================================
 // ADMIN AUTH
 // =====================================================
+// Admin uses local persistence so the authenticated
+// Admin user survives navigation to admin-otp.html.
 
 export const adminAuth =
     initializeAuth(
         adminApp,
         {
             persistence:
-                browserSessionPersistence
+                browserLocalPersistence
         }
     );
 
@@ -100,4 +98,4 @@ export const adminAuth =
 export const db =
     getFirestore(
         customerApp
-    );
+    );          

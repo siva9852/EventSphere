@@ -13,7 +13,9 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
-// ====================== ADMIN INACTIVITY LOGOUT ======================
+// =====================================================
+// ADMIN INACTIVITY LOGOUT
+// =====================================================
 
 const INACTIVITY_TIME =
     15 * 60 * 1000;
@@ -21,7 +23,9 @@ const INACTIVITY_TIME =
 let inactivityTimer = null;
 
 
-// ====================== START INACTIVITY TIMER ======================
+// =====================================================
+// START INACTIVITY TIMER
+// =====================================================
 
 function startInactivityTimer() {
 
@@ -40,11 +44,18 @@ function startInactivityTimer() {
 
                 try {
 
-                    await signOut(auth);
+                    await signOut(
+                        auth
+                    );
 
 
                     sessionStorage.removeItem(
                         "adminOtpVerified"
+                    );
+
+
+                    sessionStorage.removeItem(
+                        "adminUid"
                     );
 
 
@@ -81,7 +92,9 @@ function startInactivityTimer() {
 }
 
 
-// ====================== RESET INACTIVITY TIMER ======================
+// =====================================================
+// RESET INACTIVITY TIMER
+// =====================================================
 
 function resetInactivityTimer() {
 
@@ -94,7 +107,9 @@ function resetInactivityTimer() {
 }
 
 
-// ====================== DETECT ADMIN ACTIVITY ======================
+// =====================================================
+// DETECT ADMIN ACTIVITY
+// =====================================================
 
 [
     "click",
@@ -114,7 +129,9 @@ function resetInactivityTimer() {
 );
 
 
-// ====================== AUTH STATE ======================
+// =====================================================
+// AUTH STATE
+// =====================================================
 
 auth.onAuthStateChanged(
     (user) => {
@@ -144,7 +161,9 @@ auth.onAuthStateChanged(
 );
 
 
-// ====================== ADMIN LOGIN ======================
+// =====================================================
+// ADMIN LOGIN
+// =====================================================
 
 const adminLoginForm =
     document.getElementById(
@@ -175,10 +194,17 @@ if (adminLoginForm) {
 
             try {
 
-                // ================= CLEAR OLD OTP =================
+                // =================================================
+                // CLEAR OLD OTP DATA
+                // =================================================
 
                 sessionStorage.removeItem(
                     "adminOtpVerified"
+                );
+
+
+                sessionStorage.removeItem(
+                    "adminUid"
                 );
 
 
@@ -187,7 +213,9 @@ if (adminLoginForm) {
                 );
 
 
-                // ================= LOGIN =================
+                // =================================================
+                // ADMIN FIREBASE LOGIN
+                // =================================================
 
                 const userCredential =
                     await signInWithEmailAndPassword(
@@ -201,7 +229,24 @@ if (adminLoginForm) {
                     userCredential.user;
 
 
-                // ================= CHECK ADMIN ROLE =================
+                // =================================================
+                // SAVE ADMIN UID
+                //
+                // IMPORTANT:
+                // OTP PAGE WILL USE THIS UID.
+                // It will NOT depend on auth.currentUser
+                // after moving to the OTP page.
+                // =================================================
+
+                sessionStorage.setItem(
+                    "adminUid",
+                    user.uid
+                );
+
+
+                // =================================================
+                // CHECK ADMIN ROLE
+                // =================================================
 
                 const docRef =
                     doc(
@@ -227,6 +272,11 @@ if (adminLoginForm) {
                     );
 
 
+                    sessionStorage.removeItem(
+                        "adminUid"
+                    );
+
+
                     await signOut(
                         auth
                     );
@@ -237,7 +287,9 @@ if (adminLoginForm) {
                 }
 
 
-                // ================= SEND ADMIN OTP =================
+                // =================================================
+                // SEND ADMIN OTP
+                // =================================================
 
                 const response =
                     await fetch(
@@ -273,10 +325,20 @@ if (adminLoginForm) {
                     await response.json();
 
 
+                // =================================================
+                // OTP SEND FAILED
+                // =================================================
+
                 if (!data.success) {
 
                     alert(
-                        data.message
+                        data.message ||
+                        "Unable to send OTP."
+                    );
+
+
+                    sessionStorage.removeItem(
+                        "adminUid"
                     );
 
 
@@ -290,11 +352,22 @@ if (adminLoginForm) {
                 }
 
 
-                // ================= STORE ADMIN EMAIL =================
+                // =================================================
+                // STORE ADMIN EMAIL
+                // =================================================
 
                 localStorage.setItem(
                     "adminOtpEmail",
                     email
+                );
+
+
+                // =================================================
+                // ADMIN OTP NOT VERIFIED YET
+                // =================================================
+
+                sessionStorage.removeItem(
+                    "adminOtpVerified"
                 );
 
 
@@ -303,15 +376,9 @@ if (adminLoginForm) {
                 );
 
 
-                /*
-                 * IMPORTANT:
-                 *
-                 * adminOtpVerified is NOT set here.
-                 *
-                 * It will only be set after
-                 * the correct OTP is entered.
-                 */
-
+                // =================================================
+                // GO TO OTP PAGE
+                // =================================================
 
                 window.location.replace(
                     "admin-otp.html"
@@ -328,6 +395,13 @@ if (adminLoginForm) {
                 );
 
 
+                // Clear UID if login process failed
+
+                sessionStorage.removeItem(
+                    "adminUid"
+                );
+
+
                 alert(
                     error.message
                 );
@@ -340,7 +414,9 @@ if (adminLoginForm) {
 }
 
 
-// ====================== DASHBOARD STATISTICS ======================
+// =====================================================
+// DASHBOARD STATISTICS
+// =====================================================
 
 async function loadDashboardStats() {
 
@@ -374,7 +450,9 @@ async function loadDashboardStats() {
         );
 
 
-    // ================= RUN ONLY ON ADMIN DASHBOARD =================
+    // =================================================
+    // RUN ONLY ON ADMIN DASHBOARD
+    // =================================================
 
     if (
         !totalCustomersElement ||
@@ -391,7 +469,9 @@ async function loadDashboardStats() {
 
     try {
 
-        // ================= CUSTOMERS =================
+        // =================================================
+        // CUSTOMERS
+        // =================================================
 
         const usersSnapshot =
             await getDocs(
@@ -430,7 +510,9 @@ async function loadDashboardStats() {
             totalCustomers;
 
 
-        // ================= EVENTS =================
+        // =================================================
+        // EVENTS
+        // =================================================
 
         const eventsSnapshot =
             await getDocs(
@@ -445,7 +527,9 @@ async function loadDashboardStats() {
             eventsSnapshot.size;
 
 
-        // ================= BOOKINGS =================
+        // =================================================
+        // BOOKINGS
+        // =================================================
 
         const bookingsSnapshot =
             await getDocs(
@@ -495,7 +579,9 @@ async function loadDashboardStats() {
                     );
 
 
-                // ================= COMPLETED =================
+                // =================================================
+                // COMPLETED
+                // =================================================
 
                 if (
                     now >= eventEnd
@@ -506,7 +592,9 @@ async function loadDashboardStats() {
                 }
 
 
-                // ================= ACTIVE =================
+                // =================================================
+                // ACTIVE
+                // =================================================
 
                 else {
 
@@ -518,7 +606,9 @@ async function loadDashboardStats() {
         );
 
 
-        // ================= DISPLAY COUNTS =================
+        // =================================================
+        // DISPLAY COUNTS
+        // =================================================
 
         totalBookingsElement.textContent =
             bookingsSnapshot.size;
@@ -566,12 +656,16 @@ async function loadDashboardStats() {
 }
 
 
-// ====================== LOAD DASHBOARD ======================
+// =====================================================
+// LOAD DASHBOARD
+// =====================================================
 
 loadDashboardStats();
 
 
-// ====================== REFRESH EVERY 30 SECONDS ======================
+// =====================================================
+// REFRESH EVERY 30 SECONDS
+// =====================================================
 
 setInterval(
     () => {
@@ -583,7 +677,9 @@ setInterval(
 );
 
 
-// ====================== LOGOUT ======================
+// =====================================================
+// ADMIN LOGOUT
+// =====================================================
 
 window.logout =
     async function () {
@@ -595,10 +691,17 @@ window.logout =
             );
 
 
-            // Clear admin OTP session
+            // =================================================
+            // CLEAR ADMIN OTP SESSION
+            // =================================================
 
             sessionStorage.removeItem(
                 "adminOtpVerified"
+            );
+
+
+            sessionStorage.removeItem(
+                "adminUid"
             );
 
 
