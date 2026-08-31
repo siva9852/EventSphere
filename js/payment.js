@@ -21,9 +21,6 @@ const API_BASE_URL =
 const payButton =
     document.getElementById("payButton");
 
-const paymentForm =
-    document.getElementById("paymentForm");
-
 
 // =========================================================
 // LOAD RAZORPAY SCRIPT
@@ -50,24 +47,20 @@ function loadRazorpayScript() {
         };
 
         script.onerror = () => {
-
             reject(
                 new Error(
                     "Unable to load Razorpay Checkout."
                 )
             );
-
         };
 
         document.head.appendChild(script);
-
     });
-
 }
 
 
 // =========================================================
-// GET ELEMENT SAFELY
+// SET ELEMENT TEXT SAFELY
 // =========================================================
 
 function setElementText(id, value) {
@@ -76,17 +69,14 @@ function setElementText(id, value) {
         document.getElementById(id);
 
     if (element) {
-
         element.textContent =
             value ?? "Not specified";
-
     }
-
 }
 
 
 // =========================================================
-// LOAD BOOKING DETAILS
+// LOAD PAYMENT BOOKING
 // =========================================================
 
 async function loadPaymentBooking() {
@@ -95,25 +85,27 @@ async function loadPaymentBooking() {
         auth.currentUser;
 
 
+    // =====================================================
+    // CHECK LOGIN
+    // =====================================================
+
     if (!user) {
 
         window.location.href =
             "customer-login.html";
 
         return;
-
     }
 
 
     // =====================================================
-    // GET BOOKING ID FROM URL FIRST
+    // GET BOOKING ID
     // =====================================================
 
     const urlParams =
         new URLSearchParams(
             window.location.search
         );
-
 
     const urlBookingId =
         urlParams.get("bookingId");
@@ -126,32 +118,66 @@ async function loadPaymentBooking() {
         );
 
 
-    // Save URL booking ID for the payment process
+    // Save URL booking ID
     if (urlBookingId) {
 
         localStorage.setItem(
             "paymentBookingId",
             urlBookingId
         );
-
     }
 
 
     if (!bookingId) {
 
-        alert(
-            "Payment booking not found."
+        console.error(
+            "Payment booking ID not found."
         );
 
-        window.location.href =
-            "my-bookings.html";
+        setElementText(
+            "eventName",
+            "Booking not found"
+        );
+
+        setElementText(
+            "eventDate",
+            "Not available"
+        );
+
+        setElementText(
+            "guestCount",
+            "Not available"
+        );
+
+        setElementText(
+            "eventLocation",
+            "Not available"
+        );
+
+        setElementText(
+            "eventPrice",
+            "₹0"
+        );
+
+        if (payButton) {
+            payButton.disabled = true;
+        }
 
         return;
-
     }
 
 
+    console.log(
+        "Loading payment booking:",
+        bookingId
+    );
+
+
     try {
+
+        // =================================================
+        // GET BOOKING FROM FIRESTORE
+        // =================================================
 
         const bookingReference =
             doc(
@@ -167,151 +193,246 @@ async function loadPaymentBooking() {
             );
 
 
+        // =================================================
+        // BOOKING NOT FOUND
+        // =================================================
+
         if (!bookingSnapshot.exists()) {
 
-            alert(
-                "Booking not found."
+            console.error(
+                "Booking document does not exist:",
+                bookingId
             );
 
-            window.location.href =
-                "my-bookings.html";
+            setElementText(
+                "eventName",
+                "Booking not found"
+            );
+
+            setElementText(
+                "eventDate",
+                "Not available"
+            );
+
+            setElementText(
+                "guestCount",
+                "Not available"
+            );
+
+            setElementText(
+                "eventLocation",
+                "Not available"
+            );
+
+            setElementText(
+                "eventPrice",
+                "₹0"
+            );
+
+            if (payButton) {
+                payButton.disabled = true;
+            }
 
             return;
-
         }
 
+
+        // =================================================
+        // GET BOOKING DATA
+        // =================================================
 
         const booking =
             bookingSnapshot.data();
 
 
-        // =====================================================
+        console.log(
+            "Payment booking loaded:",
+            booking
+        );
+
+
+        // =================================================
         // SECURITY CHECK
-        // =====================================================
+        // =================================================
 
         if (
-            booking.customerId !==
-            user.uid
+            booking.customerId &&
+            booking.customerId !== user.uid
         ) {
 
-            alert(
-                "You cannot access this payment."
+            console.error(
+                "Customer does not own this booking."
             );
 
-            window.location.href =
-                "my-bookings.html";
+            setElementText(
+                "eventName",
+                "Access denied"
+            );
+
+            setElementText(
+                "eventDate",
+                "Not available"
+            );
+
+            setElementText(
+                "guestCount",
+                "Not available"
+            );
+
+            setElementText(
+                "eventLocation",
+                "Not available"
+            );
+
+            setElementText(
+                "eventPrice",
+                "₹0"
+            );
+
+            if (payButton) {
+                payButton.disabled = true;
+            }
 
             return;
-
         }
 
 
-        // =====================================================
-        // APPROVAL CHECK
-        // =====================================================
+        // =================================================
+        // DISPLAY EVENT NAME
+        // =================================================
 
-        if (
-            booking.status !==
-            "Approved"
-        ) {
+        setElementText(
+            "eventName",
+            booking.eventName ||
+            booking.event ||
+            "Event"
+        );
 
-            alert(
-                "Payment is available only for approved bookings."
+
+        // =================================================
+        // DISPLAY EVENT DATE
+        // =================================================
+
+        setElementText(
+            "eventDate",
+            booking.eventDate ||
+            "Not specified"
+        );
+
+
+        // =================================================
+        // DISPLAY GUESTS
+        // =================================================
+
+        setElementText(
+            "guestCount",
+            booking.guests ||
+            booking.guestCount ||
+            booking.numberOfGuests ||
+            "Not specified"
+        );
+
+
+        // =================================================
+        // DISPLAY LOCATION
+        // =================================================
+
+        setElementText(
+            "eventLocation",
+            booking.location ||
+            booking.eventLocation ||
+            "Not specified"
+        );
+
+
+        // =================================================
+        // DISPLAY PRICE
+        // =================================================
+
+        const amount =
+            Number(
+                booking.price ||
+                booking.amount ||
+                booking.totalAmount ||
+                0
             );
 
-            window.location.href =
-                "my-bookings.html";
 
-            return;
+        setElementText(
+            "eventPrice",
+            "₹" +
+            amount.toLocaleString("en-IN")
+        );
 
+
+        // =================================================
+        // SAVE BOOKING ID FOR PAYMENT
+        // =================================================
+
+        if (payButton) {
+
+            payButton.dataset.bookingId =
+                bookingId;
         }
 
 
-        // =====================================================
-        // ALREADY PAID
-        // =====================================================
+        // =================================================
+        // PAYMENT STATUS CHECK
+        // =================================================
 
         if (
             booking.paymentStatus ===
             "Paid"
         ) {
 
-            alert(
-                "This booking has already been paid."
-            );
+            if (payButton) {
 
-            window.location.href =
-                "my-bookings.html";
+                payButton.disabled =
+                    true;
+
+                payButton.innerHTML =
+                    "✓ Already Paid";
+            }
 
             return;
-
         }
 
 
-        // =====================================================
-        // DISPLAY BOOKING DETAILS
-        // =====================================================
+        // =================================================
+        // APPROVAL CHECK
+        // =================================================
 
-        setElementText(
-            "paymentEventName",
-            booking.eventName || "Event"
-        );
+        if (
+            booking.status !==
+            "Approved"
+        ) {
 
+            if (payButton) {
 
-        setElementText(
-            "paymentBookingId",
-            "#BK-" +
-            bookingId
-                .substring(0, 6)
-                .toUpperCase()
-        );
+                payButton.disabled =
+                    true;
 
+                payButton.innerHTML =
+                    "Payment Not Available";
+            }
 
-        setElementText(
-            "paymentEventDate",
-            booking.eventDate || "Not specified"
-        );
+            return;
+        }
 
 
-        setElementText(
-            "paymentGuests",
-            booking.guests || "Not specified"
-        );
+        // =================================================
+        // PAYMENT AVAILABLE
+        // =================================================
 
-
-        setElementText(
-            "paymentLocation",
-            booking.location || "Not specified"
-        );
-
-
-        const amount =
-            Number(
-                booking.price || 0
-            );
-
-
-        setElementText(
-            "paymentAmount",
-            "₹" +
-            amount.toLocaleString("en-IN")
-        );
-
-
-        // Save booking ID on button/form
         if (payButton) {
 
-            payButton.dataset.bookingId =
-                bookingId;
+            payButton.disabled =
+                false;
 
-        }
-
-
-        if (paymentForm) {
-
-            paymentForm.dataset.bookingId =
-                bookingId;
-
+            payButton.innerHTML = `
+                <i class="fa-solid fa-lock"></i>
+                Pay Now
+            `;
         }
 
     }
@@ -324,16 +445,36 @@ async function loadPaymentBooking() {
         );
 
 
-        alert(
-            "Unable to load payment details."
+        setElementText(
+            "eventName",
+            "Unable to load booking"
+        );
+
+        setElementText(
+            "eventDate",
+            "Please refresh the page"
+        );
+
+        setElementText(
+            "guestCount",
+            "Not available"
+        );
+
+        setElementText(
+            "eventLocation",
+            "Not available"
+        );
+
+        setElementText(
+            "eventPrice",
+            "₹0"
         );
 
 
-        window.location.href =
-            "my-bookings.html";
-
+        if (payButton) {
+            payButton.disabled = true;
+        }
     }
-
 }
 
 
@@ -350,36 +491,24 @@ async function createPaymentOrder(
         await fetch(
             `${API_BASE_URL}/create-payment-order`,
             {
-
-                method:
-                    "POST",
+                method: "POST",
 
                 headers: {
-
                     "Content-Type":
                         "application/json",
 
                     "Authorization":
                         `Bearer ${idToken}`
-
                 },
 
                 body:
                     JSON.stringify({
-
                         bookingId:
                             bookingId
-
                     })
-
             }
         );
 
-
-    // IMPORTANT:
-    // Do NOT directly call response.json()
-    // because a 404/HTML response can cause:
-    // Unexpected token '<'
 
     const responseText =
         await response.text();
@@ -404,11 +533,9 @@ async function createPaymentOrder(
             responseText
         );
 
-
         throw new Error(
             `Server error (${response.status}).`
         );
-
     }
 
 
@@ -418,7 +545,6 @@ async function createPaymentOrder(
             data.message ||
             `Payment order failed (${response.status}).`
         );
-
     }
 
 
@@ -428,12 +554,10 @@ async function createPaymentOrder(
             data.message ||
             "Unable to create payment order."
         );
-
     }
 
 
     return data;
-
 }
 
 
@@ -451,18 +575,14 @@ async function verifyPayment(
         await fetch(
             `${API_BASE_URL}/verify-payment`,
             {
-
-                method:
-                    "POST",
+                method: "POST",
 
                 headers: {
-
                     "Content-Type":
                         "application/json",
 
                     "Authorization":
                         `Bearer ${idToken}`
-
                 },
 
                 body:
@@ -482,9 +602,7 @@ async function verifyPayment(
                         razorpay_signature:
                             paymentResponse
                                 .razorpay_signature
-
                     })
-
             }
         );
 
@@ -512,11 +630,9 @@ async function verifyPayment(
             responseText
         );
 
-
         throw new Error(
             `Payment verification server error (${response.status}).`
         );
-
     }
 
 
@@ -526,7 +642,6 @@ async function verifyPayment(
             data.message ||
             `Payment verification failed (${response.status}).`
         );
-
     }
 
 
@@ -536,12 +651,10 @@ async function verifyPayment(
             data.message ||
             "Payment verification failed."
         );
-
     }
 
 
     return data;
-
 }
 
 
@@ -561,21 +674,24 @@ async function startPayment() {
             "Please login first."
         );
 
-
         window.location.href =
             "customer-login.html";
 
         return;
-
     }
 
 
+    // =====================================================
+    // GET BOOKING ID
+    // =====================================================
+
     const bookingId =
         payButton?.dataset.bookingId ||
-        paymentForm?.dataset.bookingId ||
+
         new URLSearchParams(
             window.location.search
         ).get("bookingId") ||
+
         localStorage.getItem(
             "paymentBookingId"
         );
@@ -588,47 +704,44 @@ async function startPayment() {
         );
 
         return;
-
     }
 
 
     try {
 
-        // =====================================================
+        // =================================================
         // DISABLE BUTTON
-        // =====================================================
+        // =================================================
 
         if (payButton) {
 
             payButton.disabled =
                 true;
 
-
             payButton.innerHTML = `
                 🔄 Processing Payment...
             `;
-
         }
 
 
-        // =====================================================
+        // =================================================
         // GET FIREBASE ID TOKEN
-        // =====================================================
+        // =================================================
 
         const idToken =
             await user.getIdToken();
 
 
-        // =====================================================
+        // =================================================
         // LOAD RAZORPAY
-        // =====================================================
+        // =================================================
 
         await loadRazorpayScript();
 
 
-        // =====================================================
+        // =================================================
         // CREATE RAZORPAY ORDER
-        // =====================================================
+        // =================================================
 
         const orderData =
             await createPaymentOrder(
@@ -643,40 +756,31 @@ async function startPayment() {
         );
 
 
-        // =====================================================
+        // =================================================
         // RAZORPAY OPTIONS
-        // =====================================================
+        // =================================================
 
         const options = {
 
             key:
                 orderData.keyId,
 
-
             amount:
                 orderData.amount,
-
 
             currency:
                 orderData.currency ||
                 "INR",
 
-
             name:
                 "EventSphere",
-
 
             description:
                 "Event Booking Payment",
 
-
             order_id:
                 orderData.orderId,
 
-
-            // =================================================
-            // CUSTOMER DETAILS
-            // =================================================
 
             prefill: {
 
@@ -684,29 +788,22 @@ async function startPayment() {
                     user.displayName ||
                     "",
 
-
                 email:
                     user.email ||
                     ""
-
             },
 
-
-            // =================================================
-            // THEME
-            // =================================================
 
             theme: {
 
                 color:
                     "#2563eb"
-
             },
 
 
-            // =================================================
+            // =============================================
             // PAYMENT SUCCESS
-            // =================================================
+            // =============================================
 
             handler:
                 async function (
@@ -720,7 +817,6 @@ async function startPayment() {
                             payButton.innerHTML = `
                                 🔄 Verifying Payment...
                             `;
-
                         }
 
 
@@ -729,10 +825,6 @@ async function startPayment() {
                             razorpayResponse
                         );
 
-
-                        // =====================================
-                        // VERIFY PAYMENT ON SERVER
-                        // =====================================
 
                         const latestToken =
                             await user.getIdToken(
@@ -754,9 +846,9 @@ async function startPayment() {
                         );
 
 
-                        // =====================================
+                        // =================================
                         // PAYMENT SUCCESS
-                        // =====================================
+                        // =================================
 
                         localStorage.removeItem(
                             "paymentBookingId"
@@ -770,8 +862,8 @@ async function startPayment() {
 
                         window.location.href =
                             "my-bookings.html";
-
                     }
+
 
                     catch (error) {
 
@@ -792,21 +884,18 @@ async function startPayment() {
                             payButton.disabled =
                                 false;
 
-
                             payButton.innerHTML = `
-                                🔒 Pay Now
+                                <i class="fa-solid fa-lock"></i>
+                                Pay Now
                             `;
-
                         }
-
                     }
-
                 },
 
 
-            // =================================================
-            // PAYMENT MODAL CLOSED
-            // =================================================
+            // =============================================
+            // PAYMENT CANCELLED
+            // =============================================
 
             modal: {
 
@@ -814,7 +903,7 @@ async function startPayment() {
                     function () {
 
                         console.log(
-                            "Razorpay checkout closed."
+                            "Razorpay payment window closed."
                         );
 
 
@@ -823,23 +912,19 @@ async function startPayment() {
                             payButton.disabled =
                                 false;
 
-
                             payButton.innerHTML = `
-                                🔒 Pay Now
+                                <i class="fa-solid fa-lock"></i>
+                                Pay Now
                             `;
-
                         }
-
                     }
-
             }
-
         };
 
 
-        // =====================================================
+        // =================================================
         // OPEN RAZORPAY
-        // =====================================================
+        // =================================================
 
         const razorpay =
             new window.Razorpay(
@@ -853,13 +938,13 @@ async function startPayment() {
 
                 console.error(
                     "Razorpay Payment Failed:",
-                    response.error
+                    response
                 );
 
 
                 alert(
                     response.error?.description ||
-                    "Payment failed. Please try again."
+                    "Payment failed."
                 );
 
 
@@ -868,20 +953,18 @@ async function startPayment() {
                     payButton.disabled =
                         false;
 
-
                     payButton.innerHTML = `
-                        🔒 Pay Now
+                        <i class="fa-solid fa-lock"></i>
+                        Pay Now
                     `;
-
                 }
-
             }
         );
 
 
         razorpay.open();
-
     }
+
 
     catch (error) {
 
@@ -902,15 +985,12 @@ async function startPayment() {
             payButton.disabled =
                 false;
 
-
             payButton.innerHTML = `
-                🔒 Pay Now
+                <i class="fa-solid fa-lock"></i>
+                Pay Now
             `;
-
         }
-
     }
-
 }
 
 
@@ -927,32 +1007,8 @@ if (payButton) {
             event.preventDefault();
 
             startPayment();
-
         }
     );
-
-}
-
-
-// =========================================================
-// FORM SUBMIT
-// =========================================================
-// This is included in case your payment.html
-// still has the Pay Now button inside a <form>.
-
-if (paymentForm) {
-
-    paymentForm.addEventListener(
-        "submit",
-        function (event) {
-
-            event.preventDefault();
-
-            startPayment();
-
-        }
-    );
-
 }
 
 
@@ -966,15 +1022,12 @@ auth.onAuthStateChanged(
         if (user) {
 
             loadPaymentBooking();
-
         }
 
         else {
 
             window.location.href =
                 "customer-login.html";
-
         }
-
     }
 );
