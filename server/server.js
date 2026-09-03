@@ -827,7 +827,6 @@ catch (paymentDetailsError) {
                     bookingId,
 
                 userId:
-                    booking.userId ||
                     req.user.uid,
 
                 amount:
