@@ -18,9 +18,9 @@ app.use(express.json());
 let serviceAccount;
 
 try {
-    serviceAccount = require("./serviceAccountKey.json");
+    serviceAccount = require("/etc/secrets/firebase-service-account.json");
 } catch (error) {
-    console.error("serviceAccountKey.json not found");
+    console.error("firebase-service-account.json not found");
 }
 
 if (!admin.apps.length && serviceAccount) {
