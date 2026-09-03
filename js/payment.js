@@ -1925,16 +1925,14 @@ async function startPayment() {
 
 
                         // =====================================
-                        // GENERATE RECEIPT
-                        // =====================================
+// PAYMENT SUCCESS
+// =====================================
 
-                        await generatePaymentReceipt(
-                            bookingId,
-                            booking,
-                            razorpayResponse,
-                            user,
-                            verification
-                        );
+alert(
+    verification.paymentStatus === "Paid"
+        ? "Payment successful! Your booking has been fully paid."
+        : `Payment successful! ₹${verification.amountDue.toLocaleString("en-IN")} is remaining.`
+);
 
 
                         // =====================================
