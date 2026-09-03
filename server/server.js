@@ -824,8 +824,9 @@ catch (paymentDetailsError) {
 
                 bookingId:
                     bookingId,
+
                 userId:
-    decodedToken.uid,
+                    req.user.uid,
 
                 amount:
                     paymentAmount,
