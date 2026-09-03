@@ -2,7 +2,22 @@ const express = require("express");
 const cors = require("cors");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
-const admin = require("firebase-admin");
+
+const {
+    initializeApp,
+    cert,
+    getApps
+} = require("firebase-admin/app");
+
+const {
+    getAuth
+} = require("firebase-admin/auth");
+
+const {
+    getFirestore,
+    FieldValue
+} = require("firebase-admin/firestore");
+
 const path = require("path");
 const nodemailer = require("nodemailer");
 
@@ -15,23 +30,47 @@ app.use(express.json());
    FIREBASE ADMIN
 ===================================================== */
 
-let serviceAccount;
+const serviceAccountPath =
+    "/etc/secrets/firebase-service-account.json";
 
-try {
-    serviceAccount = require("/etc/secrets/firebase-service-account.json");
-} catch (error) {
-    console.error("firebase-service-account.json not found");
+let firebaseAuth = null;
+let db = null;
+
+if (require("fs").existsSync(serviceAccountPath)) {
+
+    const serviceAccount =
+        JSON.parse(
+            require("fs").readFileSync(
+                serviceAccountPath,
+                "utf8"
+            )
+        );
+
+    if (getApps().length === 0) {
+
+        initializeApp({
+            credential:
+                cert(serviceAccount)
+        });
+
+    }
+
+    firebaseAuth =
+        getAuth();
+
+    db =
+        getFirestore();
+
+    console.log(
+        "Firebase Admin initialized."
+    );
+
+} else {
+
+    console.error(
+        "Firebase service account file not found."
+    );
 }
-
-if (serviceAccount) {
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
-    });
-}
-
-const db = admin.firestore();
-const FieldValue = admin.firestore.FieldValue;
-
 /* =====================================================
    ENVIRONMENT VARIABLES
 ===================================================== */
@@ -106,7 +145,7 @@ async function verifyFirebaseToken(req, res, next) {
             authHeader.replace("Bearer ", "").trim();
 
         const decodedToken =
-            await admin.auth().verifyIdToken(idToken);
+           firebaseAuth.verifyIdToken(idToken);
 
         req.user = decodedToken;
 
@@ -148,7 +187,7 @@ async function verifyAdmin(req, res, next) {
             authHeader.replace("Bearer ", "").trim();
 
         const decodedToken =
-            await admin.auth().verifyIdToken(idToken);
+            firebaseAuth.verifyIdToken(idToken);
 
         req.user = decodedToken;
 
