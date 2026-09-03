@@ -23,7 +23,7 @@ try {
     console.error("firebase-service-account.json not found");
 }
 
-if (!admin.apps.length && serviceAccount) {
+if (serviceAccount) {
     admin.initializeApp({
         credential: admin.credential.cert(serviceAccount)
     });
