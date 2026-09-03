@@ -444,7 +444,6 @@ app.post(
 
                         userId:
                             String(
-                                booking.userId ||
                                 req.user.uid
                             ),
 
@@ -825,9 +824,8 @@ catch (paymentDetailsError) {
 
                 bookingId:
                     bookingId,
-
                 userId:
-                    req.user.uid,
+    decodedToken.uid,
 
                 amount:
                     paymentAmount,
