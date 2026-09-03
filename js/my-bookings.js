@@ -76,7 +76,11 @@ async function loadMyBookings() {
         }
 
 
-        snapshot.forEach((bookingDoc) => {
+        // =====================================================
+        // LOOP THROUGH BOOKINGS
+        // =====================================================
+
+        for (const bookingDoc of snapshot.docs) {
 
             const booking =
                 bookingDoc.data();
@@ -156,6 +160,345 @@ async function loadMyBookings() {
                         : "Unpaid";
 
 
+           // =================================================
+// PAYMENT HISTORY
+// =================================================
+
+let paymentHistory = [];
+
+try {
+
+    const paymentSnapshot =
+        await getDocs(
+            collection(
+                db,
+                "bookings",
+                bookingDoc.id,
+                "payments"
+            )
+        );
+
+    paymentHistory =
+        paymentSnapshot.docs
+            .map((paymentDoc) => ({
+                id: paymentDoc.id,
+                ...paymentDoc.data()
+            }))
+            .sort((a, b) => {
+
+                const timeA =
+                    a.paidAt?.toMillis
+                        ? a.paidAt.toMillis()
+                        : 0;
+
+                const timeB =
+                    b.paidAt?.toMillis
+                        ? b.paidAt.toMillis()
+                        : 0;
+
+                return timeA - timeB;
+
+            });
+
+}
+catch (historyError) {
+
+    console.error(
+        "Payment History Error:",
+        historyError
+    );
+
+}
+
+
+// =================================================
+// FALLBACK FOR OLD PAYMENTS
+// =================================================
+
+if (
+    paymentHistory.length === 0 &&
+    amountPaid > 0
+) {
+
+    paymentHistory = [
+        {
+            id:
+                booking.razorpayPaymentId ||
+                "previous-payment",
+
+            amount:
+                amountPaid,
+
+            paymentMethod:
+                booking.paymentMethod ||
+                "Razorpay",
+
+            paymentVpa:
+                booking.paymentVpa ||
+                null,
+
+            bankName:
+                booking.bankName ||
+                null,
+
+            cardIssuer:
+                booking.cardIssuer ||
+                null,
+
+            razorpayPaymentId:
+                booking.razorpayPaymentId ||
+                null,
+
+            razorpayOrderId:
+                booking.razorpayOrderId ||
+                null,
+
+            paidAt:
+                booking.paidAt ||
+                null
+        }
+    ];
+
+}
+
+            // =================================================
+            // PAYMENT PROGRESS
+            // =================================================
+
+            const paymentProgress =
+                totalAmount > 0
+                    ? Math.min(
+                        100,
+                        Math.max(
+                            0,
+                            (amountPaid / totalAmount) * 100
+                        )
+                    )
+                    : 0;
+// your existing paymentHistory code above
+// ...
+
+// 👇 PASTE THE NEW CODE HERE
+
+for (const payment of paymentHistory) {
+    const paymentId =
+        payment.razorpayPaymentId || payment.id;
+
+    const hasPaymentDetails =
+        payment.bankName ||
+        payment.cardIssuer ||
+        payment.paymentVpa ||
+        payment.paymentWallet ||
+        payment.cardNetwork;
+
+    if (
+        paymentId &&
+        !hasPaymentDetails &&
+        paymentId.startsWith("pay_")
+    ) {
+        try {
+            const user = auth.currentUser;
+
+            if (user) {
+                const idToken = await user.getIdToken();
+
+                const response = await fetch(
+                    `https://eventsphere-dndh.onrender.com/payment-details/${encodeURIComponent(bookingDoc.id)}/${encodeURIComponent(paymentId)}`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${idToken}`
+                        }
+                    }
+                );
+
+                const details = await response.json();
+
+                if (response.ok && details.success) {
+
+                    payment.paymentMethod =
+                        payment.paymentMethod ||
+                        details.paymentMethod ||
+                        null;
+
+                    payment.bankName =
+                        payment.bankName ||
+                        details.bankName ||
+                        null;
+
+                    payment.paymentVpa =
+                        payment.paymentVpa ||
+                        details.paymentVpa ||
+                        null;
+
+                    payment.paymentWallet =
+                        payment.paymentWallet ||
+                        details.paymentWallet ||
+                        null;
+
+                    payment.cardNetwork =
+                        payment.cardNetwork ||
+                        details.cardNetwork ||
+                        null;
+
+                    payment.cardLast4 =
+                        payment.cardLast4 ||
+                        details.cardLast4 ||
+                        null;
+
+                    payment.cardIssuer =
+                        payment.cardIssuer ||
+                        details.cardIssuer ||
+                        null;
+                }
+            }
+
+        } catch (paymentDetailsError) {
+            console.error(
+                "Unable to load old payment details:",
+                paymentDetailsError
+            );
+        }
+    }
+}
+
+
+
+
+
+
+            // =================================================
+            // PAYMENT HISTORY HTML
+            // =================================================
+
+            const paymentHistoryHtml =
+                paymentHistory.length > 0
+
+                    ? paymentHistory
+                        .map((payment, index) => {
+
+                            const historyDate =
+                                payment.paidAt?.toDate
+                                    ? payment.paidAt
+                                        .toDate()
+                                        .toLocaleString("en-IN")
+                                    : "Date not available";
+
+
+                            const method =
+                                payment.paymentMethod
+                                    ? String(
+                                        payment.paymentMethod
+                                    ).toUpperCase()
+                                    : "RAZORPAY";
+
+
+                            const bank =
+                                payment.bankName ||
+                                payment.cardIssuer ||
+                                "Not provided";
+
+
+                            const bankLabel =
+                                payment.paymentMethod ===
+                                "upi"
+
+                                    ? (
+                                        payment.paymentVpa ||
+                                        bank
+                                    )
+
+                                    : bank;
+
+
+                            return `
+                                <div style="
+                                    padding:12px 0;
+                                    border-bottom:${
+                                        index <
+                                        paymentHistory.length - 1
+                                            ? "1px solid #e5e7eb"
+                                            : "none"
+                                    };
+                                ">
+
+                                    <div style="
+                                        display:flex;
+                                        justify-content:space-between;
+                                        align-items:center;
+                                        gap:12px;
+                                        margin-bottom:6px;
+                                    ">
+
+                                        <strong style="
+                                            color:#172554;
+                                        ">
+                                            Payment ${index + 1}
+                                        </strong>
+
+                                        <strong style="
+                                            color:#15803d;
+                                        ">
+                                            ₹${Number(
+                                                payment.amount || 0
+                                            ).toLocaleString("en-IN")}
+                                        </strong>
+
+                                    </div>
+
+
+                                    <div style="
+                                        display:grid;
+                                        grid-template-columns:
+                                            repeat(
+                                                2,
+                                                minmax(0,1fr)
+                                            );
+                                        gap:5px 15px;
+                                        color:#64748b;
+                                        font-size:12px;
+                                    ">
+
+                                        <span>
+                                            📅 ${historyDate}
+                                        </span>
+
+                                        <span>
+                                            💳 ${method}
+                                        </span>
+
+                                        <span>
+                                            🏦 Bank / Issuer:
+                                            ${bankLabel}
+                                        </span>
+
+                                        <span style="
+                                            word-break:break-all;
+                                        ">
+                                            🆔 ${
+                                                payment.razorpayPaymentId ||
+                                                payment.id
+                                            }
+                                        </span>
+
+                                    </div>
+
+                                </div>
+                            `;
+
+                        })
+                        .join("")
+
+                    : `
+                        <div style="
+                            color:#94a3b8;
+                            font-size:13px;
+                        ">
+                            No payment history available yet.
+                        </div>
+                    `;
+
+
             // =================================================
             // PAYMENT BUTTON
             // =================================================
@@ -177,7 +520,11 @@ async function loadMyBookings() {
                     <button
                         type="button"
                         class="pay-now-btn"
-                        onclick="payForBooking('${bookingDoc.id}')">
+                        onclick="
+                            payForBooking(
+                                '${bookingDoc.id}'
+                            )
+                        ">
 
                         <i class="fa-solid fa-credit-card"></i>
 
@@ -213,47 +560,49 @@ async function loadMyBookings() {
             }
 
             else if (
-    actualPaymentStatus ===
-    "Partially Paid"
-) {
+                actualPaymentStatus ===
+                "Partially Paid"
+            ) {
 
-    paidLabel = `
-        <span
-            class="booking-paid-label"
-            style="
-                display:inline-flex;
-                align-items:center;
-                gap:7px;
-                padding:7px 12px;
-                border-radius:20px;
-                background:#fff7ed;
-                border:1px solid #fed7aa;
-                color:#c2410c;
-                font-size:13px;
-                font-weight:700;
-                white-space:nowrap;
-                line-height:1;
-            ">
+                paidLabel = `
+                    <span
+                        class="booking-paid-label"
+                        style="
+                            display:inline-flex;
+                            align-items:center;
+                            gap:7px;
+                            padding:7px 12px;
+                            border-radius:20px;
+                            background:#fff7ed;
+                            border:1px solid #fed7aa;
+                            color:#c2410c;
+                            font-size:13px;
+                            font-weight:700;
+                            white-space:nowrap;
+                            line-height:1;
+                        ">
 
-            <i
-                class="fa-solid fa-circle-half-stroke"
-                style="font-size:12px;">
-            </i>
+                        <i
+                            class="fa-solid fa-circle-half-stroke"
+                            style="font-size:12px;">
+                        </i>
 
-            <span>Partially Paid</span>
+                        <span>
+                            Partially Paid
+                        </span>
 
-            <span
-                style="
-                    color:#9a3412;
-                    font-weight:600;
-                ">
-                • Due ₹${amountDue.toLocaleString("en-IN")}
-            </span>
+                        <span
+                            style="
+                                color:#9a3412;
+                                font-weight:600;
+                            ">
+                            • Due ₹${amountDue.toLocaleString("en-IN")}
+                        </span>
 
-        </span>
-    `;
+                    </span>
+                `;
 
-}
+            }
 
 
             // =================================================
@@ -271,7 +620,6 @@ async function loadMyBookings() {
 
                 statusText =
                     "✓ Approved";
-
             }
 
             else if (
@@ -281,7 +629,6 @@ async function loadMyBookings() {
 
                 statusText =
                     "✕ Cancelled";
-
             }
 
             else if (
@@ -291,7 +638,6 @@ async function loadMyBookings() {
 
                 statusText =
                     "✕ Rejected";
-
             }
 
 
@@ -315,7 +661,9 @@ async function loadMyBookings() {
                     }"
                     class="booking-event-image"
                     alt="Event"
-                    onerror="this.src='images/hero.jpg'"
+                    onerror="
+                        this.src='images/hero.jpg'
+                    "
                 >
 
 
@@ -539,13 +887,144 @@ async function loadMyBookings() {
                 </div>
 
 
+                <!-- PAYMENT PROGRESS -->
+
+                <div style="
+                    margin:0 20px 18px;
+                    padding:15px;
+                    border:1px solid #e2e8f0;
+                    border-radius:10px;
+                    background:#f8fafc;
+                ">
+
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        align-items:center;
+                        gap:10px;
+                        margin-bottom:8px;
+                    ">
+
+                        <strong style="
+                            color:#172554;
+                        ">
+                            Payment Progress
+                        </strong>
+
+                        <strong style="
+                            color:#18366f;
+                        ">
+                            ${paymentProgress.toFixed(0)}%
+                        </strong>
+
+                    </div>
+
+
+                    <div style="
+                        height:9px;
+                        background:#e2e8f0;
+                        border-radius:20px;
+                        overflow:hidden;
+                    ">
+
+                        <div style="
+                            height:100%;
+                            width:${paymentProgress}%;
+                            background:#2563eb;
+                            border-radius:20px;
+                            transition:width .3s ease;
+                        "></div>
+
+                    </div>
+
+
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        gap:10px;
+                        margin-top:8px;
+                        font-size:12px;
+                        color:#64748b;
+                    ">
+
+                        <span>
+                            Paid:
+                            <strong style="
+                                color:#15803d;
+                            ">
+                                ₹${amountPaid.toLocaleString("en-IN")}
+                            </strong>
+                        </span>
+
+                        <span>
+                            Due:
+                            <strong style="
+                                color:${
+                                    amountDue > 0
+                                        ? "#dc2626"
+                                        : "#15803d"
+                                };
+                            ">
+                                ₹${amountDue.toLocaleString("en-IN")}
+                            </strong>
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PAYMENT HISTORY -->
+
+                <div style="
+                    margin:0 20px 18px;
+                    padding:15px;
+                    border:1px solid #e2e8f0;
+                    border-radius:10px;
+                    background:#ffffff;
+                ">
+
+                    <div style="
+                        font-weight:800;
+                        color:#172554;
+                        margin-bottom:2px;
+                    ">
+
+                        <i class="
+                            fa-solid
+                            fa-clock-rotate-left
+                        "></i>
+
+                        Payment History
+
+                    </div>
+
+
+                    <div style="
+                        font-size:11px;
+                        color:#94a3b8;
+                        margin-bottom:6px;
+                    ">
+                        Each installment is shown separately.
+                    </div>
+
+
+                    ${paymentHistoryHtml}
+
+                </div>
+
+
                 <div class="booking-bottom">
 
 
                     <button
                         type="button"
                         class="view-details-btn"
-                        onclick="viewBookingDetails('${bookingDoc.id}')">
+                        onclick="
+                            viewBookingDetails(
+                                '${bookingDoc.id}'
+                            )
+                        ">
 
                         👁 View Details
 
@@ -554,21 +1033,30 @@ async function loadMyBookings() {
 
                     ${
                         status === "Pending"
-                        ? `
+                            ? `
 
-                            <button
-                                type="button"
-                                class="customer-cancel-booking-btn"
-                                onclick="cancelCustomerBooking('${bookingDoc.id}')">
+                                <button
+                                    type="button"
+                                    class="
+                                        customer-cancel-booking-btn
+                                    "
+                                    onclick="
+                                        cancelCustomerBooking(
+                                            '${bookingDoc.id}'
+                                        )
+                                    ">
 
-                                <i class="fa-solid fa-xmark"></i>
+                                    <i class="
+                                        fa-solid
+                                        fa-xmark
+                                    "></i>
 
-                                Cancel Booking
+                                    Cancel Booking
 
-                            </button>
+                                </button>
 
-                        `
-                        : ""
+                            `
+                            : ""
                     }
 
 
@@ -580,21 +1068,30 @@ async function loadMyBookings() {
 
                     ${
                         actualPaymentStatus === "Paid"
-                        ? `
+                            ? `
 
-                            <button
-                                type="button"
-                                class="download-receipt-btn"
-                                onclick="previewPaymentReceipt('${bookingDoc.id}')">
+                                <button
+                                    type="button"
+                                    class="
+                                        download-receipt-btn
+                                    "
+                                    onclick="
+                                        previewPaymentReceipt(
+                                            '${bookingDoc.id}'
+                                        )
+                                    ">
 
-                                <i class="fa-solid fa-file-pdf"></i>
+                                    <i class="
+                                        fa-solid
+                                        fa-file-pdf
+                                    "></i>
 
-                                Preview Receipt
+                                    Preview Receipt
 
-                            </button>
+                                </button>
 
-                        `
-                        : ""
+                            `
+                            : ""
                     }
 
 
@@ -605,7 +1102,7 @@ async function loadMyBookings() {
 
             container.appendChild(card);
 
-        });
+        }
 
     }
 
@@ -909,9 +1406,6 @@ window.downloadPaymentReceipt =
                     "Please login first."
                 );
 
-                window.location.href =
-                    "customer-login.html";
-
                 return;
             }
 
@@ -943,26 +1437,12 @@ window.downloadPaymentReceipt =
 
 
             if (
-                booking.customerId &&
                 booking.customerId !==
-                    user.uid
+                user.uid
             ) {
 
                 alert(
-                    "You cannot access this receipt."
-                );
-
-                return;
-            }
-
-
-            if (
-                booking.paymentStatus !==
-                "Paid"
-            ) {
-
-                alert(
-                    "Receipt is available only after successful payment."
+                    "You cannot access this booking."
                 );
 
                 return;
@@ -1006,16 +1486,50 @@ window.downloadPaymentReceipt =
                 );
 
 
+            const storedAmountPaid =
+                booking.amountPaid !== undefined
+
+                    ? Number(
+                        booking.amountPaid || 0
+                    )
+
+                    : booking.paymentStatus ===
+                        "Paid"
+
+                        ? totalPrice
+
+                        : 0;
+
+
             const amountPaid =
-                Number(
-                    booking.amountPaid ||
-                    totalPrice
+                Math.max(
+                    0,
+                    Math.min(
+                        storedAmountPaid,
+                        totalPrice
+                    )
                 );
 
 
-            // =================================================
-            // GET CUSTOMER NAME
-            // =================================================
+            const amountDue =
+                Math.max(
+                    0,
+                    Number(
+                        (
+                            totalPrice -
+                            amountPaid
+                        ).toFixed(2)
+                    )
+                );
+
+
+            const paymentStatus =
+                amountDue <= 0
+                    ? "Paid"
+                    : amountPaid > 0
+                        ? "Partially Paid"
+                        : "Unpaid";
+
 
             const customerDoc =
                 await getDoc(
@@ -1153,7 +1667,7 @@ window.downloadPaymentReceipt =
 
 
             pdf.text(
-                "PAYMENT STATUS: PAID",
+                `PAYMENT STATUS: ${paymentStatus.toUpperCase()}`,
                 105,
                 52,
                 {
@@ -1333,6 +1847,13 @@ window.downloadPaymentReceipt =
             );
 
 
+            pdf.text(
+                `Amount Due: Rs. ${amountDue.toLocaleString("en-IN")}`,
+                20,
+                231
+            );
+
+
             pdf.setFillColor(
                 24,
                 54,
@@ -1342,7 +1863,7 @@ window.downloadPaymentReceipt =
 
             pdf.roundedRect(
                 20,
-                230,
+                238,
                 170,
                 25,
                 4,
@@ -1370,7 +1891,7 @@ window.downloadPaymentReceipt =
             pdf.text(
                 "TOTAL PAID",
                 30,
-                246
+                254
             );
 
 
@@ -1380,7 +1901,7 @@ window.downloadPaymentReceipt =
             pdf.text(
                 `Rs. ${amountPaid.toLocaleString("en-IN")}`,
                 180,
-                246,
+                254,
                 {
                     align: "right"
                 }
@@ -1410,7 +1931,7 @@ window.downloadPaymentReceipt =
             pdf.text(
                 "Thank you for choosing EventSphere.",
                 105,
-                270,
+                275,
                 {
                     align: "center"
                 }
@@ -1420,7 +1941,7 @@ window.downloadPaymentReceipt =
             pdf.text(
                 "This is a computer-generated payment receipt.",
                 105,
-                278,
+                283,
                 {
                     align: "center"
                 }
@@ -1466,7 +1987,8 @@ window.downloadPaymentReceipt =
 
     };
 
-    // =========================================================
+
+// =========================================================
 // PREVIEW PAYMENT RECEIPT
 // =========================================================
 
@@ -1574,10 +2096,28 @@ window.previewPaymentReceipt =
                 );
 
 
+            const storedAmountPaid =
+                booking.amountPaid !== undefined
+
+                    ? Number(
+                        booking.amountPaid || 0
+                    )
+
+                    : booking.paymentStatus ===
+                        "Paid"
+
+                        ? totalPrice
+
+                        : 0;
+
+
             const amountPaid =
-                Number(
-                    booking.amountPaid ||
-                    totalPrice
+                Math.max(
+                    0,
+                    Math.min(
+                        storedAmountPaid,
+                        totalPrice
+                    )
                 );
 
 
@@ -1690,7 +2230,10 @@ window.previewPaymentReceipt =
                         font-size:16px;
                     ">
 
-                        <i class="fa-solid fa-file-invoice"></i>
+                        <i class="
+                            fa-solid
+                            fa-file-invoice
+                        "></i>
 
                         &nbsp; Payment Receipt Preview
 
@@ -1803,9 +2346,7 @@ window.previewPaymentReceipt =
                                     font-size:12px;
                                     font-weight:800;
                                 ">
-
                                     ✓ PAYMENT PAID
-
                                 </span>
 
                             </div>
@@ -2082,7 +2623,7 @@ window.previewPaymentReceipt =
                                 <div style="
                                     display:flex;
                                     justify-content:space-between;
-                                    margin-bottom:8px;
+                                    margin-bottom:12px;
                                 ">
 
                                     <span>
@@ -2349,6 +2890,136 @@ window.previewPaymentReceipt =
 
     };
 
+     
+// =========================================================
+// CANCEL CUSTOMER BOOKING
+// =========================================================
+
+window.cancelCustomerBooking =
+    async function (bookingId) {
+
+        try {
+
+            const user =
+                auth.currentUser;
+
+
+            if (!user) {
+
+                alert(
+                    "Please login first."
+                );
+
+                window.location.href =
+                    "customer-login.html";
+
+                return;
+            }
+
+
+            const bookingRef =
+                doc(
+                    db,
+                    "bookings",
+                    bookingId
+                );
+
+
+            const bookingSnapshot =
+                await getDoc(
+                    bookingRef
+                );
+
+
+            if (
+                !bookingSnapshot.exists()
+            ) {
+
+                alert(
+                    "Booking not found."
+                );
+
+                return;
+            }
+
+
+            const booking =
+                bookingSnapshot.data();
+
+
+            if (
+                booking.customerId !==
+                user.uid
+            ) {
+
+                alert(
+                    "You cannot cancel this booking."
+                );
+
+                return;
+            }
+
+
+            if (
+                booking.status !==
+                "Pending"
+            ) {
+
+                alert(
+                    "Only pending bookings can be cancelled."
+                );
+
+                return;
+            }
+
+
+            const confirmed =
+                confirm(
+                    "Are you sure you want to cancel this booking?"
+                );
+
+
+            if (!confirmed) {
+                return;
+            }
+
+
+            await updateDoc(
+                bookingRef,
+                {
+                    status: "Cancelled",
+                    cancelledBy: "customer",
+                    cancelledAt:
+                        new Date()
+                }
+            );
+
+
+            alert(
+                "Booking cancelled successfully."
+            );
+
+
+            await loadMyBookings();
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Cancel Booking Error:",
+                error
+            );
+
+
+            alert(
+                "Unable to cancel booking. Please try again."
+            );
+
+        }
+
+    };
+
 
 // =========================================================
 // VIEW BOOKING DETAILS
@@ -2358,6 +3029,20 @@ window.viewBookingDetails =
     async function (bookingId) {
 
         try {
+
+            const user =
+                auth.currentUser;
+
+
+            if (!user) {
+
+                alert(
+                    "Please login first."
+                );
+
+                return;
+            }
+
 
             const bookingSnapshot =
                 await getDoc(
@@ -2374,7 +3059,7 @@ window.viewBookingDetails =
             ) {
 
                 alert(
-                    "Booking details not found."
+                    "Booking not found."
                 );
 
                 return;
@@ -2385,32 +3070,21 @@ window.viewBookingDetails =
                 bookingSnapshot.data();
 
 
-            const eventName =
-                booking.eventName ||
-                "Event";
+            if (
+                booking.customerId &&
+                booking.customerId !==
+                    user.uid
+            ) {
+
+                alert(
+                    "You cannot view this booking."
+                );
+
+                return;
+            }
 
 
-            const eventDate =
-                booking.eventDate ||
-                "Not specified";
-
-
-            const endTime =
-                booking.eventEndTime ||
-                "Not specified";
-
-
-            const guests =
-                booking.guests ||
-                "Not specified";
-
-
-            const location =
-                booking.location ||
-                "Not specified";
-
-
-            const totalPrice =
+            const totalAmount =
                 Number(
                     booking.price ||
                     booking.amount ||
@@ -2423,14 +3097,13 @@ window.viewBookingDetails =
                 booking.amountPaid !== undefined
 
                     ? Number(
-                        booking.amountPaid ||
-                        0
+                        booking.amountPaid || 0
                     )
 
                     : booking.paymentStatus ===
                         "Paid"
 
-                        ? totalPrice
+                        ? totalAmount
 
                         : 0;
 
@@ -2440,7 +3113,7 @@ window.viewBookingDetails =
                     0,
                     Math.min(
                         storedAmountPaid,
-                        totalPrice
+                        totalAmount
                     )
                 );
 
@@ -2450,14 +3123,14 @@ window.viewBookingDetails =
                     0,
                     Number(
                         (
-                            totalPrice -
+                            totalAmount -
                             amountPaid
                         ).toFixed(2)
                     )
                 );
 
 
-            const actualPaymentStatus =
+            const paymentStatus =
                 amountDue <= 0
                     ? "Paid"
                     : amountPaid > 0
@@ -2465,97 +3138,178 @@ window.viewBookingDetails =
                         : "Unpaid";
 
 
-            const requirements =
-                booking.requirements ||
-                "None";
+            // =============================================
+            // GET PAYMENT HISTORY
+            // =============================================
+
+            let paymentHistory = [];
+
+            try {
+
+                const historySnapshot =
+                    await getDocs(
+                        collection(
+                            db,
+                            "bookings",
+                            bookingId,
+                            "payments"
+                        )
+                    );
 
 
-            const status =
-                booking.status ||
-                "Pending";
+                paymentHistory =
+                    historySnapshot.docs
+                        .map((paymentDoc) => ({
+                            id: paymentDoc.id,
+                            ...paymentDoc.data()
+                        }))
+                        .sort((a, b) => {
 
+                            const aTime =
+                                a.paidAt?.toMillis
+                                    ? a.paidAt.toMillis()
+                                    : 0;
 
-            const cancellationReason =
-                booking.cancellationReason ||
-                "";
+                            const bTime =
+                                b.paidAt?.toMillis
+                                    ? b.paidAt.toMillis()
+                                    : 0;
 
+                            return aTime - bTime;
 
-            const rejectionReason =
-                booking.rejectionReason ||
-                booking.reason ||
-                "";
-
-
-            const bookingIdText =
-                "#BK-" +
-                bookingId
-                    .substring(0, 6)
-                    .toUpperCase();
-
-
-            let statusClass =
-                "pending";
-
-
-            if (
-                status === "Approved"
-            ) {
-
-                statusClass =
-                    "approved";
-
-            }
-
-            else if (
-                status === "Cancelled"
-            ) {
-
-                statusClass =
-                    "cancelled";
+                        });
 
             }
 
-            else if (
-                status === "Rejected"
-            ) {
+            catch (historyError) {
 
-                statusClass =
-                    "rejected";
+                console.error(
+                    "Payment History Error:",
+                    historyError
+                );
 
             }
 
 
-            let statusText =
-                "◷ Pending";
+            const historyHtml =
+                paymentHistory.length
+
+                    ? paymentHistory
+                        .map((payment, index) => {
+
+                            const date =
+                                payment.paidAt?.toDate
+                                    ? payment.paidAt
+                                        .toDate()
+                                        .toLocaleString(
+                                            "en-IN"
+                                        )
+                                    : "Date not available";
 
 
-            if (
-                status === "Approved"
-            ) {
+                            const method =
+                                payment.paymentMethod
+                                    ? String(
+                                        payment.paymentMethod
+                                    ).toUpperCase()
+                                    : "RAZORPAY";
 
-                statusText =
-                    "✓ Approved";
 
-            }
+                            const bank =
+                                payment.paymentMethod ===
+                                "upi"
 
-            else if (
-                status === "Cancelled"
-            ) {
+                                    ? (
+                                        payment.paymentVpa ||
+                                        payment.bankName ||
+                                        "Not provided"
+                                    )
 
-                statusText =
-                    "✕ Cancelled";
+                                    : (
+                                        payment.bankName ||
+                                        payment.cardIssuer ||
+                                        "Not provided"
+                                    );
 
-            }
 
-            else if (
-                status === "Rejected"
-            ) {
+                            return `
+                                <div style="
+                                    padding:12px 0;
+                                    border-bottom:
+                                        1px solid #e5e7eb;
+                                ">
 
-                statusText =
-                    "✕ Rejected";
+                                    <div style="
+                                        display:flex;
+                                        justify-content:
+                                            space-between;
+                                        gap:10px;
+                                    ">
 
-            }
+                                        <strong>
+                                            Payment ${index + 1}
+                                        </strong>
 
+                                        <strong style="
+                                            color:#15803d;
+                                        ">
+                                            ₹${Number(
+                                                payment.amount || 0
+                                            ).toLocaleString("en-IN")}
+                                        </strong>
+
+                                    </div>
+
+
+                                    <div style="
+                                        margin-top:6px;
+                                        font-size:12px;
+                                        color:#64748b;
+                                        line-height:1.7;
+                                    ">
+
+                                        <div>
+                                            📅 ${date}
+                                        </div>
+
+                                        <div>
+                                            💳 ${method}
+                                        </div>
+
+                                        <div>
+                                            🏦 ${bank}
+                                        </div>
+
+                                        <div style="
+                                            word-break:break-all;
+                                        ">
+                                            🆔 ${
+                                                payment.razorpayPaymentId ||
+                                                payment.id
+                                            }
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            `;
+
+                        })
+                        .join("")
+
+                    : `
+                        <div style="
+                            color:#94a3b8;
+                            font-size:13px;
+                        ">
+                            No payment history available.
+                        </div>
+                    `;
+
+
+            // =============================================
+            // DETAILS MODAL
+            // =============================================
 
             const overlay =
                 document.createElement(
@@ -2563,238 +3317,419 @@ window.viewBookingDetails =
                 );
 
 
-            overlay.className =
-                "booking-details-overlay";
+            overlay.style.cssText = `
+                position:fixed;
+                inset:0;
+                z-index:99998;
+                background:rgba(15,23,42,.72);
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                padding:20px;
+                overflow:auto;
+                box-sizing:border-box;
+            `;
 
 
-            overlay.innerHTML = `
+            const modal =
+                document.createElement(
+                    "div"
+                );
 
-                <div class="booking-details-modal">
+
+            modal.style.cssText = `
+                width:100%;
+                max-width:720px;
+                max-height:92vh;
+                overflow:auto;
+                background:white;
+                border-radius:16px;
+                box-shadow:
+                    0 25px 70px rgba(0,0,0,.30);
+            `;
+
+
+            modal.innerHTML = `
+
+                <div style="
+                    background:#18366f;
+                    color:white;
+                    padding:18px 22px;
+                    display:flex;
+                    align-items:center;
+                    justify-content:space-between;
+                    position:sticky;
+                    top:0;
+                    z-index:5;
+                ">
+
+                    <strong style="
+                        font-size:17px;
+                    ">
+                        Booking Details
+                    </strong>
+
 
                     <button
+                        id="closeBookingDetails"
                         type="button"
-                        class="close-booking-details"
-                        id="closeBookingDetails">
-
+                        style="
+                            width:34px;
+                            height:34px;
+                            border:0;
+                            border-radius:7px;
+                            background:
+                                rgba(255,255,255,.15);
+                            color:white;
+                            font-size:22px;
+                            cursor:pointer;
+                        "
+                    >
                         ×
-
                     </button>
 
-
-                    <div class="booking-modal-icon">
-                        🎉
-                    </div>
+                </div>
 
 
-                    <h2>
-                        Booking Details
-                    </h2>
+                <div style="
+                    padding:24px;
+                ">
 
 
-                    <p class="booking-modal-event">
-                        ${eventName}
-                    </p>
-
-
-                    <div class="
-                        booking-modal-status
-                        ${statusClass}
+                    <div style="
+                        text-align:center;
+                        margin-bottom:20px;
                     ">
-                        ${statusText}
+
+                        <h2 style="
+                            margin:0;
+                            color:#172554;
+                        ">
+                            ${
+                                booking.eventName ||
+                                "Event"
+                            }
+                        </h2>
+
+
+                        <div style="
+                            margin-top:6px;
+                            color:#64748b;
+                            font-size:13px;
+                        ">
+                            Booking ID:
+                            #BK-${bookingId
+                                .substring(0,6)
+                                .toUpperCase()}
+                        </div>
+
                     </div>
 
 
-                    <div class="booking-modal-grid">
+                    <div style="
+                        display:grid;
+                        grid-template-columns:
+                            repeat(
+                                2,
+                                minmax(0,1fr)
+                            );
+                        gap:12px;
+                    ">
 
 
-                        <div>
+                        <div style="
+                            padding:13px;
+                            background:#f8fafc;
+                            border-radius:9px;
+                        ">
 
-                            <span>
-                                Booking ID
-                            </span>
-
-                            <strong>
-                                ${bookingIdText}
-                            </strong>
-
-                        </div>
-
-
-                        <div>
-
-                            <span>
+                            <small>
                                 Event Date
-                            </span>
+                            </small>
 
-                            <strong>
-                                ${eventDate}
+                            <strong style="
+                                display:block;
+                                margin-top:5px;
+                            ">
+                                ${
+                                    booking.eventDate ||
+                                    "Not specified"
+                                }
                             </strong>
 
                         </div>
 
 
-                        <div>
+                        <div style="
+                            padding:13px;
+                            background:#f8fafc;
+                            border-radius:9px;
+                        ">
 
-                            <span>
-                                Event End Time
-                            </span>
-
-                            <strong>
-                                ${endTime}
-                            </strong>
-
-                        </div>
-
-
-                        <div>
-
-                            <span>
+                            <small>
                                 Guests
-                            </span>
+                            </small>
 
-                            <strong>
-                                ${guests}
+                            <strong style="
+                                display:block;
+                                margin-top:5px;
+                            ">
+                                ${
+                                    booking.guests ||
+                                    0
+                                }
                             </strong>
 
                         </div>
 
 
-                        <div>
+                        <div style="
+                            padding:13px;
+                            background:#f8fafc;
+                            border-radius:9px;
+                        ">
 
-                            <span>
+                            <small>
                                 Location
-                            </span>
+                            </small>
 
-                            <strong>
-                                ${location}
+                            <strong style="
+                                display:block;
+                                margin-top:5px;
+                            ">
+                                ${
+                                    booking.location ||
+                                    "Not specified"
+                                }
                             </strong>
 
                         </div>
 
 
-                        <div>
+                        <div style="
+                            padding:13px;
+                            background:#f8fafc;
+                            border-radius:9px;
+                        ">
+
+                            <small>
+                                Booking Status
+                            </small>
+
+                            <strong style="
+                                display:block;
+                                margin-top:5px;
+                            ">
+                                ${
+                                    booking.status ||
+                                    "Pending"
+                                }
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PAYMENT SUMMARY -->
+
+                    <div style="
+                        margin-top:20px;
+                        padding:18px;
+                        border-radius:10px;
+                        background:#f8fafc;
+                        border:1px solid #e2e8f0;
+                    ">
+
+                        <h3 style="
+                            margin:0 0 15px;
+                            color:#172554;
+                        ">
+                            Payment Summary
+                        </h3>
+
+
+                        <div style="
+                            display:flex;
+                            justify-content:
+                                space-between;
+                            margin-bottom:10px;
+                        ">
 
                             <span>
-                                Total Price
+                                Total Amount
                             </span>
 
                             <strong>
-                                ₹${totalPrice.toLocaleString("en-IN")}
+                                ₹${totalAmount.toLocaleString("en-IN")}
                             </strong>
 
                         </div>
 
 
-                        <div>
+                        <div style="
+                            display:flex;
+                            justify-content:
+                                space-between;
+                            margin-bottom:10px;
+                        ">
 
                             <span>
                                 Amount Paid
                             </span>
 
-                            <strong>
+                            <strong style="
+                                color:#15803d;
+                            ">
                                 ₹${amountPaid.toLocaleString("en-IN")}
                             </strong>
 
                         </div>
 
 
-                        <div>
+                        <div style="
+                            display:flex;
+                            justify-content:
+                                space-between;
+                        ">
 
                             <span>
                                 Amount Due
                             </span>
 
-                            <strong>
+                            <strong style="
+                                color:${
+                                    amountDue > 0
+                                        ? "#dc2626"
+                                        : "#15803d"
+                                };
+                            ">
                                 ₹${amountDue.toLocaleString("en-IN")}
                             </strong>
 
                         </div>
 
 
-                        <div>
+                        <div style="
+                            margin-top:15px;
+                            padding-top:15px;
+                            border-top:
+                                1px solid #e2e8f0;
+                            display:flex;
+                            justify-content:
+                                space-between;
+                        ">
 
                             <span>
                                 Payment Status
                             </span>
 
                             <strong>
-                                ${actualPaymentStatus}
+                                ${paymentStatus}
                             </strong>
 
                         </div>
-
-
-                        <div class="full-width">
-
-                            <span>
-                                Requirements
-                            </span>
-
-                            <strong>
-                                ${requirements}
-                            </strong>
-
-                        </div>
-
-
-                        ${
-                            status === "Cancelled"
-                            ? `
-
-                                <div class="full-width">
-
-                                    <span>
-                                        Cancellation Reason
-                                    </span>
-
-                                    <strong>
-                                        ${
-                                            cancellationReason ||
-                                            "No reason provided."
-                                        }
-                                    </strong>
-
-                                </div>
-
-                            `
-                            : ""
-                        }
-
-
-                        ${
-                            status === "Rejected"
-                            ? `
-
-                                <div class="full-width">
-
-                                    <span>
-                                        Rejection Reason
-                                    </span>
-
-                                    <strong>
-                                        ${
-                                            rejectionReason ||
-                                            "No reason provided."
-                                        }
-                                    </strong>
-
-                                </div>
-
-                            `
-                            : ""
-                        }
-
 
                     </div>
 
 
+                    <!-- PAYMENT HISTORY -->
+
+                    <div style="
+                        margin-top:20px;
+                        padding:18px;
+                        border:1px solid #e2e8f0;
+                        border-radius:10px;
+                    ">
+
+                        <h3 style="
+                            margin:0;
+                            color:#172554;
+                        ">
+
+                            <i class="
+                                fa-solid
+                                fa-clock-rotate-left
+                            "></i>
+
+                            Payment History
+
+                        </h3>
+
+
+                        <p style="
+                            margin:5px 0 10px;
+                            color:#94a3b8;
+                            font-size:12px;
+                        ">
+                            All successful installments
+                            are listed below.
+                        </p>
+
+
+                        ${historyHtml}
+
+                    </div>
+
+
+                    ${
+                        booking.requirements
+                            ? `
+
+                                <div style="
+                                    margin-top:20px;
+                                    padding:18px;
+                                    background:#f8fafc;
+                                    border-radius:10px;
+                                ">
+
+                                    <h3 style="
+                                        margin-top:0;
+                                        color:#172554;
+                                    ">
+                                        Requirements
+                                    </h3>
+
+                                    <p style="
+                                        margin-bottom:0;
+                                        color:#475569;
+                                        line-height:1.6;
+                                    ">
+                                        ${
+                                            booking.requirements
+                                        }
+                                    </p>
+
+                                </div>
+
+                            `
+                            : ""
+                    }
+
+
+                </div>
+
+
+                <div style="
+                    padding:15px 22px;
+                    border-top:1px solid #e2e8f0;
+                    text-align:right;
+                ">
+
                     <button
+                        id="closeBookingDetailsBottom"
                         type="button"
-                        class="close-details-btn"
-                        id="closeDetailsButton">
-
+                        style="
+                            padding:10px 18px;
+                            border:0;
+                            border-radius:8px;
+                            background:#18366f;
+                            color:white;
+                            font-weight:700;
+                            cursor:pointer;
+                        "
+                    >
                         Close
-
                     </button>
 
                 </div>
@@ -2802,9 +3737,18 @@ window.viewBookingDetails =
             `;
 
 
+            overlay.appendChild(
+                modal
+            );
+
+
             document.body.appendChild(
                 overlay
             );
+
+
+            const closeModal =
+                () => overlay.remove();
 
 
             document
@@ -2813,21 +3757,17 @@ window.viewBookingDetails =
                 )
                 .addEventListener(
                     "click",
-                    () => {
-                        overlay.remove();
-                    }
+                    closeModal
                 );
 
 
             document
                 .getElementById(
-                    "closeDetailsButton"
+                    "closeBookingDetailsBottom"
                 )
                 .addEventListener(
                     "click",
-                    () => {
-                        overlay.remove();
-                    }
+                    closeModal
                 );
 
 
@@ -2840,7 +3780,7 @@ window.viewBookingDetails =
                         overlay
                     ) {
 
-                        overlay.remove();
+                        closeModal();
 
                     }
 
@@ -2852,7 +3792,7 @@ window.viewBookingDetails =
         catch (error) {
 
             console.error(
-                "View Booking Details Error:",
+                "View Details Error:",
                 error
             );
 
@@ -2867,392 +3807,140 @@ window.viewBookingDetails =
 
 
 // =========================================================
-// CUSTOMER CANCEL BOOKING
-// =========================================================
-
-window.cancelCustomerBooking =
-    async function (bookingId) {
-
-        const overlay =
-            document.createElement(
-                "div"
-            );
-
-
-        overlay.className =
-            "cancel-booking-overlay";
-
-
-        overlay.innerHTML = `
-
-            <div class="cancel-booking-modal">
-
-
-                <div class="cancel-modal-icon">
-
-                    <i class="fa-solid fa-calendar-xmark"></i>
-
-                </div>
-
-
-                <h2>
-                    Cancel Booking
-                </h2>
-
-
-                <p class="cancel-modal-event">
-
-                    Are you sure you want to cancel
-                    this booking?
-
-                </p>
-
-
-                <label
-                    class="cancel-reason-label"
-                    for="customerCancelReason">
-
-                    Reason for cancellation
-
-                    <span class="cancel-reason-required">
-                        *
-                    </span>
-
-                </label>
-
-
-                <textarea
-                    id="customerCancelReason"
-                    class="cancel-reason-input"
-                    placeholder="Please enter your reason for cancelling this booking..."
-                    required></textarea>
-
-
-                <div class="cancel-modal-actions">
-
-
-                    <button
-                        type="button"
-                        class="
-                            cancel-modal-btn
-                            cancel-close-btn
-                        "
-                        id="closeCancelBooking">
-
-                        Keep Booking
-
-                    </button>
-
-
-                    <button
-                        type="button"
-                        class="
-                            cancel-modal-btn
-                            cancel-confirm-btn
-                        "
-                        id="confirmCancelBooking">
-
-                        <i class="fa-solid fa-xmark"></i>
-
-                        Cancel Booking
-
-                    </button>
-
-
-                </div>
-
-
-            </div>
-
-        `;
-
-
-        document.body.appendChild(
-            overlay
-        );
-
-
-        const reasonInput =
-            document.getElementById(
-                "customerCancelReason"
-            );
-
-
-        const closeButton =
-            document.getElementById(
-                "closeCancelBooking"
-            );
-
-
-        const confirmButton =
-            document.getElementById(
-                "confirmCancelBooking"
-            );
-
-
-        closeButton.addEventListener(
-            "click",
-            () => {
-                overlay.remove();
-            }
-        );
-
-
-        overlay.addEventListener(
-            "click",
-            (event) => {
-
-                if (
-                    event.target ===
-                    overlay
-                ) {
-
-                    overlay.remove();
-
-                }
-
-            }
-        );
-
-
-        confirmButton.addEventListener(
-            "click",
-            async () => {
-
-                const reason =
-                    reasonInput.value.trim();
-
-
-                if (!reason) {
-
-                    alert(
-                        "Please enter a reason for cancellation."
-                    );
-
-                    reasonInput.focus();
-
-                    return;
-                }
-
-
-                const confirmed =
-                    confirm(
-                        "Are you sure you want to cancel this booking?"
-                    );
-
-
-                if (!confirmed) {
-                    return;
-                }
-
-
-                try {
-
-                    confirmButton.disabled =
-                        true;
-
-
-                    confirmButton.innerHTML = `
-
-                        <i class="fa-solid fa-spinner fa-spin"></i>
-
-                        Cancelling...
-
-                    `;
-
-
-                    const bookingSnapshot =
-                        await getDoc(
-                            doc(
-                                db,
-                                "bookings",
-                                bookingId
-                            )
-                        );
-
-
-                    if (
-                        !bookingSnapshot.exists()
-                    ) {
-
-                        throw new Error(
-                            "Booking not found."
-                        );
-
-                    }
-
-
-                    const booking =
-                        bookingSnapshot.data();
-
-
-                    const eventName =
-                        booking.eventName ||
-                        "Event";
-
-
-                    const customerEmail =
-                        auth.currentUser?.email ||
-                        booking.customerEmail ||
-                        "";
-
-
-                    await updateDoc(
-                        doc(
-                            db,
-                            "bookings",
-                            bookingId
-                        ),
-                        {
-
-                            status:
-                                "Cancelled",
-
-                            cancelledBy:
-                                "Customer",
-
-                            cancellationReason:
-                                reason,
-
-                            cancelledAt:
-                                new Date()
-
-                        }
-                    );
-
-
-                    // =================================================
-                    // SEND CANCELLATION EMAIL
-                    // =================================================
-
-                    try {
-
-                        const response =
-                            await fetch(
-                                "https://eventsphere-dndh.onrender.com/customer-cancelled",
-                                {
-
-                                    method:
-                                        "POST",
-
-                                    headers: {
-                                        "Content-Type":
-                                            "application/json"
-                                    },
-
-                                    body:
-                                        JSON.stringify({
-
-                                            customerEmail:
-                                                customerEmail,
-
-                                            eventName:
-                                                eventName,
-
-                                            reason:
-                                                reason
-
-                                        })
-
-                                }
-                            );
-
-
-                        const data =
-                            await response.json();
-
-
-                        if (
-                            !response.ok ||
-                            !data.success
-                        ) {
-
-                            console.error(
-                                "Cancellation email failed:",
-                                data.message
-                            );
-
-                        }
-
-                    }
-
-                    catch (
-                        emailError
-                    ) {
-
-                        console.error(
-                            "Cancellation email error:",
-                            emailError
-                        );
-
-                    }
-
-
-                    overlay.remove();
-
-
-                    alert(
-                        "Booking cancelled successfully."
-                    );
-
-
-                    await loadMyBookings();
-
-                }
-
-                catch (error) {
-
-                    console.error(
-                        "Cancel Booking Error:",
-                        error
-                    );
-
-
-                    confirmButton.disabled =
-                        false;
-
-
-                    confirmButton.innerHTML = `
-
-                        <i class="fa-solid fa-xmark"></i>
-
-                        Cancel Booking
-
-                    `;
-
-
-                    alert(
-                        error.message ||
-                        "Unable to cancel booking."
-                    );
-
-                }
-
-            }
-        );
-
-    };
-
-
-// =========================================================
 // AUTH STATE
 // =========================================================
 
 auth.onAuthStateChanged(
-    (user) => {
+    async (user) => {
 
-        if (user) {
+        if (!user) {
 
-            loadMyBookings();
+            window.location.href =
+                "customer-login.html";
 
+            return;
         }
 
-        else {
+
+        await loadMyBookings();
+
+    }
+);
+
+
+// =========================================================
+// LOGOUT
+// =========================================================
+
+window.logoutCustomer =
+    async function () {
+
+        try {
+
+            // Firebase Auth signOut is imported
+            // dynamically so this file keeps its
+            // existing Firebase configuration.
+
+            const {
+                signOut
+            } = await import(
+                "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js"
+            );
+
+
+            await signOut(
+                auth
+            );
+
 
             window.location.href =
                 "customer-login.html";
 
         }
 
+        catch (error) {
+
+            console.error(
+                "Logout Error:",
+                error
+            );
+
+
+            alert(
+                "Unable to logout."
+            );
+
+        }
+
+    };
+
+
+// =========================================================
+// AUTO REFRESH
+// =========================================================
+
+// Refresh the booking list when the page
+// becomes visible again.
+
+document.addEventListener(
+    "visibilitychange",
+    async () => {
+
+        if (
+            document.visibilityState ===
+            "visible" &&
+            auth.currentUser
+        ) {
+
+            await loadMyBookings();
+
+        }
+
     }
-);s
+);
+
+
+// =========================================================
+// ESC KEY FOR MODALS
+// =========================================================
+
+document.addEventListener(
+    "keydown",
+    (event) => {
+
+        if (
+            event.key !==
+            "Escape"
+        ) {
+
+            return;
+        }
+
+
+        const overlays =
+            document.querySelectorAll(
+                'body > div[style*="position:fixed"]'
+            );
+
+
+        const lastOverlay =
+            overlays[
+                overlays.length - 1
+            ];
+
+
+        if (lastOverlay) {
+            lastOverlay.remove();
+        }
+
+    }
+);
+
+
+// =========================================================
+// FINAL INITIALIZATION
+// =========================================================
+
+console.log(
+    "EventSphere My Bookings loaded successfully."
+);
