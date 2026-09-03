@@ -5,17 +5,133 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>Bookings - EventSphere</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet"
+          href="css/style.css">
+
+    <style>
+
+        /* ================= PAYMENT FILTER ================= */
+
+        .payment-filter-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .payment-filter-label {
+            font-weight: 700;
+            color: #334155;
+            font-size: 14px;
+        }
+
+        .payment-filter-btn {
+            border: 1px solid #d5dce8;
+            background: #ffffff;
+            color: #475569;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .payment-filter-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .payment-filter-btn.active-payment-filter {
+            background: #172554;
+            color: #ffffff;
+            border-color: #172554;
+        }
+
+        /* ================= PAYMENT BOX ================= */
+
+        .payment-details-box {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+
+        .payment-details-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #172554;
+            margin-bottom: 12px;
+        }
+
+        .payment-details-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 10px 25px;
+        }
+
+        .payment-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .payment-info strong {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .payment-info span {
+            font-size: 13px;
+            color: #172554;
+            word-break: break-word;
+        }
+
+        /* ================= PAYMENT STATUS ================= */
+
+        .payment-status {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .payment-paid {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .payment-unpaid {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        @media (max-width: 700px) {
+
+            .payment-details-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
 
 </head>
+
 
 <body>
 
 <div class="dashboard">
+
 
     <!-- SIDEBAR -->
 
@@ -26,40 +142,62 @@
         <ul>
 
             <li>
+
                 <a href="admin-dashboard.html">
                     🏠 Dashboard
                 </a>
+
             </li>
 
+
             <li>
+
                 <a href="add-event.html">
                     ➕ Add Event
                 </a>
+
             </li>
 
+
             <li>
+
                 <a href="view-events.html">
                     🎉 View Events
                 </a>
+
             </li>
 
+
             <li>
+
                 <a href="admin-bookings.html"
                    class="active-menu">
+
                     📅 Bookings
+
                 </a>
+
             </li>
 
+
             <li>
+
                 <a href="admin-customers.html">
                     👥 Customers
                 </a>
+
             </li>
 
+
             <li>
-                <a href="#" onclick="logout()">
+
+                <a href="#"
+                   onclick="logout()">
+
                     🚪 Logout
+
                 </a>
+
             </li>
 
         </ul>
@@ -71,23 +209,31 @@
 
     <div class="dashboard-content bookings-page">
 
-        <h1>Customer Bookings</h1>
+
+        <h1>
+            Customer Bookings
+        </h1>
 
 
         <!-- STATUS FILTERS -->
 
         <div class="booking-filters">
 
+
             <button
                 class="filter-btn active-filter"
                 onclick="filterBookings('All')">
 
-                <span>All</span>
+                <span>
+                    All
+                </span>
 
                 <span
                     class="count-badge all-count"
                     id="allCount">
+
                     0
+
                 </span>
 
             </button>
@@ -97,12 +243,16 @@
                 class="filter-btn"
                 onclick="filterBookings('Pending')">
 
-                <span>Pending</span>
+                <span>
+                    Pending
+                </span>
 
                 <span
                     class="count-badge pending-count"
                     id="pendingCount">
+
                     0
+
                 </span>
 
             </button>
@@ -112,12 +262,16 @@
                 class="filter-btn"
                 onclick="filterBookings('Approved')">
 
-                <span>Approved</span>
+                <span>
+                    Approved
+                </span>
 
                 <span
                     class="count-badge approved-count"
                     id="approvedCount">
+
                     0
+
                 </span>
 
             </button>
@@ -127,13 +281,56 @@
                 class="filter-btn"
                 onclick="filterBookings('Rejected')">
 
-                <span>Rejected</span>
+                <span>
+                    Rejected
+                </span>
 
                 <span
                     class="count-badge rejected-count"
                     id="rejectedCount">
+
                     0
+
                 </span>
+
+            </button>
+
+
+        </div>
+
+
+        <!-- PAYMENT FILTER -->
+
+        <div class="payment-filter-section">
+
+            <span class="payment-filter-label">
+                Payment:
+            </span>
+
+
+            <button
+                class="payment-filter-btn active-payment-filter"
+                onclick="filterPaymentBookings('All')">
+
+                All
+
+            </button>
+
+
+            <button
+                class="payment-filter-btn"
+                onclick="filterPaymentBookings('Paid')">
+
+                Paid
+
+            </button>
+
+
+            <button
+                class="payment-filter-btn"
+                onclick="filterPaymentBookings('Unpaid')">
+
+                Unpaid
 
             </button>
 
@@ -144,7 +341,10 @@
 
         <div class="booking-search">
 
-            <span>🔍</span>
+            <span>
+                🔍
+            </span>
+
 
             <input
                 type="text"
@@ -159,9 +359,12 @@
 
         <div id="bookingsContainer">
 
-            <p>Loading bookings...</p>
+            <p>
+                Loading bookings...
+            </p>
 
         </div>
+
 
     </div>
 
@@ -171,6 +374,7 @@
 <script type="module"
         src="js/admin-bookings.js">
 </script>
+
 
 </body>
 

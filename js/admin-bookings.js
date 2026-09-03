@@ -6,7 +6,6 @@ import {
     doc,
     updateDoc,
     deleteDoc,
-    setDoc,
     increment,
     runTransaction
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
@@ -22,9 +21,12 @@ const searchInput =
 let allBookings = [];
 
 let currentFilter = "All";
+let currentPaymentFilter = "All";
 
 
-// ================= LOAD BOOKINGS =================
+// =========================================================
+// LOAD BOOKINGS
+// =========================================================
 
 async function loadBookings() {
 
@@ -35,13 +37,14 @@ async function loadBookings() {
                 collection(db, "bookings")
             );
 
-
         const now = new Date();
 
         allBookings = [];
 
 
-        // ================= CHECK COMPLETED BOOKINGS =================
+        // =====================================================
+        // CHECK COMPLETED BOOKINGS
+        // =====================================================
 
         for (const bookingDoc of snapshot.docs) {
 
@@ -60,8 +63,6 @@ async function loadBookings() {
                         `${booking.eventDate}T${endTime}:00`
                     );
 
-
-                // ================= COMPLETED =================
 
                 if (now >= eventEndDate) {
 
@@ -88,8 +89,6 @@ async function loadBookings() {
                             "main"
                         );
 
-
-                    // Count only once
 
                     await runTransaction(
                         db,
@@ -146,8 +145,6 @@ async function loadBookings() {
                     );
 
 
-                    // Delete completed booking
-
                     await deleteDoc(
                         doc(
                             db,
@@ -176,7 +173,9 @@ async function loadBookings() {
         }
 
 
-        // ================= NEWEST FIRST =================
+        // =====================================================
+        // NEWEST FIRST
+        // =====================================================
 
         allBookings.sort((a, b) => {
 
@@ -203,6 +202,7 @@ async function loadBookings() {
 
     }
 
+
     catch (error) {
 
         console.error(
@@ -219,7 +219,9 @@ async function loadBookings() {
 }
 
 
-// ================= UPDATE COUNTS =================
+// =========================================================
+// UPDATE BOOKING COUNTS
+// =========================================================
 
 function updateBookingCounts() {
 
@@ -279,7 +281,9 @@ function updateBookingCounts() {
 }
 
 
-// ================= DISPLAY BOOKINGS =================
+// =========================================================
+// DISPLAY BOOKINGS
+// =========================================================
 
 function displayBookings() {
 
@@ -298,7 +302,9 @@ function displayBookings() {
         allBookings.filter((booking) => {
 
 
-            // ================= STATUS FILTER =================
+            // =================================================
+            // STATUS FILTER
+            // =================================================
 
             if (
                 currentFilter !== "All" &&
@@ -310,7 +316,90 @@ function displayBookings() {
             }
 
 
-            // ================= SEARCH =================
+            // =================================================
+            // PAYMENT FILTER
+            // =================================================
+
+            const bookingTotal =
+                Number(
+                    booking.price ||
+                    booking.amount ||
+                    booking.totalAmount ||
+                    0
+                );
+
+
+            const storedPaid =
+                booking.amountPaid !== undefined
+
+                    ? Number(
+                        booking.amountPaid || 0
+                    )
+
+                    : booking.paymentStatus === "Paid"
+
+                        ? bookingTotal
+
+                        : 0;
+
+
+            const calculatedPaid =
+                Math.max(
+                    0,
+                    Math.min(
+                        storedPaid,
+                        bookingTotal
+                    )
+                );
+
+
+            const calculatedDue =
+                Math.max(
+                    0,
+                    Number(
+                        (
+                            bookingTotal -
+                            calculatedPaid
+                        ).toFixed(2)
+                    )
+                );
+
+
+            const actualPaymentStatus =
+                calculatedDue <= 0
+
+                    ? "Paid"
+
+                    : calculatedPaid > 0
+
+                        ? "Partially Paid"
+
+                        : "Unpaid";
+
+
+            if (
+                currentPaymentFilter === "Paid" &&
+                actualPaymentStatus !== "Paid"
+            ) {
+
+                return false;
+
+            }
+
+
+            if (
+                currentPaymentFilter === "Unpaid" &&
+                actualPaymentStatus !== "Unpaid"
+            ) {
+
+                return false;
+
+            }
+
+
+            // =================================================
+            // SEARCH
+            // =================================================
 
             if (!searchText) {
 
@@ -358,7 +447,9 @@ function displayBookings() {
         });
 
 
-    // ================= NO RESULTS =================
+    // =========================================================
+    // NO RESULTS
+    // =========================================================
 
     if (filteredBookings.length === 0) {
 
@@ -370,7 +461,9 @@ function displayBookings() {
     }
 
 
-    // ================= CREATE CARDS =================
+    // =========================================================
+    // CREATE BOOKING CARDS
+    // =========================================================
 
     filteredBookings.forEach((booking) => {
 
@@ -378,14 +471,13 @@ function displayBookings() {
             document.createElement("div");
 
 
-        // IMPORTANT:
-        // Uses the new CSS design
-
         card.className =
             "booking-card";
 
 
-        // ================= STATUS CLASS =================
+        // =====================================================
+        // BOOKING STATUS
+        // =====================================================
 
         let statusClass =
             "status-pending";
@@ -406,7 +498,9 @@ function displayBookings() {
         }
 
 
-        // ================= ACTION BUTTONS =================
+        // =====================================================
+        // ACTION BUTTONS
+        // =====================================================
 
         let actionButtons = "";
 
@@ -421,8 +515,8 @@ function displayBookings() {
                         class="approve-btn"
                         onclick="approveBooking(
                             '${booking.id}',
-                            '${booking.customerEmail}',
-                            '${booking.eventName}'
+                            '${booking.customerEmail || ""}',
+                            '${booking.eventName || ""}'
                         )">
 
                         ✓ Approve
@@ -434,8 +528,8 @@ function displayBookings() {
                         class="reject-btn"
                         onclick="rejectBooking(
                             '${booking.id}',
-                            '${booking.customerEmail}',
-                            '${booking.eventName}'
+                            '${booking.customerEmail || ""}',
+                            '${booking.eventName || ""}'
                         )">
 
                         ✕ Reject
@@ -449,7 +543,9 @@ function displayBookings() {
         }
 
 
-        // ================= BOOKED AT =================
+        // =====================================================
+        // BOOKED DATE
+        // =====================================================
 
         let bookedAt =
             "Not available";
@@ -457,7 +553,7 @@ function displayBookings() {
 
         if (
             booking.createdAt &&
-            booking.createdAt.toDate
+            typeof booking.createdAt.toDate === "function"
         ) {
 
             bookedAt =
@@ -468,21 +564,131 @@ function displayBookings() {
         }
 
 
-        // ================= CARD =================
+        // =====================================================
+        // PAYMENT INFORMATION
+        // =====================================================
+
+        const bookingAmount =
+            Number(
+                booking.price ||
+                booking.amount ||
+                booking.totalAmount ||
+                0
+            );
+
+
+        // =====================================================
+        // SUPPORT OLD BOOKINGS
+        // =====================================================
+
+        const storedAmountPaid =
+            booking.amountPaid !== undefined
+
+                ? Number(
+                    booking.amountPaid || 0
+                )
+
+                : booking.paymentStatus === "Paid"
+
+                    ? bookingAmount
+
+                    : 0;
+
+
+        // =====================================================
+        // SAFE AMOUNT PAID
+        // =====================================================
+
+        const amountPaid =
+            Math.max(
+                0,
+                Math.min(
+                    storedAmountPaid,
+                    bookingAmount
+                )
+            );
+
+
+        // =====================================================
+        // AMOUNT DUE
+        // =====================================================
+
+        const amountDue =
+            Math.max(
+                0,
+                Number(
+                    (
+                        bookingAmount -
+                        amountPaid
+                    ).toFixed(2)
+                )
+            );
+
+
+        // =====================================================
+        // ACTUAL PAYMENT STATUS
+        // =====================================================
+
+        const actualPaymentStatus =
+            amountDue <= 0
+
+                ? "Paid"
+
+                : amountPaid > 0
+
+                    ? "Partially Paid"
+
+                    : "Unpaid";
+
+
+        // =====================================================
+        // PAYMENT STATUS CLASS
+        // =====================================================
+
+        const paymentStatusClass =
+            actualPaymentStatus === "Paid" ||
+            actualPaymentStatus === "Partially Paid"
+
+                ? "payment-paid"
+
+                : "payment-unpaid";
+
+
+        // =====================================================
+        // PAYMENT DATE
+        // =====================================================
+
+        let paymentDate =
+            "Not paid";
+
+
+        if (
+            amountPaid > 0 &&
+            booking.paidAt &&
+            typeof booking.paidAt.toDate === "function"
+        ) {
+
+            paymentDate =
+                booking.paidAt
+                    .toDate()
+                    .toLocaleString("en-IN");
+
+        }
+
+
+        // =====================================================
+        // CARD HTML
+        // =====================================================
 
         card.innerHTML = `
 
             <div class="booking-status ${statusClass}">
-
                 ${booking.status || "Pending"}
-
             </div>
 
 
             <h2>
-
                 ${booking.eventName || "Event"}
-
             </h2>
 
 
@@ -492,7 +698,6 @@ function displayBookings() {
                 <!-- COLUMN 1 -->
 
                 <div class="booking-column">
-
 
                     <div class="booking-info">
 
@@ -538,14 +743,12 @@ function displayBookings() {
 
                     </div>
 
-
                 </div>
 
 
                 <!-- COLUMN 2 -->
 
                 <div class="booking-column">
-
 
                     <div class="booking-info">
 
@@ -591,14 +794,12 @@ function displayBookings() {
 
                     </div>
 
-
                 </div>
 
 
                 <!-- COLUMN 3 -->
 
                 <div class="booking-column">
-
 
                     <div class="booking-info">
 
@@ -608,13 +809,183 @@ function displayBookings() {
                             Booked At:
                         </strong>
 
-
                         <br><br>
 
+                        <span>
+                            ${bookedAt}
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 PAYMENT DETAILS
+                 ================================================= -->
+
+            <div class="payment-details-box">
+
+                <div class="payment-details-title">
+                    Payment Details
+                </div>
+
+
+                <div class="payment-details-grid">
+
+
+                    <!-- TOTAL AMOUNT -->
+
+                    <div class="payment-info">
+
+                        <strong>
+                            Total Amount
+                        </strong>
+
+                        <span>
+                            ₹${bookingAmount.toLocaleString("en-IN")}
+                        </span>
+
+                    </div>
+
+
+                    <!-- PAYMENT STATUS -->
+
+                    <div class="payment-info">
+
+                        <strong>
+                            Payment Status
+                        </strong>
+
+                        <span
+                            class="payment-status ${paymentStatusClass}"
+                        >
+
+                            ${actualPaymentStatus}
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- AMOUNT PAID -->
+
+                    <div class="payment-info">
+
+                        <strong>
+                            Amount Paid
+                        </strong>
 
                         <span>
 
-                            ${bookedAt}
+                            ₹${amountPaid.toLocaleString("en-IN")}
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- AMOUNT DUE -->
+
+                    <div class="payment-info">
+
+                        <strong>
+                            Amount Due
+                        </strong>
+
+                        <span
+                            style="
+                                font-weight:800;
+                                ${
+                                    amountDue > 0
+                                        ? "color:#dc2626;"
+                                        : "color:#16a34a;"
+                                }
+                            "
+                        >
+
+                            ₹${amountDue.toLocaleString("en-IN")}
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- PAYMENT METHOD -->
+
+                    <div class="payment-info">
+
+                        <strong>
+                            Payment Method
+                        </strong>
+
+                        <span>
+
+                            ${
+                                amountPaid > 0
+                                    ? "Razorpay"
+                                    : "Not paid"
+                            }
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- PAYMENT DATE -->
+
+                    <div class="payment-info">
+
+                        <strong>
+                            Payment Date & Time
+                        </strong>
+
+                        <span>
+
+                            ${paymentDate}
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- PAYMENT ID -->
+
+                    <div class="payment-info">
+
+                        <strong>
+                            Razorpay Payment ID
+                        </strong>
+
+                        <span>
+
+                            ${
+                                booking.razorpayPaymentId ||
+                                "Not available"
+                            }
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- ORDER ID -->
+
+                    <div class="payment-info">
+
+                        <strong>
+                            Razorpay Order ID
+                        </strong>
+
+                        <span>
+
+                            ${
+                                booking.razorpayOrderId ||
+                                "Not available"
+                            }
 
                         </span>
 
@@ -623,6 +994,39 @@ function displayBookings() {
 
                 </div>
 
+
+                ${
+                    actualPaymentStatus === "Partially Paid"
+
+                        ? `
+
+                            <div style="
+                                margin-top:12px;
+                                padding:10px 12px;
+                                border-radius:8px;
+                                background:#fff7ed;
+                                color:#c2410c;
+                                font-size:13px;
+                                font-weight:700;
+                            ">
+
+                                <i class="fa-solid fa-circle-info"></i>
+
+                                Customer has paid
+                                ₹${amountPaid.toLocaleString("en-IN")}
+                                out of
+                                ₹${bookingAmount.toLocaleString("en-IN")}.
+
+                                Remaining:
+                                ₹${amountDue.toLocaleString("en-IN")}
+
+                            </div>
+
+                        `
+
+                        : ""
+
+                }
 
             </div>
 
@@ -637,14 +1041,16 @@ function displayBookings() {
     });
 
 
-    // Update active filter button
-
     updateActiveFilterButton();
+
+    updatePaymentFilterButton();
 
 }
 
 
-// ================= FILTER BOOKINGS =================
+// =========================================================
+// STATUS FILTER
+// =========================================================
 
 window.filterBookings =
     function (filter) {
@@ -652,13 +1058,64 @@ window.filterBookings =
         currentFilter =
             filter;
 
+        displayBookings();
+
+    };
+
+
+// =========================================================
+// PAYMENT FILTER
+// =========================================================
+
+window.filterPaymentBookings =
+    function (filter) {
+
+        currentPaymentFilter =
+            filter;
 
         displayBookings();
 
     };
 
 
-// ================= ACTIVE FILTER BUTTON =================
+// =========================================================
+// PAYMENT FILTER BUTTON ACTIVE STATE
+// =========================================================
+
+function updatePaymentFilterButton() {
+
+    const buttons =
+        document.querySelectorAll(
+            ".payment-filter-btn"
+        );
+
+
+    buttons.forEach((button) => {
+
+        button.classList.remove(
+            "active-payment-filter"
+        );
+
+
+        if (
+            button.textContent.trim() ===
+            currentPaymentFilter
+        ) {
+
+            button.classList.add(
+                "active-payment-filter"
+            );
+
+        }
+
+    });
+
+}
+
+
+// =========================================================
+// STATUS FILTER BUTTON ACTIVE STATE
+// =========================================================
 
 function updateActiveFilterButton() {
 
@@ -686,7 +1143,9 @@ function updateActiveFilterButton() {
                 .trim();
 
 
-        if (text === currentFilter) {
+        if (
+            text === currentFilter
+        ) {
 
             button.classList.add(
                 "active-filter"
@@ -699,7 +1158,9 @@ function updateActiveFilterButton() {
 }
 
 
-// ================= SEARCH =================
+// =========================================================
+// SEARCH
+// =========================================================
 
 if (searchInput) {
 
@@ -715,471 +1176,554 @@ if (searchInput) {
 }
 
 
-// ================= APPROVE =================
+// =========================================================
+// APPROVE BOOKING
+// =========================================================
 
-window.approveBooking = async function (
-    bookingId,
-    customerEmail,
-    eventName
-) {
+window.approveBooking =
+    async function (
+        bookingId,
+        customerEmail,
+        eventName
+    ) {
 
-    try {
+        try {
 
-        await updateDoc(
-            doc(
-                db,
-                "bookings",
-                bookingId
-            ),
-            {
-                status:
-                    "Approved"
-            }
-        );
-
-
-        // ================= SEND EMAIL =================
-
-        const response =
-            await fetch(
-                "https://eventsphere-dndh.onrender.com/booking-status",
+            await updateDoc(
+                doc(
+                    db,
+                    "bookings",
+                    bookingId
+                ),
                 {
-
-                    method:
-                        "POST",
-
-                    headers: {
-
-                        "Content-Type":
-                            "application/json"
-
-                    },
-
-                    body: JSON.stringify({
-
-                        email:
-                            customerEmail,
-
-                        eventName:
-                            eventName,
-
-                        status:
-                            "Approved"
-
-                    })
-
+                    status:
+                        "Approved"
                 }
             );
 
 
-        const data =
-            await response.json();
+            // =================================================
+            // SEND APPROVAL EMAIL
+            // =================================================
 
+            const response =
+                await fetch(
+                    "https://eventsphere-dndh.onrender.com/booking-status",
+                    {
 
-        if (!data.success) {
+                        method:
+                            "POST",
 
-            alert(
-                "Booking approved, but email could not be sent."
-            );
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
 
-            loadBookings();
+                        body:
+                            JSON.stringify({
 
-            return;
+                                email:
+                                    customerEmail,
 
-        }
+                                eventName:
+                                    eventName,
 
+                                status:
+                                    "Approved"
 
-        alert(
-            "Booking Approved! Email sent to customer."
-        );
+                            })
 
-
-        loadBookings();
-
-    }
-
-    catch (error) {
-
-        console.error(error);
-
-        alert(
-            error.message
-        );
-
-    }
-
-};
-
-
-// ================= REJECT =================
-
-window.rejectBooking = async function (
-    bookingId,
-    customerEmail,
-    eventName
-) {
-
-    const overlay =
-        document.createElement("div");
-
-    overlay.id = "adminRejectOverlay";
-
-    overlay.style.cssText = `
-        position:fixed;
-        inset:0;
-        background:rgba(15,23,42,0.55);
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        padding:20px;
-        z-index:9999;
-        backdrop-filter:blur(4px);
-    `;
-
-
-    overlay.innerHTML = `
-
-        <div style="
-            width:100%;
-            max-width:440px;
-            background:#ffffff;
-            border-radius:18px;
-            padding:28px;
-            box-sizing:border-box;
-            box-shadow:0 20px 50px rgba(15,23,42,0.22);
-        ">
-
-            <div style="
-                width:50px;
-                height:50px;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                border-radius:14px;
-                background:#fff1f2;
-                color:#dc2626;
-                font-size:21px;
-                margin-bottom:15px;
-            ">
-                ✕
-            </div>
-
-
-            <h2 style="
-                margin:0 0 7px;
-                color:#172554;
-                font-size:23px;
-            ">
-                Reject Booking
-            </h2>
-
-
-            <p style="
-                margin:0 0 20px;
-                color:#64748b;
-                font-size:14px;
-            ">
-                Are you sure you want to reject
-                <strong>${eventName}</strong>?
-            </p>
-
-
-            <label style="
-                display:block;
-                margin-bottom:7px;
-                color:#334155;
-                font-size:14px;
-                font-weight:700;
-            ">
-                Reason for rejection
-                <span style="color:#dc2626;">*</span>
-            </label>
-
-
-            <textarea
-                id="adminRejectReason"
-                placeholder="Please enter the reason for rejecting this booking..."
-                style="
-                    width:100%;
-                    min-height:100px;
-                    padding:12px 13px;
-                    box-sizing:border-box;
-                    border:1px solid #d5dce8;
-                    border-radius:10px;
-                    resize:vertical;
-                    outline:none;
-                    font-family:inherit;
-                    font-size:14px;
-                    color:#172554;
-                    background:#fbfcff;
-                "
-            ></textarea>
-
-
-            <div style="
-                display:flex;
-                justify-content:flex-end;
-                gap:10px;
-                margin-top:20px;
-            ">
-
-                <button
-                    type="button"
-                    id="closeAdminReject"
-                    style="
-                        height:40px;
-                        padding:0 17px;
-                        border:none;
-                        border-radius:8px;
-                        background:#f1f5f9;
-                        color:#475569;
-                        font-size:14px;
-                        font-weight:700;
-                        cursor:pointer;
-                    "
-                >
-                    Keep Booking
-                </button>
-
-
-                <button
-                    type="button"
-                    id="confirmAdminReject"
-                    style="
-                        height:40px;
-                        padding:0 17px;
-                        border:none;
-                        border-radius:8px;
-                        background:#dc2626;
-                        color:#ffffff;
-                        font-size:14px;
-                        font-weight:700;
-                        cursor:pointer;
-                    "
-                >
-                    ✕ Reject Booking
-                </button>
-
-            </div>
-
-        </div>
-
-    `;
-
-
-    document.body.appendChild(overlay);
-
-
-    const reasonInput =
-        document.getElementById(
-            "adminRejectReason"
-        );
-
-
-    const closeButton =
-        document.getElementById(
-            "closeAdminReject"
-        );
-
-
-    const confirmButton =
-        document.getElementById(
-            "confirmAdminReject"
-        );
-
-
-    // ================= CLOSE =================
-
-    closeButton.addEventListener(
-        "click",
-        () => {
-
-            overlay.remove();
-
-        }
-    );
-
-
-    // ================= CLICK OUTSIDE =================
-
-    overlay.addEventListener(
-        "click",
-        (event) => {
-
-            if (
-                event.target === overlay
-            ) {
-
-                overlay.remove();
-
-            }
-
-        }
-    );
-
-
-    // ================= CONFIRM =================
-
-    confirmButton.addEventListener(
-        "click",
-        async () => {
-
-            const reason =
-                reasonInput.value.trim();
-
-
-            if (!reason) {
-
-                alert(
-                    "Please enter a reason for rejection."
+                    }
                 );
 
-                reasonInput.focus();
+
+            const data =
+                await response.json();
+
+
+            if (!data.success) {
+
+                alert(
+                    "Booking approved, but email could not be sent."
+                );
+
+                loadBookings();
 
                 return;
 
             }
 
 
-            try {
-
-                confirmButton.disabled = true;
-
-                confirmButton.innerHTML =
-                    "Rejecting...";
+            alert(
+                "Booking Approved! Email sent to customer."
+            );
 
 
-                // ================= FIRESTORE =================
+            loadBookings();
 
-                await updateDoc(
-
-                    doc(
-                        db,
-                        "bookings",
-                        bookingId
-                    ),
-
-                    {
-
-                        status:
-                            "Rejected",
-
-                        cancelledBy:
-                            "Admin",
-
-                        cancellationReason:
-                            reason,
-
-                        cancelledAt:
-                            new Date()
-
-                    }
-
-                );
+        }
 
 
-                // ================= EMAIL =================
+        catch (error) {
 
-                const response =
-                    await fetch(
-                        "https://eventsphere-dndh.onrender.com/booking-status",
-                        {
-
-                            method: "POST",
-
-                            headers: {
-
-                                "Content-Type":
-                                    "application/json"
-
-                            },
-
-                            body:
-                                JSON.stringify({
-
-                                    email:
-                                        customerEmail,
-
-                                    eventName:
-                                        eventName,
-
-                                    status:
-                                        "Rejected",
-
-                                    reason:
-                                        reason
-
-                                })
-
-                        }
-                    );
+            console.error(
+                "Approve Booking Error:",
+                error
+            );
 
 
-                const data =
-                    await response.json();
+            alert(
+                error.message ||
+                "Unable to approve booking."
+            );
 
+        }
+
+    };
+
+
+// =========================================================
+// REJECT BOOKING
+// =========================================================
+
+window.rejectBooking =
+    async function (
+        bookingId,
+        customerEmail,
+        eventName
+    ) {
+
+
+        // =====================================================
+        // CREATE OVERLAY
+        // =====================================================
+
+        const overlay =
+            document.createElement("div");
+
+
+        overlay.id =
+            "adminRejectOverlay";
+
+
+        overlay.style.cssText = `
+
+            position:fixed;
+            inset:0;
+            background:rgba(15,23,42,0.55);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:20px;
+            z-index:9999;
+            backdrop-filter:blur(4px);
+
+        `;
+
+
+        overlay.innerHTML = `
+
+            <div style="
+
+                width:100%;
+                max-width:440px;
+                background:#ffffff;
+                border-radius:18px;
+                padding:28px;
+                box-sizing:border-box;
+                box-shadow:0 20px 50px rgba(15,23,42,0.22);
+
+            ">
+
+
+                <div style="
+
+                    width:50px;
+                    height:50px;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    border-radius:14px;
+                    background:#fff1f2;
+                    color:#dc2626;
+                    font-size:21px;
+                    margin-bottom:15px;
+
+                ">
+
+                    ✕
+
+                </div>
+
+
+                <h2 style="
+
+                    margin:0 0 7px;
+                    color:#172554;
+                    font-size:23px;
+
+                ">
+
+                    Reject Booking
+
+                </h2>
+
+
+                <p style="
+
+                    margin:0 0 20px;
+                    color:#64748b;
+                    font-size:14px;
+
+                ">
+
+                    Are you sure you want to reject
+                    <strong>${eventName}</strong>?
+
+                </p>
+
+
+                <label style="
+
+                    display:block;
+                    margin-bottom:7px;
+                    color:#334155;
+                    font-size:14px;
+                    font-weight:700;
+
+                ">
+
+                    Reason for rejection
+
+                    <span style="color:#dc2626;">
+                        *
+                    </span>
+
+                </label>
+
+
+                <textarea
+                    id="adminRejectReason"
+                    placeholder="Please enter the reason for rejecting this booking..."
+                    style="
+
+                        width:100%;
+                        min-height:100px;
+                        padding:12px 13px;
+                        box-sizing:border-box;
+                        border:1px solid #d5dce8;
+                        border-radius:10px;
+                        resize:vertical;
+                        outline:none;
+                        font-family:inherit;
+                        font-size:14px;
+                        color:#172554;
+                        background:#fbfcff;
+
+                    "
+                ></textarea>
+
+
+                <div style="
+
+                    display:flex;
+                    justify-content:flex-end;
+                    gap:10px;
+                    margin-top:20px;
+
+                ">
+
+
+                    <button
+                        type="button"
+                        id="closeAdminReject"
+                        style="
+
+                            height:40px;
+                            padding:0 17px;
+                            border:none;
+                            border-radius:8px;
+                            background:#f1f5f9;
+                            color:#475569;
+                            font-size:14px;
+                            font-weight:700;
+                            cursor:pointer;
+
+                        "
+                    >
+
+                        Keep Booking
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="confirmAdminReject"
+                        style="
+
+                            height:40px;
+                            padding:0 17px;
+                            border:none;
+                            border-radius:8px;
+                            background:#dc2626;
+                            color:#ffffff;
+                            font-size:14px;
+                            font-weight:700;
+                            cursor:pointer;
+
+                        "
+                    >
+
+                        ✕ Reject Booking
+
+                    </button>
+
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        document.body.appendChild(
+            overlay
+        );
+
+
+        // =====================================================
+        // GET ELEMENTS
+        // =====================================================
+
+        const reasonInput =
+            document.getElementById(
+                "adminRejectReason"
+            );
+
+
+        const closeButton =
+            document.getElementById(
+                "closeAdminReject"
+            );
+
+
+        const confirmButton =
+            document.getElementById(
+                "confirmAdminReject"
+            );
+
+
+        // =====================================================
+        // CLOSE BUTTON
+        // =====================================================
+
+        closeButton.addEventListener(
+            "click",
+            () => {
 
                 overlay.remove();
 
+            }
+        );
 
-                if (!data.success) {
+
+        // =====================================================
+        // CLICK OUTSIDE
+        // =====================================================
+
+        overlay.addEventListener(
+            "click",
+            (event) => {
+
+                if (
+                    event.target === overlay
+                ) {
+
+                    overlay.remove();
+
+                }
+
+            }
+        );
+
+
+        // =====================================================
+        // CONFIRM REJECTION
+        // =====================================================
+
+        confirmButton.addEventListener(
+            "click",
+            async () => {
+
+
+                const reason =
+                    reasonInput.value.trim();
+
+
+                if (!reason) {
 
                     alert(
-                        "Booking rejected, but email could not be sent."
+                        "Please enter a reason for rejection."
                     );
 
-                    loadBookings();
+                    reasonInput.focus();
 
                     return;
 
                 }
 
 
-                alert(
-                    "Booking Rejected! Email sent to customer."
-                );
+                try {
+
+                    confirmButton.disabled =
+                        true;
 
 
-                loadBookings();
+                    confirmButton.innerHTML =
+                        "Rejecting...";
+
+
+                    // =========================================
+                    // UPDATE FIRESTORE
+                    // =========================================
+
+                    await updateDoc(
+                        doc(
+                            db,
+                            "bookings",
+                            bookingId
+                        ),
+                        {
+
+                            status:
+                                "Rejected",
+
+                            cancelledBy:
+                                "Admin",
+
+                            cancellationReason:
+                                reason,
+
+                            cancelledAt:
+                                new Date()
+
+                        }
+                    );
+
+
+                    // =========================================
+                    // SEND REJECTION EMAIL
+                    // =========================================
+
+                    const response =
+                        await fetch(
+                            "https://eventsphere-dndh.onrender.com/booking-status",
+                            {
+
+                                method:
+                                    "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify({
+
+                                        email:
+                                            customerEmail,
+
+                                        eventName:
+                                            eventName,
+
+                                        status:
+                                            "Rejected",
+
+                                        reason:
+                                            reason
+
+                                    })
+
+                            }
+                        );
+
+
+                    const data =
+                        await response.json();
+
+
+                    overlay.remove();
+
+
+                    if (!data.success) {
+
+                        alert(
+                            "Booking rejected, but email could not be sent."
+                        );
+
+                        loadBookings();
+
+                        return;
+
+                    }
+
+
+                    alert(
+                        "Booking Rejected! Email sent to customer."
+                    );
+
+
+                    loadBookings();
+
+                }
+
+
+                catch (error) {
+
+                    console.error(
+                        "Reject Booking Error:",
+                        error
+                    );
+
+
+                    confirmButton.disabled =
+                        false;
+
+
+                    confirmButton.innerHTML =
+                        "✕ Reject Booking";
+
+
+                    alert(
+                        error.message ||
+                        "Unable to reject booking."
+                    );
+
+                }
 
             }
+        );
 
-            catch (error) {
+    };
 
-                console.error(
-                    "Reject Booking Error:",
-                    error
-                );
-
-
-                confirmButton.disabled =
-                    false;
-
-
-                confirmButton.innerHTML =
-                    "✕ Reject Booking";
-
-
-                alert(
-                    error.message ||
-                    "Unable to reject booking."
-                );
-
-            }
-
-        }
-    );
-
-};
-// ================= FIRST LOAD =================
+    // =========================================================
+// FIRST LOAD
+// =========================================================
 
 loadBookings();
 
 
-// ================= CHECK EVERY 30 SECONDS =================
+// =========================================================
+// AUTO REFRESH EVERY 30 SECONDS
+// =========================================================
 
-setInterval(() => {
+setInterval(
+    () => {
 
-    loadBookings();
+        loadBookings();
 
-}, 30000);
+    },
+    30000
+);
