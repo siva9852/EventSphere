@@ -213,27 +213,47 @@ async function loadMyBookings() {
             }
 
             else if (
-                actualPaymentStatus ===
-                "Partially Paid"
-            ) {
+    actualPaymentStatus ===
+    "Partially Paid"
+) {
 
-                paidLabel = `
-                    <span
-                        class="booking-paid-label"
-                        style="
-                            color:#b45309;
-                            background:#fef3c7;
-                        ">
+    paidLabel = `
+        <span
+            class="booking-paid-label"
+            style="
+                display:inline-flex;
+                align-items:center;
+                gap:7px;
+                padding:7px 12px;
+                border-radius:20px;
+                background:#fff7ed;
+                border:1px solid #fed7aa;
+                color:#c2410c;
+                font-size:13px;
+                font-weight:700;
+                white-space:nowrap;
+                line-height:1;
+            ">
 
-                        <i class="fa-solid fa-clock"></i>
+            <i
+                class="fa-solid fa-circle-half-stroke"
+                style="font-size:12px;">
+            </i>
 
-                        Partially Paid —
-                        Due ₹${amountDue.toLocaleString("en-IN")}
+            <span>Partially Paid</span>
 
-                    </span>
-                `;
+            <span
+                style="
+                    color:#9a3412;
+                    font-weight:600;
+                ">
+                • Due ₹${amountDue.toLocaleString("en-IN")}
+            </span>
 
-            }
+        </span>
+    `;
+
+}
 
 
             // =================================================
