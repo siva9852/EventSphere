@@ -821,7 +821,7 @@ app.post(
             const message =
 `Hello Admin,
 
-A customer has cancelled a booking.
+A customer has cancelled their EventSphere booking.
 
 Event:
 ${eventName}
@@ -829,10 +829,10 @@ ${eventName}
 Customer Email:
 ${customerEmail}
 
-Reason for cancellation:
+Cancellation Reason:
 ${reason}
 
-Please login to EventSphere to view the booking details.
+Please login to the EventSphere Admin Panel to review this cancellation.
 
 Regards,
 EventSphere Team`;
@@ -894,7 +894,7 @@ EventSphere Team`;
 
 
             console.log(
-                `Customer cancellation email sent to ${adminEmail}`
+                "Customer cancellation email sent to admin."
             );
 
 
@@ -904,7 +904,7 @@ EventSphere Team`;
                     true,
 
                 message:
-                    "Customer cancellation email sent successfully!"
+                    "Cancellation notification sent successfully."
 
             });
 
@@ -931,7 +931,7 @@ EventSphere Team`;
                         false,
 
                     message:
-                        "Failed to send customer cancellation email."
+                        "Failed to send cancellation notification."
 
                 });
 
@@ -942,21 +942,210 @@ EventSphere Team`;
 
 
 // =========================================================
-// DELETE CUSTOMER
+// ADMIN BOOKING NOTIFICATION
 // =========================================================
 
-app.delete(
-    "/delete-customer",
+app.post(
+    "/admin-booking-notification",
     async (req, res) => {
 
         try {
 
             const {
-                email
+                eventName,
+                customerName,
+                customerEmail,
+                eventDate,
+                guests,
+                location
             } = req.body;
 
 
-            if (!email) {
+            if (
+                !eventName ||
+                !customerEmail
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Event name and customer email are required."
+
+                    });
+
+            }
+
+
+            const adminEmail =
+                "eventsphere.official2026@gmail.com";
+
+
+            const subject =
+                "New EventSphere Booking Received";
+
+
+            const message =
+`Hello Admin,
+
+A new booking has been received on EventSphere.
+
+================================
+        NEW BOOKING
+================================
+
+Event:
+${eventName}
+
+Customer Name:
+${customerName || "Not specified"}
+
+Customer Email:
+${customerEmail}
+
+Event Date:
+${eventDate || "Not specified"}
+
+Guests:
+${guests || "Not specified"}
+
+Location:
+${location || "Not specified"}
+
+================================
+
+Please login to the EventSphere Admin Panel to review and process this booking.
+
+Regards,
+EventSphere Team`;
+
+
+            await axios.post(
+
+                "https://api.brevo.com/v3/smtp/email",
+
+                {
+
+                    sender: {
+
+                        name:
+                            "EventSphere",
+
+                        email:
+                            "eventsphere.official2026@gmail.com"
+
+                    },
+
+                    to: [
+
+                        {
+
+                            email:
+                                adminEmail
+
+                        }
+
+                    ],
+
+                    subject:
+                        subject,
+
+                    textContent:
+                        message
+
+                },
+
+                {
+
+                    headers: {
+
+                        accept:
+                            "application/json",
+
+                        "api-key":
+                            process.env.BREVO_API_KEY,
+
+                        "content-type":
+                            "application/json"
+
+                    }
+
+                }
+
+            );
+
+
+            console.log(
+                "New booking notification sent to admin."
+            );
+
+
+            res.json({
+
+                success:
+                    true,
+
+                message:
+                    "Admin notification sent successfully."
+
+            });
+
+        }
+
+
+        catch (error) {
+
+            console.error(
+
+                "Admin Booking Notification Error:",
+
+                error.response?.data ||
+                error.message
+
+            );
+
+
+            res
+                .status(500)
+                .json({
+
+                    success:
+                        false,
+
+                    message:
+                        "Failed to send admin notification."
+
+                });
+
+        }
+
+    }
+);
+
+
+// =========================================================
+// CUSTOMER REGISTRATION NOTIFICATION
+// =========================================================
+
+app.post(
+    "/customer-registration-notification",
+    async (req, res) => {
+
+        try {
+
+            const {
+                customerName,
+                customerEmail
+            } = req.body;
+
+
+            if (
+                !customerEmail
+            ) {
 
                 return res
                     .status(400)
@@ -973,7 +1162,154 @@ app.delete(
             }
 
 
-            if (!firebaseAuth) {
+            const adminEmail =
+                "eventsphere.official2026@gmail.com";
+
+
+            const subject =
+                "New EventSphere Customer Registration";
+
+
+            const message =
+`Hello Admin,
+
+A new customer has registered on EventSphere.
+
+================================
+       CUSTOMER REGISTRATION
+================================
+
+Customer Name:
+${customerName || "Not specified"}
+
+Customer Email:
+${customerEmail}
+
+================================
+
+The customer can now login to EventSphere and use the booking system.
+
+Regards,
+EventSphere Team`;
+
+
+            await axios.post(
+
+                "https://api.brevo.com/v3/smtp/email",
+
+                {
+
+                    sender: {
+
+                        name:
+                            "EventSphere",
+
+                        email:
+                            "eventsphere.official2026@gmail.com"
+
+                    },
+
+                    to: [
+
+                        {
+
+                            email:
+                                adminEmail
+
+                        }
+
+                    ],
+
+                    subject:
+                        subject,
+
+                    textContent:
+                        message
+
+                },
+
+                {
+
+                    headers: {
+
+                        accept:
+                            "application/json",
+
+                        "api-key":
+                            process.env.BREVO_API_KEY,
+
+                        "content-type":
+                            "application/json"
+
+                    }
+
+                }
+
+            );
+
+
+            console.log(
+                "Customer registration notification sent to admin."
+            );
+
+
+            res.json({
+
+                success:
+                    true,
+
+                message:
+                    "Registration notification sent successfully."
+
+            });
+
+        }
+
+
+        catch (error) {
+
+            console.error(
+
+                "Customer Registration Notification Error:",
+
+                error.response?.data ||
+                error.message
+
+            );
+
+
+            res
+                .status(500)
+                .json({
+
+                    success:
+                        false,
+
+                    message:
+                        "Failed to send registration notification."
+
+                });
+
+        }
+
+    }
+);
+
+
+// =========================================================
+// ADMIN DELETE CUSTOMER
+// =========================================================
+
+app.delete(
+    "/delete-customer/:uid",
+    async (req, res) => {
+
+        try {
+
+            if (
+                !firebaseAuth ||
+                !firebaseDb
+            ) {
 
                 return res
                     .status(500)
@@ -990,50 +1326,191 @@ app.delete(
             }
 
 
+            const uid =
+                req.params.uid;
+
+
+            if (!uid) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Customer UID is required."
+
+                    });
+
+            }
+
+
             // =================================================
-            // DELETE AUTH ACCOUNT
+            // AUTHENTICATION
+            // =================================================
+
+            const authHeader =
+                req.headers.authorization ||
+                "";
+
+
+            if (
+                !authHeader.startsWith(
+                    "Bearer "
+                )
+            ) {
+
+                return res
+                    .status(401)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Authentication required."
+
+                    });
+
+            }
+
+
+            const idToken =
+                authHeader.substring(
+                    7
+                );
+
+
+            const decodedToken =
+                await firebaseAuth
+                    .verifyIdToken(
+                        idToken
+                    );
+
+
+            // =================================================
+            // ADMIN CHECK
+            // =================================================
+
+            const adminEmail =
+                decodedToken.email ||
+                "";
+
+
+            if (
+                adminEmail.toLowerCase() !==
+                "eventsphere.official2026@gmail.com"
+            ) {
+
+                return res
+                    .status(403)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Admin access required."
+
+                    });
+
+            }
+
+
+            // =================================================
+            // DELETE FIREBASE AUTH USER
+            // =================================================
+
+            await firebaseAuth
+                .deleteUser(
+                    uid
+                );
+
+
+            // =================================================
+            // DELETE CUSTOMER DOCUMENT
             // =================================================
 
             try {
 
-                const userRecord =
-                    await firebaseAuth
-                        .getUserByEmail(
-                            email
-                        );
+                await firebaseDb
+                    .collection(
+                        "customers"
+                    )
+                    .doc(
+                        uid
+                    )
+                    .delete();
 
+            }
 
-                await firebaseAuth
-                    .deleteUser(
-                        userRecord.uid
-                    );
+            catch (
+                customerDeleteError
+            ) {
 
-
-                console.log(
-                    `Customer deleted from Authentication: ${email}`
+                console.error(
+                    "Customer document delete error:",
+                    customerDeleteError
                 );
 
             }
 
 
-            catch (authError) {
+            // =================================================
+            // DELETE CUSTOMER BOOKINGS
+            // =================================================
 
-                if (
-                    authError.code ===
-                    "auth/user-not-found"
-                ) {
+            try {
 
-                    console.log(
-                        `No Authentication account found for ${email}.`
+                const bookingsSnapshot =
+                    await firebaseDb
+                        .collection(
+                            "bookings"
+                        )
+                        .where(
+                            "customerId",
+                            "==",
+                            uid
+                        )
+                        .get();
+
+
+                const batch =
+                    firebaseDb.batch();
+
+
+                bookingsSnapshot
+                    .forEach(
+                        bookingDoc => {
+
+                            batch.delete(
+                                bookingDoc.ref
+                            );
+
+                        }
                     );
 
+
+                if (
+                    !bookingsSnapshot.empty
+                ) {
+
+                    await batch.commit();
+
                 }
 
-                else {
+            }
 
-                    throw authError;
+            catch (
+                bookingDeleteError
+            ) {
 
-                }
+                console.error(
+                    "Booking delete error:",
+                    bookingDeleteError
+                );
 
             }
 
@@ -1044,7 +1521,7 @@ app.delete(
                     true,
 
                 message:
-                    "Customer deleted successfully!"
+                    "Customer deleted successfully."
 
             });
 
@@ -1054,11 +1531,8 @@ app.delete(
         catch (error) {
 
             console.error(
-
                 "Delete Customer Error:",
-
                 error.message
-
             );
 
 
@@ -1103,11 +1577,13 @@ app.post(
                             "Razorpay is not configured."
 
                     });
-
             }
 
 
-            if (!firebaseAuth || !firebaseDb) {
+            if (
+                !firebaseAuth ||
+                !firebaseDb
+            ) {
 
                 return res
                     .status(500)
@@ -1120,17 +1596,69 @@ app.post(
                             "Firebase Admin is not initialized."
 
                     });
-
             }
 
 
             const {
-                bookingId
+                bookingId,
+                paymentAmount
             } = req.body;
 
 
+            if (!bookingId) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Booking ID is required."
+
+                    });
+            }
+
+
+            // =================================================
+            // CUSTOMER PAYMENT AMOUNT
+            // =================================================
+
+            const requestedAmount =
+                Number(
+                    paymentAmount
+                );
+
+
+            if (
+                !Number.isFinite(
+                    requestedAmount
+                ) ||
+                requestedAmount <= 0
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Please enter a valid payment amount."
+
+                    });
+            }
+
+
+            // =================================================
+            // AUTHENTICATION
+            // =================================================
+
             const authHeader =
-                req.headers.authorization || "";
+                req.headers.authorization ||
+                "";
 
 
             if (
@@ -1150,7 +1678,6 @@ app.post(
                             "Authentication required."
 
                     });
-
             }
 
 
@@ -1167,10 +1694,18 @@ app.post(
                     );
 
 
+            // =================================================
+            // GET BOOKING
+            // =================================================
+
             const bookingRef =
                 firebaseDb
-                    .collection("bookings")
-                    .doc(bookingId);
+                    .collection(
+                        "bookings"
+                    )
+                    .doc(
+                        bookingId
+                    );
 
 
             const bookingSnapshot =
@@ -1192,7 +1727,6 @@ app.post(
                             "Booking not found."
 
                     });
-
             }
 
 
@@ -1220,7 +1754,6 @@ app.post(
                             "You cannot pay for this booking."
 
                     });
-
             }
 
 
@@ -1244,43 +1777,25 @@ app.post(
                             "Payment is available only for approved bookings."
 
                     });
-
             }
 
 
             // =================================================
-            // ALREADY PAID CHECK
+            // TOTAL BOOKING AMOUNT
             // =================================================
 
-            if (
-                booking.paymentStatus ===
-                "Paid"
-            ) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        success:
-                            false,
-
-                        message:
-                            "This booking has already been paid."
-
-                    });
-
-            }
-
-
-            const amount =
+            const totalAmount =
                 Number(
-                    booking.price
+                    booking.price ||
+                    0
                 );
 
 
             if (
-                !Number.isFinite(amount) ||
-                amount <= 0
+                !Number.isFinite(
+                    totalAmount
+                ) ||
+                totalAmount <= 0
             ) {
 
                 return res
@@ -1294,8 +1809,113 @@ app.post(
                             "Invalid booking amount."
 
                     });
-
             }
+
+
+            // =================================================
+            // EXISTING PAID AMOUNT
+            // =================================================
+
+            // Supports old bookings that only have
+            // paymentStatus = "Paid".
+
+            const storedAmountPaid =
+                booking.amountPaid !== undefined
+
+                    ? Number(
+                        booking.amountPaid ||
+                        0
+                    )
+
+                    : booking.paymentStatus ===
+                        "Paid"
+
+                        ? totalAmount
+
+                        : 0;
+
+
+            const amountPaid =
+                Math.max(
+
+                    0,
+
+                    Math.min(
+                        storedAmountPaid,
+                        totalAmount
+                    )
+
+                );
+
+
+            // =================================================
+            // CURRENT DUE
+            // =================================================
+
+            const amountDue =
+                Math.max(
+
+                    0,
+
+                    Number(
+                        (
+                            totalAmount -
+                            amountPaid
+                        ).toFixed(2)
+                    )
+
+                );
+
+
+            // =================================================
+            // ALREADY FULLY PAID
+            // =================================================
+
+            if (
+                amountDue <= 0
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "This booking has already been fully paid."
+
+                    });
+            }
+
+
+            // =================================================
+            // PAYMENT AMOUNT LIMIT
+            // =================================================
+
+            if (
+                requestedAmount >
+                amountDue + 0.01
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            `Payment amount cannot exceed the remaining due amount of ₹${amountDue.toLocaleString("en-IN")}.`
+
+                    });
+            }
+
+
+            const finalPaymentAmount =
+                Number(
+                    requestedAmount.toFixed(2)
+                );
 
 
             // =================================================
@@ -1305,16 +1925,21 @@ app.post(
             const order =
                 await razorpay.orders.create({
 
+                    // IMPORTANT:
+                    // Only the selected installment
+                    // is sent to Razorpay.
+
                     amount:
                         Math.round(
-                            amount * 100
+                            finalPaymentAmount *
+                            100
                         ),
 
                     currency:
                         "INR",
 
                     receipt:
-                        `ES_${bookingId.substring(0, 20)}`,
+                        `ES_${bookingId.substring(0, 20)}_${Date.now()}`,
 
                     notes: {
 
@@ -1322,15 +1947,34 @@ app.post(
                             bookingId,
 
                         customerId:
-                            decodedToken.uid
+                            decodedToken.uid,
 
+                        paymentAmount:
+                            String(
+                                finalPaymentAmount
+                            ),
+
+                        totalAmount:
+                            String(
+                                totalAmount
+                            ),
+
+                        amountPaid:
+                            String(
+                                amountPaid
+                            ),
+
+                        amountDue:
+                            String(
+                                amountDue
+                            )
                     }
 
                 });
 
 
             // =================================================
-            // SAVE ORDER ID
+            // SAVE PAYMENT ORDER
             // =================================================
 
             await bookingRef.update({
@@ -1338,11 +1982,18 @@ app.post(
                 razorpayOrderId:
                     order.id,
 
+                pendingPaymentAmount:
+                    finalPaymentAmount,
+
                 paymentStatus:
                     "Payment Initiated"
 
             });
 
+
+            // =================================================
+            // SEND ORDER DATA
+            // =================================================
 
             res.json({
 
@@ -1362,7 +2013,19 @@ app.post(
                     order.currency,
 
                 bookingId:
-                    bookingId
+                    bookingId,
+
+                paymentAmount:
+                    finalPaymentAmount,
+
+                totalAmount:
+                    totalAmount,
+
+                amountPaid:
+                    amountPaid,
+
+                amountDue:
+                    amountDue
 
             });
 
@@ -1396,7 +2059,6 @@ app.post(
 
     }
 );
-
 // =========================================================
 // RAZORPAY - VERIFY PAYMENT + SEND RECEIPT EMAIL
 // =========================================================
@@ -1407,16 +2069,21 @@ app.post(
 
         try {
 
-            if (!firebaseAuth || !firebaseDb) {
+            if (
+                !firebaseAuth ||
+                !firebaseDb
+            ) {
 
                 return res
                     .status(500)
                     .json({
+
                         success:
                             false,
 
                         message:
                             "Firebase Admin is not initialized."
+
                     });
 
             }
@@ -1444,11 +2111,13 @@ app.post(
                 return res
                     .status(400)
                     .json({
+
                         success:
                             false,
 
                         message:
                             "Payment verification details are incomplete."
+
                     });
 
             }
@@ -1459,7 +2128,8 @@ app.post(
             // =================================================
 
             const authHeader =
-                req.headers.authorization || "";
+                req.headers.authorization ||
+                "";
 
 
             if (
@@ -1471,11 +2141,13 @@ app.post(
                 return res
                     .status(401)
                     .json({
+
                         success:
                             false,
 
                         message:
                             "Authentication required."
+
                     });
 
             }
@@ -1486,9 +2158,10 @@ app.post(
 
 
             const decodedToken =
-                await firebaseAuth.verifyIdToken(
-                    idToken
-                );
+                await firebaseAuth
+                    .verifyIdToken(
+                        idToken
+                    );
 
 
             // =================================================
@@ -1497,8 +2170,12 @@ app.post(
 
             const bookingRef =
                 firebaseDb
-                    .collection("bookings")
-                    .doc(bookingId);
+                    .collection(
+                        "bookings"
+                    )
+                    .doc(
+                        bookingId
+                    );
 
 
             const bookingSnapshot =
@@ -1512,11 +2189,13 @@ app.post(
                 return res
                     .status(404)
                     .json({
+
                         success:
                             false,
 
                         message:
                             "Booking not found."
+
                     });
 
             }
@@ -1538,11 +2217,13 @@ app.post(
                 return res
                     .status(403)
                     .json({
+
                         success:
                             false,
 
                         message:
                             "You cannot verify this payment."
+
                     });
 
             }
@@ -1560,11 +2241,13 @@ app.post(
                 return res
                     .status(400)
                     .json({
+
                         success:
                             false,
 
                         message:
                             "Payment order does not match the booking."
+
                     });
 
             }
@@ -1596,11 +2279,13 @@ app.post(
                 return res
                     .status(400)
                     .json({
+
                         success:
                             false,
 
                         message:
                             "Payment verification failed."
+
                     });
 
             }
@@ -1625,24 +2310,265 @@ app.post(
                 return res
                     .status(400)
                     .json({
+
                         success:
                             false,
 
                         message:
                             "Payment verification failed."
+
                     });
 
             }
 
 
             // =================================================
-            // PAYMENT SUCCESS
+            // TOTAL BOOKING AMOUNT
+            // =================================================
+
+            const totalAmount =
+                Number(
+                    booking.price ||
+                    0
+                );
+
+
+            if (
+                !Number.isFinite(
+                    totalAmount
+                ) ||
+                totalAmount <= 0
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Invalid booking amount."
+
+                    });
+
+            }
+
+
+            // =================================================
+            // PREVIOUS AMOUNT PAID
+            // =================================================
+
+            const storedAmountPaid =
+                booking.amountPaid !== undefined
+
+                    ? Number(
+                        booking.amountPaid ||
+                        0
+                    )
+
+                    : booking.paymentStatus ===
+                        "Paid"
+
+                        ? totalAmount
+
+                        : 0;
+
+
+            const previousAmountPaid =
+                Math.max(
+
+                    0,
+
+                    Math.min(
+                        storedAmountPaid,
+                        totalAmount
+                    )
+
+                );
+
+
+            // =================================================
+            // CURRENT PAYMENT AMOUNT
+            // =================================================
+
+            const paymentAmount =
+                Number(
+                    booking.pendingPaymentAmount ||
+                    0
+                );
+
+
+            if (
+                !Number.isFinite(
+                    paymentAmount
+                ) ||
+                paymentAmount <= 0
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Payment amount could not be determined."
+
+                    });
+
+            }
+
+
+            // =================================================
+            // PREVENT PAYMENT FROM EXCEEDING DUE
+            // =================================================
+
+            const previousAmountDue =
+                Math.max(
+
+                    0,
+
+                    Number(
+                        (
+                            totalAmount -
+                            previousAmountPaid
+                        ).toFixed(2)
+                    )
+
+                );
+
+
+            if (
+                paymentAmount >
+                previousAmountDue + 0.01
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success:
+                            false,
+
+                        message:
+                            "Payment amount exceeds the remaining amount due."
+
+                    });
+
+            }
+
+
+            // =================================================
+            // CALCULATE CUMULATIVE PAYMENT
+            // =================================================
+
+            const newAmountPaid =
+                Math.min(
+
+                    totalAmount,
+
+                    Number(
+                        (
+                            previousAmountPaid +
+                            paymentAmount
+                        ).toFixed(2)
+                    )
+
+                );
+
+
+            const newAmountDue =
+                Math.max(
+
+                    0,
+
+                    Number(
+                        (
+                            totalAmount -
+                            newAmountPaid
+                        ).toFixed(2)
+                    )
+
+                );
+
+
+            // =================================================
+            // PAYMENT STATUS
+            // =================================================
+
+            const newPaymentStatus =
+                newAmountDue <= 0
+
+                    ? "Paid"
+
+                    : "Partially Paid";
+
+
+            // =================================================
+            // SAVE PAYMENT HISTORY
+            // =================================================
+
+            const paymentHistoryRef =
+                bookingRef
+                    .collection(
+                        "payments"
+                    )
+                    .doc(
+                        razorpay_payment_id
+                    );
+
+
+            await paymentHistoryRef.set({
+
+                amount:
+                    paymentAmount,
+
+                totalAmount:
+                    totalAmount,
+
+                amountPaidBefore:
+                    previousAmountPaid,
+
+                amountPaidAfter:
+                    newAmountPaid,
+
+                amountDue:
+                    newAmountDue,
+
+                paymentStatus:
+                    newPaymentStatus,
+
+                razorpayPaymentId:
+                    razorpay_payment_id,
+
+                razorpayOrderId:
+                    razorpay_order_id,
+
+                razorpaySignature:
+                    razorpay_signature,
+
+                paidAt:
+                    FieldValue.serverTimestamp()
+
+            });
+
+
+            // =================================================
+            // UPDATE MAIN BOOKING
             // =================================================
 
             await bookingRef.update({
 
+                amountPaid:
+                    newAmountPaid,
+
+                amountDue:
+                    newAmountDue,
+
                 paymentStatus:
-                    "Paid",
+                    newPaymentStatus,
 
                 razorpayPaymentId:
                     razorpay_payment_id,
@@ -1651,7 +2577,10 @@ app.post(
                     razorpay_signature,
 
                 paidAt:
-                    FieldValue.serverTimestamp()
+                    FieldValue.serverTimestamp(),
+
+                pendingPaymentAmount:
+                    FieldValue.delete()
 
             });
 
@@ -1678,30 +2607,30 @@ app.post(
                     "Not specified";
 
 
-                const amount =
-                    Number(
-                        booking.price || 0
-                    );
-
-
                 const receiptBookingId =
                     "BK-" +
                     bookingId
-                        .substring(0, 8)
+                        .substring(
+                            0,
+                            8
+                        )
                         .toUpperCase();
 
 
                 const paymentDate =
-                    new Date().toLocaleString(
-                        "en-IN",
-                        {
-                            timeZone:
-                                "Asia/Kolkata"
-                        }
-                    );
+                    new Date()
+                        .toLocaleString(
+                            "en-IN",
+                            {
+                                timeZone:
+                                    "Asia/Kolkata"
+                            }
+                        );
 
 
-                if (customerEmail) {
+                if (
+                    customerEmail
+                ) {
 
                     const subject =
                         "EventSphere Payment Receipt - " +
@@ -1714,7 +2643,7 @@ app.post(
 Your payment for EventSphere has been successfully received.
 
 ================================
-       PAYMENT RECEIPT
+        PAYMENT RECEIPT
 ================================
 
 Booking ID:
@@ -1726,8 +2655,17 @@ ${eventName}
 Event Date:
 ${eventDate}
 
-Amount Paid:
-₹${amount.toLocaleString("en-IN")}
+This Payment:
+₹${paymentAmount.toLocaleString("en-IN")}
+
+Total Booking Amount:
+₹${totalAmount.toLocaleString("en-IN")}
+
+Total Amount Paid:
+₹${newAmountPaid.toLocaleString("en-IN")}
+
+Amount Remaining:
+₹${newAmountDue.toLocaleString("en-IN")}
 
 Payment ID:
 ${razorpay_payment_id}
@@ -1736,11 +2674,15 @@ Payment Date:
 ${paymentDate}
 
 Payment Status:
-PAID
+${newPaymentStatus}
 
 ================================
 
-Your payment has been successfully verified.
+${
+    newAmountDue > 0
+        ? `Your remaining amount is ₹${newAmountDue.toLocaleString("en-IN")}. You can login to EventSphere and pay the remaining amount from My Bookings.`
+        : "Your booking has been fully paid."
+}
 
 You can login to EventSphere and view your booking in the My Bookings section.
 
@@ -1822,15 +2764,20 @@ EventSphere Team`;
             }
 
 
-            catch (emailError) {
+            catch (
+                emailError
+            ) {
 
                 // Payment is already successful.
-                // Email failure must not make the payment fail.
+                // Email failure must NOT make payment fail.
 
                 console.error(
+
                     "Payment receipt email failed:",
+
                     emailError.response?.data ||
                     emailError.message
+
                 );
 
             }
@@ -1846,7 +2793,25 @@ EventSphere Team`;
                     true,
 
                 message:
-                    "Payment verified successfully."
+                    "Payment verified successfully.",
+
+                paymentAmount:
+                    paymentAmount,
+
+                totalAmount:
+                    totalAmount,
+
+                amountPaid:
+                    newAmountPaid,
+
+                amountDue:
+                    newAmountDue,
+
+                paymentStatus:
+                    newPaymentStatus,
+
+                razorpayPaymentId:
+                    razorpay_payment_id
 
             });
 
@@ -1856,8 +2821,11 @@ EventSphere Team`;
         catch (error) {
 
             console.error(
+
                 "Verify Razorpay Payment Error:",
+
                 error
+
             );
 
 
