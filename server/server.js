@@ -1,7 +1,11 @@
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
-const Razorpay = require("razorpay");
+const axios = require("axios");
+const fs = require("fs");
 const crypto = require("crypto");
+const Razorpay = require("razorpay");
 
 const {
     initializeApp,
@@ -18,270 +22,1037 @@ const {
     FieldValue
 } = require("firebase-admin/firestore");
 
-const path = require("path");
-const nodemailer = require("nodemailer");
-
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-/* =====================================================
-   FIREBASE ADMIN
-===================================================== */
 
-const serviceAccountPath =
-    "/etc/secrets/firebase-service-account.json";
+// =========================================================
+// CONFIGURATION
+// =========================================================
 
-let firebaseAuth = null;
-let db = null;
-
-if (require("fs").existsSync(serviceAccountPath)) {
-
-    const serviceAccount =
-        JSON.parse(
-            require("fs").readFileSync(
-                serviceAccountPath,
-                "utf8"
-            )
-        );
-
-    if (getApps().length === 0) {
-
-        initializeApp({
-            credential:
-                cert(serviceAccount)
-        });
-
-    }
-
-    firebaseAuth =
-        getAuth();
-
-    db =
-        getFirestore();
-
-    console.log(
-        "Firebase Admin initialized."
-    );
-
-} else {
-
-    console.error(
-        "Firebase service account file not found."
-    );
-}
-/* =====================================================
-   ENVIRONMENT VARIABLES
-===================================================== */
-
-const PORT = process.env.PORT || 10000;
-
-const RAZORPAY_KEY_ID =
-    process.env.RAZORPAY_KEY_ID || "";
-
-const RAZORPAY_KEY_SECRET =
-    process.env.RAZORPAY_KEY_SECRET || "";
+const PORT = process.env.PORT || 3000;
 
 const BREVO_API_KEY =
     process.env.BREVO_API_KEY || "";
 
 const EMAIL_FROM =
-    process.env.EMAIL_FROM || "";
+    "eventsphere.official2026@gmail.com";
 
-const EMAIL_FROM_NAME =
-    process.env.EMAIL_FROM_NAME || "EventSphere";
 
-const FRONTEND_URL =
-    process.env.FRONTEND_URL ||
-    "https://eventsphere-dndh.web.app";
+// =========================================================
+// FIREBASE ADMIN
+// =========================================================
 
-/* =====================================================
-   RAZORPAY
-===================================================== */
+let firebaseAuth = null;
+let firebaseDb = null;
 
-const razorpay = new Razorpay({
-    key_id: RAZORPAY_KEY_ID,
-    key_secret: RAZORPAY_KEY_SECRET
-});
+const serviceAccountPath =
+    "/etc/secrets/firebase-service-account.json";
 
-/* =====================================================
-   BASIC ROUTES
-===================================================== */
+try {
 
-app.get("/", (req, res) => {
-    res.json({
-        success: true,
-        message: "EventSphere backend is running"
-    });
-});
+    if (fs.existsSync(serviceAccountPath)) {
 
-app.get("/health", (req, res) => {
-    res.json({
-        success: true,
-        status: "healthy"
-    });
-});
+        const serviceAccount =
+            JSON.parse(
+                fs.readFileSync(
+                    serviceAccountPath,
+                    "utf8"
+                )
+            );
 
-/* =====================================================
-   FIREBASE AUTH HELPER
-===================================================== */
+        if (getApps().length === 0) {
 
-async function verifyFirebaseToken(req, res, next) {
-
-    try {
-
-        const authHeader =
-            req.headers.authorization || "";
-
-        if (!authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({
-                success: false,
-                message: "Authentication token missing"
+            initializeApp({
+                credential:
+                    cert(serviceAccount)
             });
+
         }
 
-        const idToken =
-            authHeader.replace("Bearer ", "").trim();
+        firebaseAuth = getAuth();
+        firebaseDb = getFirestore();
 
-        const decodedToken =
-           firebaseAuth.verifyIdToken(idToken);
-
-        req.user = decodedToken;
-
-        next();
-
-    } catch (error) {
-
-        console.error(
-            "Firebase authentication error:",
-            error.message
+        console.log(
+            "Firebase Admin initialized."
         );
 
-        return res.status(401).json({
-            success: false,
-            message: "Invalid authentication token"
-        });
-    }
-}
-
-/* =====================================================
-   ADMIN AUTH HELPER
-===================================================== */
-
-async function verifyAdmin(req, res, next) {
-
-    try {
-
-        const authHeader =
-            req.headers.authorization || "";
-
-        if (!authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({
-                success: false,
-                message: "Authentication token missing"
-            });
-        }
-
-        const idToken =
-            authHeader.replace("Bearer ", "").trim();
-
-        const decodedToken =
-            firebaseAuth.verifyIdToken(idToken);
-
-        req.user = decodedToken;
-
-        const email =
-            String(decodedToken.email || "")
-                .toLowerCase();
-
-        const adminEmails = [
-            "admin@eventsphere.com"
-        ];
-
-        if (!adminEmails.includes(email)) {
-            return res.status(403).json({
-                success: false,
-                message: "Admin access required"
-            });
-        }
-
-        next();
-
-    } catch (error) {
+    } else {
 
         console.error(
-            "Admin authentication error:",
-            error.message
+            "Firebase service account file not found."
         );
 
-        return res.status(401).json({
-            success: false,
-            message: "Invalid authentication token"
-        });
     }
+
+} catch (error) {
+
+    console.error(
+        "Firebase initialization error:",
+        error.message
+    );
+
 }
 
-/* =====================================================
-   CREATE RAZORPAY ORDER
-   PARTIAL PAYMENT SUPPORTED
-===================================================== */
+
+// =========================================================
+// RAZORPAY
+// =========================================================
+
+let razorpay = null;
+
+if (
+    process.env.RAZORPAY_KEY_ID &&
+    process.env.RAZORPAY_KEY_SECRET
+) {
+
+    razorpay =
+        new Razorpay({
+            key_id:
+                process.env.RAZORPAY_KEY_ID,
+
+            key_secret:
+                process.env.RAZORPAY_KEY_SECRET
+        });
+
+    console.log(
+        "Razorpay initialized."
+    );
+
+} else {
+
+    console.error(
+        "Razorpay environment variables are missing."
+    );
+
+}
+
+
+// =========================================================
+// OTP STORAGE
+// =========================================================
+
+const otpStore = new Map();
+
+
+// =========================================================
+// SEND EMAIL USING BREVO API
+// NO NODEMAILER
+// =========================================================
+
+async function sendEmail({
+    to,
+    subject,
+    text
+}) {
+
+    if (!BREVO_API_KEY) {
+
+        throw new Error(
+            "BREVO_API_KEY is not configured."
+        );
+
+    }
+
+    await axios.post(
+
+        "https://api.brevo.com/v3/smtp/email",
+
+        {
+            sender: {
+                name: "EventSphere",
+                email: EMAIL_FROM
+            },
+
+            to: [
+                {
+                    email: to
+                }
+            ],
+
+            subject: subject,
+
+            textContent: text
+        },
+
+        {
+            headers: {
+                accept:
+                    "application/json",
+
+                "api-key":
+                    BREVO_API_KEY,
+
+                "content-type":
+                    "application/json"
+            }
+        }
+    );
+
+}
+
+
+// =========================================================
+// SEND OTP
+// =========================================================
 
 app.post(
-    "/create-payment-order",
-    verifyFirebaseToken,
+    "/send-otp",
     async (req, res) => {
 
         try {
+
+            const email =
+                String(
+                    req.body?.email || ""
+                )
+                    .trim()
+                    .toLowerCase();
+
+            const loginType =
+                req.body?.loginType ||
+                "registration";
+
+
+            if (!email) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Email is required."
+                });
+
+            }
+
+
+            if (
+                ![
+                    "registration",
+                    "customer",
+                    "admin"
+                ].includes(loginType)
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Invalid OTP type."
+                });
+
+            }
+
+
+            // Generate 6 digit OTP
+
+            const otp =
+                Math.floor(
+                    100000 +
+                    Math.random() * 900000
+                )
+                    .toString();
+
+
+            let subject = "";
+            let message = "";
+
+
+            // =================================================
+            // REGISTRATION OTP
+            // =================================================
+
+            if (
+                loginType ===
+                "registration"
+            ) {
+
+                subject =
+                    "EventSphere Customer Registration OTP";
+
+                message =
+`Hello,
+
+Your EventSphere customer registration OTP is:
+
+${otp}
+
+This OTP is valid for 5 minutes.
+
+If you did not request this registration, please ignore this email.
+
+Regards,
+EventSphere Team`;
+
+            }
+
+
+            // =================================================
+            // CUSTOMER LOGIN OTP
+            // =================================================
+
+            else if (
+                loginType ===
+                "customer"
+            ) {
+
+                subject =
+                    "EventSphere Customer Login OTP";
+
+                message =
+`Hello,
+
+Your EventSphere customer login OTP is:
+
+${otp}
+
+This OTP is valid for 5 minutes.
+
+This OTP is required to securely access your EventSphere customer account.
+
+If you did not attempt to login, please ignore this email.
+
+Regards,
+EventSphere Team`;
+
+            }
+
+
+            // =================================================
+            // ADMIN LOGIN OTP
+            // =================================================
+
+            else {
+
+                subject =
+                    "EventSphere Admin Login OTP";
+
+                message =
+`Hello Admin,
+
+Your EventSphere administrator login OTP is:
+
+${otp}
+
+This OTP is valid for 5 minutes.
+
+This OTP is required for secure administrator access to EventSphere.
+
+If you did not attempt to login to the EventSphere Admin Panel, please ignore this email.
+
+Regards,
+EventSphere Admin Security`;
+
+            }
+
+
+            // =================================================
+            // SEND EMAIL FIRST
+            // =================================================
+
+            await sendEmail({
+
+                to: email,
+
+                subject: subject,
+
+                text: message
+
+            });
+
+
+            // =================================================
+            // STORE OTP ONLY AFTER EMAIL SUCCESS
+            // =================================================
+
+            otpStore.set(
+                email,
+                {
+                    otp: otp,
+
+                    expiresAt:
+                        Date.now() +
+                        5 * 60 * 1000
+                }
+            );
+
+
+            console.log(
+                `OTP sent successfully to ${email}`
+            );
+
+
+            return res.json({
+
+                success: true,
+
+                message:
+                    "OTP sent successfully!"
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "SEND OTP ERROR:",
+                error.response?.data ||
+                error.message
+            );
+
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    "Failed to send OTP. Check BREVO_API_KEY in server environment variables."
+            });
+
+        }
+
+    }
+);
+
+
+// =========================================================
+// VERIFY OTP
+// =========================================================
+
+app.post(
+    "/verify-otp",
+    (req, res) => {
+
+        try {
+
+            const email =
+                String(
+                    req.body?.email || ""
+                )
+                    .trim()
+                    .toLowerCase();
+
+            const otp =
+                String(
+                    req.body?.otp || ""
+                )
+                    .trim();
+
+
+            if (!email || !otp) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Email and OTP are required."
+                });
+
+            }
+
+
+            const savedOtp =
+                otpStore.get(email);
+
+
+            if (!savedOtp) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "OTP not found. Please request a new OTP."
+                });
+
+            }
+
+
+            if (
+                Date.now() >
+                savedOtp.expiresAt
+            ) {
+
+                otpStore.delete(email);
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "OTP expired. Please request a new OTP."
+                });
+
+            }
+
+
+            if (
+                otp !==
+                savedOtp.otp
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Invalid OTP."
+                });
+
+            }
+
+
+            // OTP correct
+
+            otpStore.delete(email);
+
+
+            return res.json({
+
+                success: true,
+
+                message:
+                    "OTP verified successfully!"
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "VERIFY OTP ERROR:",
+                error.message
+            );
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    "Unable to verify OTP."
+            });
+
+        }
+
+    }
+);
+
+
+// =========================================================
+// BOOKING STATUS EMAIL
+// =========================================================
+
+app.post(
+    "/booking-status",
+    async (req, res) => {
+
+        try {
+
+            const {
+                email,
+                eventName,
+                status,
+                reason
+            } = req.body;
+
+
+            if (
+                !email ||
+                !eventName ||
+                !status
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Email, event name and status are required."
+                });
+
+            }
+
+
+            let subject;
+            let message;
+
+
+            if (
+                status ===
+                "Approved"
+            ) {
+
+                subject =
+                    "EventSphere Booking Approved";
+
+                message =
+`Hello,
+
+Your booking for "${eventName}" has been approved by the EventSphere admin.
+
+Your event booking is now confirmed.
+
+You can login to EventSphere and check your booking details in the My Bookings section.
+
+Thank you for choosing EventSphere.
+
+Regards,
+EventSphere Team`;
+
+            }
+
+            else if (
+                status ===
+                "Rejected"
+            ) {
+
+                subject =
+                    "EventSphere Booking Rejected";
+
+                message =
+`Hello,
+
+Your booking for "${eventName}" has been rejected by the EventSphere admin.
+
+Reason for rejection:
+
+${reason || "No reason was provided."}
+
+You can login to EventSphere and check your booking details in the My Bookings section.
+
+Regards,
+EventSphere Team`;
+
+            }
+
+            else {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Invalid booking status."
+                });
+
+            }
+
+
+            await sendEmail({
+
+                to: email,
+
+                subject: subject,
+
+                text: message
+
+            });
+
+
+            return res.json({
+
+                success: true,
+
+                message:
+                    "Booking status email sent successfully!"
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "BOOKING STATUS EMAIL ERROR:",
+                error.response?.data ||
+                error.message
+            );
+
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    "Failed to send booking status email."
+            });
+
+        }
+
+    }
+);
+
+
+// =========================================================
+// CUSTOMER CANCELLED BOOKING EMAIL
+// =========================================================
+
+app.post(
+    "/customer-cancelled",
+    async (req, res) => {
+
+        try {
+
+            const {
+                customerEmail,
+                eventName,
+                reason
+            } = req.body;
+
+
+            if (
+                !customerEmail ||
+                !eventName ||
+                !reason
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Customer email, event name and reason are required."
+                });
+
+            }
+
+
+            const message =
+`Hello Admin,
+
+A customer has cancelled a booking.
+
+Event:
+${eventName}
+
+Customer Email:
+${customerEmail}
+
+Reason:
+${reason}
+
+Please login to EventSphere to view the booking details.
+
+Regards,
+EventSphere Team`;
+
+
+            await sendEmail({
+
+                to:
+                    EMAIL_FROM,
+
+                subject:
+                    "EventSphere Booking Cancelled by Customer",
+
+                text:
+                    message
+
+            });
+
+
+            return res.json({
+
+                success: true,
+
+                message:
+                    "Customer cancellation email sent successfully!"
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "CUSTOMER CANCELLATION EMAIL ERROR:",
+                error.response?.data ||
+                error.message
+            );
+
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    "Failed to send customer cancellation email."
+            });
+
+        }
+
+    }
+);
+
+
+// =========================================================
+// DELETE CUSTOMER
+// =========================================================
+
+app.delete(
+    "/delete-customer",
+    async (req, res) => {
+
+        try {
+
+            const email =
+                String(
+                    req.body?.email || ""
+                )
+                    .trim()
+                    .toLowerCase();
+
+
+            if (!email) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Customer email is required."
+                });
+
+            }
+
+
+            if (!firebaseAuth) {
+
+                return res.status(500).json({
+
+                    success: false,
+
+                    message:
+                        "Firebase Admin is not initialized."
+                });
+
+            }
+
+
+            try {
+
+                const userRecord =
+                    await firebaseAuth
+                        .getUserByEmail(email);
+
+
+                await firebaseAuth
+                    .deleteUser(
+                        userRecord.uid
+                    );
+
+
+                console.log(
+                    `Customer deleted: ${email}`
+                );
+
+            }
+
+            catch (error) {
+
+                if (
+                    error.code !==
+                    "auth/user-not-found"
+                ) {
+
+                    throw error;
+
+                }
+
+            }
+
+
+            return res.json({
+
+                success: true,
+
+                message:
+                    "Customer deleted successfully!"
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "DELETE CUSTOMER ERROR:",
+                error.message
+            );
+
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    "Failed to delete customer."
+            });
+
+        }
+
+    }
+);
+
+
+// =========================================================
+// CREATE RAZORPAY PAYMENT ORDER
+// =========================================================
+
+app.post(
+    "/create-payment-order",
+    async (req, res) => {
+
+        try {
+
+            if (!razorpay) {
+
+                return res.status(500).json({
+
+                    success: false,
+
+                    message:
+                        "Razorpay is not configured."
+                });
+
+            }
+
+
+            if (
+                !firebaseAuth ||
+                !firebaseDb
+            ) {
+
+                return res.status(500).json({
+
+                    success: false,
+
+                    message:
+                        "Firebase Admin is not initialized."
+                });
+
+            }
+
 
             const {
                 bookingId,
                 paymentAmount
             } = req.body;
 
+
             if (!bookingId) {
+
                 return res.status(400).json({
+
                     success: false,
-                    message: "Booking ID is required"
+
+                    message:
+                        "Booking ID is required."
                 });
+
             }
 
-            const bookingRef =
-                db.collection("bookings")
-                    .doc(bookingId);
 
-            const bookingSnap =
-                await bookingRef.get();
+            const authHeader =
+                req.headers.authorization ||
+                "";
 
-            if (!bookingSnap.exists) {
-                return res.status(404).json({
-                    success: false,
-                    message: "Booking not found"
-                });
-            }
-
-            const booking =
-                bookingSnap.data();
-
-            /* -----------------------------------------
-               CHECK BOOKING OWNER
-            ----------------------------------------- */
 
             if (
-                booking.userId &&
-                booking.userId !== req.user.uid
+                !authHeader.startsWith(
+                    "Bearer "
+                )
+            ) {
+
+                return res.status(401).json({
+
+                    success: false,
+
+                    message:
+                        "Authentication required."
+                });
+
+            }
+
+
+            const idToken =
+                authHeader.substring(7);
+
+
+            const decodedToken =
+                await firebaseAuth
+                    .verifyIdToken(
+                        idToken
+                    );
+
+
+            const bookingRef =
+                firebaseDb
+                    .collection("bookings")
+                    .doc(bookingId);
+
+
+            const bookingSnapshot =
+                await bookingRef.get();
+
+
+            if (!bookingSnapshot.exists) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    message:
+                        "Booking not found."
+                });
+
+            }
+
+
+            const booking =
+                bookingSnapshot.data();
+
+
+            // Support both customerId and userId
+
+            const ownerId =
+                booking.customerId ||
+                booking.userId;
+
+
+            if (
+                ownerId !==
+                decodedToken.uid
             ) {
 
                 return res.status(403).json({
+
                     success: false,
+
                     message:
-                        "You are not allowed to pay for this booking"
+                        "You cannot pay for this booking."
                 });
+
             }
 
-            /* -----------------------------------------
-               TOTAL BOOKING AMOUNT
-            ----------------------------------------- */
+
+            if (
+                booking.status !==
+                "Approved"
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Payment is available only for approved bookings."
+                });
+
+            }
+
 
             const totalAmount =
                 Number(
@@ -291,220 +1062,174 @@ app.post(
                     0
                 );
 
+
             if (
-                !Number.isFinite(totalAmount) ||
+                !Number.isFinite(
+                    totalAmount
+                ) ||
                 totalAmount <= 0
             ) {
 
                 return res.status(400).json({
+
                     success: false,
+
                     message:
-                        "Invalid booking amount"
+                        "Invalid booking amount."
                 });
+
             }
 
-            /* -----------------------------------------
-               PREVIOUSLY PAID AMOUNT
 
-               New bookings:
-               booking.amountPaid
-
-               Old bookings:
-               if status is Paid, assume total paid
-            ----------------------------------------- */
-
-            let amountPaid;
-
-            if (
-                booking.amountPaid !== undefined &&
-                booking.amountPaid !== null
-            ) {
-
-                amountPaid =
-                    Number(booking.amountPaid || 0);
-
-            } else if (
-                booking.paymentStatus === "Paid"
-            ) {
-
-                amountPaid =
-                    totalAmount;
-
-            } else {
-
-                amountPaid = 0;
-            }
-
-            amountPaid =
-                Math.max(
-                    0,
-                    Math.min(amountPaid, totalAmount)
+            const oldPaid =
+                Number(
+                    booking.amountPaid ||
+                    0
                 );
 
-            /* -----------------------------------------
-               CURRENT AMOUNT DUE
-            ----------------------------------------- */
 
-            const amountDue =
+            const amountPaid =
                 Math.max(
                     0,
-                    Number(
-                        (
-                            totalAmount -
-                            amountPaid
-                        ).toFixed(2)
+                    Math.min(
+                        oldPaid,
+                        totalAmount
                     )
                 );
+
+
+            const amountDue =
+                Number(
+                    (
+                        totalAmount -
+                        amountPaid
+                    ).toFixed(2)
+                );
+
 
             if (amountDue <= 0) {
 
                 return res.status(400).json({
+
                     success: false,
+
                     message:
-                        "This booking is already fully paid"
+                        "This booking has already been fully paid."
                 });
+
             }
 
-            /* -----------------------------------------
-               CUSTOMER PAYMENT AMOUNT
-
-               Customer can enter:
-               ₹1
-               ₹5000
-               ₹20000
-               etc.
-
-               But never more than amount due.
-            ----------------------------------------- */
 
             const requestedAmount =
-                Number(paymentAmount);
+                Number(
+                    paymentAmount
+                );
+
 
             if (
-                !Number.isFinite(requestedAmount) ||
+                !Number.isFinite(
+                    requestedAmount
+                ) ||
                 requestedAmount <= 0
             ) {
 
                 return res.status(400).json({
+
                     success: false,
+
                     message:
-                        "Please enter a valid payment amount"
+                        "Please enter a valid payment amount."
                 });
+
             }
 
-            if (requestedAmount > amountDue) {
+
+            if (
+                requestedAmount >
+                amountDue
+            ) {
 
                 return res.status(400).json({
+
                     success: false,
+
                     message:
-                        `Payment amount cannot exceed the current due amount of ₹${amountDue.toLocaleString("en-IN")}`
+                        `Maximum payment allowed now is ₹${amountDue.toLocaleString("en-IN")}.`
                 });
+
             }
 
-            const finalPaymentAmount =
-                Number(
-                    requestedAmount.toFixed(2)
+
+            const amountPaise =
+                Math.round(
+                    requestedAmount * 100
                 );
 
-            /* -----------------------------------------
-               CREATE RAZORPAY ORDER
 
-               IMPORTANT:
-               Razorpay receives ONLY the amount
-               customer selected.
-
-               Example:
-
-               Total = ₹50,000
-               Paid  = ₹0
-               Customer enters = ₹20,000
-
-               Razorpay order = ₹20,000
-
-               Remaining due = ₹30,000
-            ----------------------------------------- */
-
-            const razorpayOrder =
+            const order =
                 await razorpay.orders.create({
 
                     amount:
-                        Math.round(
-                            finalPaymentAmount * 100
-                        ),
+                        amountPaise,
 
-                    currency: "INR",
+                    currency:
+                        "INR",
 
                     receipt:
-                        `booking_${bookingId}_${Date.now()}`,
+                        `ES_${bookingId}_${Date.now()}`
+                            .substring(0, 40),
 
                     notes: {
 
                         bookingId:
-                            String(bookingId),
+                            bookingId,
 
-                        userId:
-                            String(
-                                booking.userId ||
-                                req.user.uid
-                            ),
-
-                        totalAmount:
-                            String(totalAmount),
-
-                        amountPaid:
-                            String(amountPaid),
-
-                        amountDue:
-                            String(amountDue),
+                        customerId:
+                            decodedToken.uid,
 
                         paymentAmount:
-                            String(finalPaymentAmount)
+                            requestedAmount
+
                     }
+
                 });
 
-            /* -----------------------------------------
-               SAVE PENDING PAYMENT INFORMATION
-
-               This is important because when Razorpay
-               returns the payment we need to know how
-               much this particular installment was for.
-            ----------------------------------------- */
 
             await bookingRef.update({
 
                 razorpayOrderId:
-                    razorpayOrder.id,
+                    order.id,
 
                 pendingPaymentAmount:
-                    finalPaymentAmount,
-
-                pendingPaymentCreatedAt:
-                    FieldValue.serverTimestamp(),
+                    requestedAmount,
 
                 paymentStatus:
-                    amountPaid > 0
-                        ? "Partially Paid"
-                        : "Payment Initiated"
+                    "Payment Initiated"
+
             });
+
 
             return res.json({
 
                 success: true,
 
-                orderId:
-                    razorpayOrder.id,
-
                 keyId:
-                    RAZORPAY_KEY_ID,
+                    process.env.RAZORPAY_KEY_ID,
+
+                orderId:
+                    order.id,
 
                 amount:
-                    razorpayOrder.amount,
+                    order.amount,
 
                 currency:
-                    razorpayOrder.currency,
+                    order.currency,
+
+                bookingId:
+                    bookingId,
 
                 paymentAmount:
-                    finalPaymentAmount,
+                    requestedAmount,
 
                 totalAmount:
                     totalAmount,
@@ -514,37 +1239,58 @@ app.post(
 
                 amountDue:
                     amountDue
+
             });
 
-        } catch (error) {
+        }
+
+        catch (error) {
 
             console.error(
-                "Create payment order error:",
+                "CREATE PAYMENT ORDER ERROR:",
                 error
             );
 
+
             return res.status(500).json({
+
                 success: false,
+
                 message:
-                    "Unable to create payment order",
-                error:
-                    error.message
+                    "Unable to create payment order."
             });
+
         }
+
     }
 );
 
-/* =====================================================
-   VERIFY RAZORPAY PAYMENT
-   CUMULATIVE PARTIAL PAYMENT
-===================================================== */
+// =========================================================
+// VERIFY RAZORPAY PAYMENT
+// =========================================================
 
 app.post(
     "/verify-payment",
-    verifyFirebaseToken,
     async (req, res) => {
 
         try {
+
+            if (
+                !firebaseAuth ||
+                !firebaseDb ||
+                !razorpay
+            ) {
+
+                return res.status(500).json({
+
+                    success: false,
+
+                    message:
+                        "Payment service is not initialized."
+                });
+
+            }
+
 
             const {
                 bookingId,
@@ -552,6 +1298,7 @@ app.post(
                 razorpay_payment_id,
                 razorpay_signature
             } = req.body;
+
 
             if (
                 !bookingId ||
@@ -561,1723 +1308,1057 @@ app.post(
             ) {
 
                 return res.status(400).json({
+
                     success: false,
+
                     message:
-                        "Payment verification details are incomplete"
+                        "Payment verification details are incomplete."
                 });
+
             }
 
-            /* -----------------------------------------
-               GET BOOKING
-            ----------------------------------------- */
 
-            const bookingRef =
-                db.collection("bookings")
-                    .doc(bookingId);
+            // =================================================
+            // AUTHENTICATION
+            // =================================================
 
-            const bookingSnap =
-                await bookingRef.get();
+            const authHeader =
+                req.headers.authorization ||
+                "";
 
-            if (!bookingSnap.exists) {
-
-                return res.status(404).json({
-                    success: false,
-                    message:
-                        "Booking not found"
-                });
-            }
-
-            const booking =
-                bookingSnap.data();
-
-            /* -----------------------------------------
-               CHECK OWNER
-            ----------------------------------------- */
 
             if (
-                booking.userId &&
-                booking.userId !== req.user.uid
+                !authHeader.startsWith(
+                    "Bearer "
+                )
+            ) {
+
+                return res.status(401).json({
+
+                    success: false,
+
+                    message:
+                        "Authentication required."
+                });
+
+            }
+
+
+            const idToken =
+                authHeader.substring(7);
+
+
+            const decodedToken =
+                await firebaseAuth
+                    .verifyIdToken(
+                        idToken
+                    );
+
+
+            // =================================================
+            // GET BOOKING
+            // =================================================
+
+            const bookingRef =
+                firebaseDb
+                    .collection("bookings")
+                    .doc(bookingId);
+
+
+            const bookingSnapshot =
+                await bookingRef.get();
+
+
+            if (!bookingSnapshot.exists) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    message:
+                        "Booking not found."
+                });
+
+            }
+
+
+            const booking =
+                bookingSnapshot.data();
+
+
+            const ownerId =
+                booking.customerId ||
+                booking.userId;
+
+
+            if (
+                ownerId !==
+                decodedToken.uid
             ) {
 
                 return res.status(403).json({
+
                     success: false,
+
                     message:
-                        "You are not allowed to verify this payment"
+                        "You cannot verify this payment."
                 });
+
             }
 
-            /* -----------------------------------------
-               VERIFY RAZORPAY SIGNATURE
-            ----------------------------------------- */
+
+            if (
+                booking.status !==
+                "Approved"
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "This booking is not approved."
+                });
+
+            }
+
+
+            if (
+                booking.razorpayOrderId !==
+                razorpay_order_id
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Payment order does not match the booking."
+                });
+
+            }
+
+
+            // =================================================
+            // VERIFY RAZORPAY SIGNATURE
+            // =================================================
+
+            if (
+                !process.env.RAZORPAY_KEY_SECRET
+            ) {
+
+                return res.status(500).json({
+
+                    success: false,
+
+                    message:
+                        "Razorpay secret is not configured."
+                });
+
+            }
+
 
             const generatedSignature =
                 crypto
                     .createHmac(
                         "sha256",
-                        RAZORPAY_KEY_SECRET
+                        process.env
+                            .RAZORPAY_KEY_SECRET
                     )
                     .update(
                         `${razorpay_order_id}|${razorpay_payment_id}`
                     )
                     .digest("hex");
 
+
             if (
-                generatedSignature !==
-                razorpay_signature
+                generatedSignature.length !==
+                razorpay_signature.length
             ) {
 
                 return res.status(400).json({
+
                     success: false,
+
                     message:
-                        "Payment signature verification failed"
+                        "Payment verification failed."
                 });
+
             }
 
-            /* -----------------------------------------
-               TOTAL BOOKING AMOUNT
-            ----------------------------------------- */
 
-            const totalAmount =
-                Number(
-                    booking.price ||
-                    booking.amount ||
-                    booking.totalAmount ||
-                    0
-                );
+            const signatureValid =
+                crypto.timingSafeEqual(
 
-            /* -----------------------------------------
-               OLD AMOUNT PAID
-            ----------------------------------------- */
+                    Buffer.from(
+                        generatedSignature
+                    ),
 
-            let oldAmountPaid;
-
-            if (
-                booking.amountPaid !== undefined &&
-                booking.amountPaid !== null
-            ) {
-
-                oldAmountPaid =
-                    Number(
-                        booking.amountPaid || 0
-                    );
-
-            } else if (
-                booking.paymentStatus === "Paid"
-            ) {
-
-                oldAmountPaid =
-                    totalAmount;
-
-            } else {
-
-                oldAmountPaid = 0;
-            }
-
-            oldAmountPaid =
-                Math.max(
-                    0,
-                    Math.min(
-                        oldAmountPaid,
-                        totalAmount
+                    Buffer.from(
+                        razorpay_signature
                     )
+
                 );
 
-            /* -----------------------------------------
-               CURRENT INSTALLMENT
 
-               Read the amount saved when the order
-               was created.
-            ----------------------------------------- */
+            if (!signatureValid) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Payment verification failed."
+                });
+
+            }
+
+
+            // =================================================
+            // VERIFY RAZORPAY ORDER AMOUNT
+            // =================================================
+
+            const razorpayOrder =
+                await razorpay.orders.fetch(
+                    razorpay_order_id
+                );
+
 
             const paymentAmount =
                 Number(
-                    booking.pendingPaymentAmount || 0
+                    booking.pendingPaymentAmount ||
+                    0
                 );
 
+
             if (
-                !Number.isFinite(paymentAmount) ||
+                !Number.isFinite(
+                    paymentAmount
+                ) ||
                 paymentAmount <= 0
             ) {
 
                 return res.status(400).json({
+
                     success: false,
+
                     message:
-                        "Payment amount could not be determined"
+                        "Payment amount could not be determined."
                 });
+
             }
 
-            const newAmountPaid =
-                Number(
-                    (
-                        oldAmountPaid +
-                        paymentAmount
-                    ).toFixed(2)
-                );
-
-            const amountPaid =
-                Math.min(
-                    newAmountPaid,
-                    totalAmount
-                );
-
-            const amountDue =
-                Math.max(
-                    0,
-                    Number(
-                        (
-                            totalAmount -
-                            amountPaid
-                        ).toFixed(2)
-                    )
-                );
-
-            const paymentStatus =
-                amountDue <= 0
-                    ? "Paid"
-                    : "Partially Paid";
-
-           // =========================================================
-// GET RAZORPAY PAYMENT DETAILS
-// =========================================================
-
-let paymentMethod = null;
-let bankName = null;
-let paymentVpa = null;
-let paymentWallet = null;
-let cardNetwork = null;
-let cardLast4 = null;
-let cardIssuer = null;
-
-try {
-
-    const razorpayPayment =
-        await razorpay.payments.fetch(
-            razorpay_payment_id
-        );
-
-    paymentMethod =
-        razorpayPayment.method || null;
-
-    bankName =
-        razorpayPayment.bank || null;
-
-    paymentVpa =
-        razorpayPayment.vpa || null;
-
-    paymentWallet =
-        razorpayPayment.wallet || null;
-
-    cardNetwork =
-        razorpayPayment.card?.network || null;
-
-    cardLast4 =
-        razorpayPayment.card?.last4 || null;
-
-    cardIssuer =
-        razorpayPayment.card?.issuer || null;
-
-    console.log(
-        "Razorpay payment details:",
-        {
-            method: paymentMethod,
-            bank: bankName,
-            vpa: paymentVpa,
-            wallet: paymentWallet,
-            cardNetwork: cardNetwork,
-            cardLast4: cardLast4,
-            cardIssuer: cardIssuer
-        }
-    );
-
-}
-catch (paymentDetailsError) {
-
-    console.error(
-        "Unable to fetch Razorpay payment details:",
-        paymentDetailsError.message
-    );
-
-}
-
-            /* -----------------------------------------
-               SAVE PAYMENT HISTORY
-
-               Every installment gets its own document.
-
-               Payment 1 = ₹20,000
-               Payment 2 = ₹30,000
-
-               Both remain in Firestore.
-            ----------------------------------------- */
-
-            const paymentHistoryRef =
-                bookingRef
-                    .collection("payments")
-                    .doc(razorpay_payment_id);
-
-            await paymentHistoryRef.set({
-
-                razorpayPaymentId:
-                    razorpay_payment_id,
-
-                razorpayOrderId:
-                    razorpay_order_id,
-
-                bookingId:
-                    bookingId,
-
-                userId:
-                    req.user.uid,
-
-                amount:
-                    paymentAmount,
-
-                totalAmount:
-                    totalAmount,
-
-                amountPaidBefore:
-                    oldAmountPaid,
-
-                cumulativeAmountPaid:
-                    amountPaid,
-
-                amountDueAfter:
-                    amountDue,
-
-                paymentStatus:
-                    paymentStatus,
-
-                paymentMethod:
-                    paymentMethod,
-
-                bankName:
-                    bankName,
-
-                paymentVpa:
-                    paymentVpa,
-
-                paymentWallet:
-                    paymentWallet,
-
-                cardNetwork:
-                    cardNetwork,
-
-                cardLast4:
-                    cardLast4,
-
-                cardIssuer:
-                    cardIssuer,
-
-                paidAt:
-                    FieldValue.serverTimestamp()
-            });
-
-            /* -----------------------------------------
-               UPDATE MAIN BOOKING
-            ----------------------------------------- */
-
-            await bookingRef.update({
-
-                amountPaid:
-                    amountPaid,
-
-                amountDue:
-                    amountDue,
-
-                paymentStatus:
-                    paymentStatus,
-
-                razorpayPaymentId:
-                    razorpay_payment_id,
-
-                razorpayOrderId:
-                    razorpay_order_id,
-
-                lastPaymentAmount:
-                    paymentAmount,
-
-                lastPaymentMethod:
-                    paymentMethod,
-
-                paymentDate:
-                    FieldValue.serverTimestamp(),
-
-                pendingPaymentAmount:
-                    FieldValue.delete(),
-
-                pendingPaymentCreatedAt:
-                    FieldValue.delete()
-            });
-
-            /* -----------------------------------------
-               RESPONSE
-            ----------------------------------------- */
-
-            return res.json({
-
-                success: true,
-
-                message:
-                    paymentStatus === "Paid"
-                        ? "Payment completed successfully"
-                        : "Partial payment completed successfully",
-
-                bookingId:
-                    bookingId,
-
-                razorpayOrderId:
-                    razorpay_order_id,
-
-                razorpayPaymentId:
-                    razorpay_payment_id,
-
-                paymentAmount:
-                    paymentAmount,
-
-                totalAmount:
-                    totalAmount,
-
-                amountPaid:
-                    amountPaid,
-
-                amountDue:
-                    amountDue,
-
-                paymentStatus:
-                    paymentStatus,
-
-                paymentMethod:
-                    paymentMethod
-            });
-
-        } catch (error) {
-
-            console.error(
-                "Verify payment error:",
-                error
-            );
-
-            return res.status(500).json({
-                success: false,
-                message:
-                    "Payment verification failed",
-                error:
-                    error.message
-            });
-        }
-    }
-);
-
-/* =====================================================
-   GET PAYMENT HISTORY
-===================================================== */
-
-app.get(
-    "/payment-history/:bookingId",
-    verifyFirebaseToken,
-    async (req, res) => {
-
-        try {
-
-            const bookingId =
-                req.params.bookingId;
-
-            const bookingRef =
-                db.collection("bookings")
-                    .doc(bookingId);
-
-            const bookingSnap =
-                await bookingRef.get();
-
-            if (!bookingSnap.exists) {
-
-                return res.status(404).json({
-                    success: false,
-                    message:
-                        "Booking not found"
-                });
-            }
-
-            const booking =
-                bookingSnap.data();
 
             if (
-                booking.userId &&
-                booking.userId !== req.user.uid
+                Number(
+                    razorpayOrder.amount
+                ) !==
+                Math.round(
+                    paymentAmount * 100
+                )
             ) {
 
-                return res.status(403).json({
+                return res.status(400).json({
+
                     success: false,
+
                     message:
-                        "Access denied"
+                        "Payment amount does not match the order."
                 });
+
             }
 
-            const paymentsSnapshot =
-                await bookingRef
-                    .collection("payments")
-                    .orderBy(
-                        "paidAt",
-                        "asc"
-                    )
-                    .get();
 
-            const payments =
-                paymentsSnapshot.docs.map(
-                    (paymentDoc) => ({
-                        id:
-                            paymentDoc.id,
-                        ...paymentDoc.data()
-                    })
+            // =================================================
+            // PAYMENT DETAILS
+            // =================================================
+
+            let paymentMethod = null;
+            let bankName = null;
+            let paymentVpa = null;
+            let paymentWallet = null;
+            let cardNetwork = null;
+            let cardLast4 = null;
+            let cardIssuer = null;
+
+
+            try {
+
+                const payment =
+                    await razorpay
+                        .payments
+                        .fetch(
+                            razorpay_payment_id
+                        );
+
+
+                paymentMethod =
+                    payment.method ||
+                    null;
+
+                bankName =
+                    payment.bank ||
+                    null;
+
+                paymentVpa =
+                    payment.vpa ||
+                    null;
+
+                paymentWallet =
+                    payment.wallet ||
+                    null;
+
+                cardNetwork =
+                    payment.card?.network ||
+                    null;
+
+                cardLast4 =
+                    payment.card?.last4 ||
+                    null;
+
+                cardIssuer =
+                    payment.card?.issuer ||
+                    null;
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Payment details fetch failed:",
+                    error.message
                 );
 
+            }
+
+
+            // =================================================
+            // FIRESTORE TRANSACTION
+            // =================================================
+
+            const paymentRef =
+                bookingRef
+                    .collection("payments")
+                    .doc(
+                        razorpay_payment_id
+                    );
+
+
+            let result;
+
+
+            await firebaseDb.runTransaction(
+                async (transaction) => {
+
+                    const freshSnapshot =
+                        await transaction.get(
+                            bookingRef
+                        );
+
+
+                    if (
+                        !freshSnapshot.exists
+                    ) {
+
+                        throw new Error(
+                            "Booking not found."
+                        );
+
+                    }
+
+
+                    const freshBooking =
+                        freshSnapshot.data();
+
+
+                    const existingPayment =
+                        await transaction.get(
+                            paymentRef
+                        );
+
+
+                    // =========================================
+                    // PAYMENT ALREADY PROCESSED
+                    // =========================================
+
+                    if (
+                        existingPayment.exists
+                    ) {
+
+                        const existing =
+                            existingPayment.data();
+
+
+                        const total =
+                            Number(
+                                freshBooking.price ||
+                                freshBooking.amount ||
+                                freshBooking.totalAmount ||
+                                0
+                            );
+
+
+                        const paid =
+                            Math.min(
+
+                                Number(
+                                    freshBooking.amountPaid ||
+                                    0
+                                ),
+
+                                total
+
+                            );
+
+
+                        result = {
+
+                            paymentAmount:
+                                Number(
+                                    existing.amount ||
+                                    paymentAmount
+                                ),
+
+                            totalAmount:
+                                total,
+
+                            amountPaid:
+                                paid,
+
+                            amountDue:
+                                Math.max(
+                                    0,
+                                    total - paid
+                                ),
+
+                            paymentStatus:
+                                freshBooking.paymentStatus ||
+                                "Paid"
+
+                        };
+
+
+                        return;
+
+                    }
+
+
+                    // =========================================
+                    // TOTAL
+                    // =========================================
+
+                    const totalAmount =
+                        Number(
+                            freshBooking.price ||
+                            freshBooking.amount ||
+                            freshBooking.totalAmount ||
+                            0
+                        );
+
+
+                    if (
+                        !Number.isFinite(
+                            totalAmount
+                        ) ||
+                        totalAmount <= 0
+                    ) {
+
+                        throw new Error(
+                            "Invalid booking amount."
+                        );
+
+                    }
+
+
+                    // =========================================
+                    // OLD PAID
+                    // =========================================
+
+                    const oldPaid =
+                        Number(
+                            freshBooking.amountPaid ||
+                            0
+                        );
+
+
+                    const safeOldPaid =
+                        Math.max(
+                            0,
+                            Math.min(
+                                oldPaid,
+                                totalAmount
+                            )
+                        );
+
+
+                    // =========================================
+                    // PREVENT OVERPAYMENT
+                    // =========================================
+
+                    if (
+                        paymentAmount >
+                        (
+                            totalAmount -
+                            safeOldPaid +
+                            0.01
+                        )
+                    ) {
+
+                        throw new Error(
+                            "This payment is greater than the remaining amount."
+                        );
+
+                    }
+
+
+                    // =========================================
+                    // NEW TOTAL
+                    // =========================================
+
+                    const newPaid =
+                        Number(
+                            (
+                                safeOldPaid +
+                                paymentAmount
+                            ).toFixed(2)
+                        );
+
+
+                    const amountPaid =
+                        Math.min(
+                            newPaid,
+                            totalAmount
+                        );
+
+
+                    const amountDue =
+                        Math.max(
+
+                            0,
+
+                            Number(
+                                (
+                                    totalAmount -
+                                    amountPaid
+                                ).toFixed(2)
+                            )
+
+                        );
+
+
+                    const paymentStatus =
+                        amountDue <= 0
+                            ? "Paid"
+                            : "Partially Paid";
+
+
+                    // =========================================
+                    // SAVE PAYMENT HISTORY
+                    // =========================================
+
+                    transaction.set(
+
+                        paymentRef,
+
+                        {
+
+                            razorpayPaymentId:
+                                razorpay_payment_id,
+
+                            razorpayOrderId:
+                                razorpay_order_id,
+
+                            amount:
+                                paymentAmount,
+
+                            totalAmount:
+                                totalAmount,
+
+                            amountPaidBefore:
+                                safeOldPaid,
+
+                            cumulativeAmountPaid:
+                                amountPaid,
+
+                            amountDueAfter:
+                                amountDue,
+
+                            paymentStatus:
+                                paymentStatus,
+
+                            paymentMethod:
+                                paymentMethod,
+
+                            bankName:
+                                bankName,
+
+                            paymentVpa:
+                                paymentVpa,
+
+                            paymentWallet:
+                                paymentWallet,
+
+                            cardNetwork:
+                                cardNetwork,
+
+                            cardLast4:
+                                cardLast4,
+
+                            cardIssuer:
+                                cardIssuer,
+
+                            userId:
+                                decodedToken.uid,
+
+                            bookingId:
+                                bookingId,
+
+                            paidAt:
+                                FieldValue
+                                    .serverTimestamp()
+
+                        }
+
+                    );
+
+
+                    // =========================================
+                    // UPDATE BOOKING
+                    // =========================================
+
+                    transaction.update(
+
+                        bookingRef,
+
+                        {
+
+                            amountPaid:
+                                amountPaid,
+
+                            amountDue:
+                                amountDue,
+
+                            paymentStatus:
+                                paymentStatus,
+
+                            razorpayPaymentId:
+                                razorpay_payment_id,
+
+                            razorpaySignature:
+                                razorpay_signature,
+
+                            paidAt:
+                                FieldValue
+                                    .serverTimestamp(),
+
+                            pendingPaymentAmount:
+                                FieldValue.delete()
+
+                        }
+
+                    );
+
+
+                    result = {
+
+                        paymentAmount:
+                            paymentAmount,
+
+                        totalAmount:
+                            totalAmount,
+
+                        amountPaid:
+                            amountPaid,
+
+                        amountDue:
+                            amountDue,
+
+                        paymentStatus:
+                            paymentStatus
+
+                    };
+
+                }
+
+            );
+
+
+            // =================================================
+            // PAYMENT RECEIPT EMAIL
+            // =================================================
+
+            try {
+
+                const customerEmail =
+                    booking.customerEmail ||
+                    decodedToken.email ||
+                    "";
+
+
+                if (customerEmail) {
+
+                    const eventName =
+                        booking.eventName ||
+                        "Event";
+
+
+                    const eventDate =
+                        booking.eventDate ||
+                        "Not specified";
+
+
+                    const bookingReference =
+                        "BK-" +
+                        bookingId
+                            .substring(0, 8)
+                            .toUpperCase();
+
+
+                    const paymentDate =
+                        new Date()
+                            .toLocaleString(
+                                "en-IN",
+                                {
+                                    timeZone:
+                                        "Asia/Kolkata"
+                                }
+                            );
+
+
+                    const emailText =
+`Hello,
+
+Your EventSphere payment has been successfully verified.
+
+================================
+        PAYMENT RECEIPT
+================================
+
+Booking ID:
+${bookingReference}
+
+Event:
+${eventName}
+
+Event Date:
+${eventDate}
+
+Amount Paid This Time:
+₹${Number(
+    result.paymentAmount
+).toLocaleString("en-IN")}
+
+Total Paid So Far:
+₹${Number(
+    result.amountPaid
+).toLocaleString("en-IN")}
+
+Amount Remaining:
+₹${Number(
+    result.amountDue
+).toLocaleString("en-IN")}
+
+Payment ID:
+${razorpay_payment_id}
+
+Payment Date:
+${paymentDate}
+
+Payment Status:
+${result.paymentStatus}
+
+================================
+
+Thank you for choosing EventSphere.
+
+Regards,
+EventSphere Team`;
+
+
+                    await sendEmail({
+
+                        to:
+                            customerEmail,
+
+                        subject:
+                            `EventSphere Payment Receipt - ${bookingReference}`,
+
+                        text:
+                            emailText
+
+                    });
+
+                }
+
+            }
+
+            catch (emailError) {
+
+                console.error(
+                    "Receipt email failed:",
+                    emailError.response?.data ||
+                    emailError.message
+                );
+
+                // Payment is already successful.
+                // Do NOT fail the payment response.
+            }
+
+
             return res.json({
+
                 success: true,
-                payments: payments
+
+                message:
+                    "Payment verified successfully.",
+
+                paymentAmount:
+                    result.paymentAmount,
+
+                totalAmount:
+                    result.totalAmount,
+
+                amountPaid:
+                    result.amountPaid,
+
+                amountDue:
+                    result.amountDue,
+
+                paymentStatus:
+                    result.paymentStatus
+
             });
 
-        } catch (error) {
+        }
+
+        catch (error) {
 
             console.error(
-                "Payment history error:",
+                "VERIFY PAYMENT ERROR:",
                 error
             );
 
+
             return res.status(500).json({
+
                 success: false,
+
                 message:
-                    "Unable to load payment history",
-                error:
-                    error.message
+                    error.message ||
+                    "Unable to verify payment."
             });
+
         }
+
     }
 );
 
-/* =====================================================
-   GET SINGLE RAZORPAY PAYMENT DETAILS
-   USED FOR OLD PAYMENT HISTORY
-===================================================== */
+
+// =========================================================
+// GET PAYMENT DETAILS
+// =========================================================
 
 app.get(
     "/payment-details/:bookingId/:paymentId",
-    verifyFirebaseToken,
     async (req, res) => {
 
         try {
+
+            if (
+                !firebaseAuth ||
+                !firebaseDb ||
+                !razorpay
+            ) {
+
+                return res.status(500).json({
+
+                    success: false,
+
+                    message:
+                        "Payment service is not initialized."
+                });
+
+            }
+
+
+            const authHeader =
+                req.headers.authorization ||
+                "";
+
+
+            if (
+                !authHeader.startsWith(
+                    "Bearer "
+                )
+            ) {
+
+                return res.status(401).json({
+
+                    success: false,
+
+                    message:
+                        "Authentication required."
+                });
+
+            }
+
+
+            const idToken =
+                authHeader.substring(7);
+
+
+            const decodedToken =
+                await firebaseAuth
+                    .verifyIdToken(
+                        idToken
+                    );
+
 
             const {
                 bookingId,
                 paymentId
             } = req.params;
 
+
             const bookingRef =
-                db.collection("bookings")
+                firebaseDb
+                    .collection("bookings")
                     .doc(bookingId);
 
-            const bookingSnap =
+
+            const bookingSnapshot =
                 await bookingRef.get();
 
-            if (!bookingSnap.exists) {
+
+            if (!bookingSnapshot.exists) {
+
                 return res.status(404).json({
+
                     success: false,
-                    message: "Booking not found"
+
+                    message:
+                        "Booking not found."
                 });
+
             }
+
 
             const booking =
-                bookingSnap.data();
+                bookingSnapshot.data();
 
-            // Make sure this booking belongs to the logged-in user
+
+            const ownerId =
+                booking.customerId ||
+                booking.userId;
+
+
             if (
-                booking.userId &&
-                booking.userId !== req.user.uid
+                ownerId !==
+                decodedToken.uid
             ) {
+
                 return res.status(403).json({
+
                     success: false,
-                    message: "Access denied"
+
+                    message:
+                        "You cannot view this payment."
                 });
+
             }
 
-            // Fetch the old payment details from Razorpay
+
             const payment =
-                await razorpay.payments.fetch(
-                    paymentId
-                );
+                await razorpay
+                    .payments
+                    .fetch(
+                        paymentId
+                    );
+
 
             return res.json({
+
                 success: true,
 
                 paymentMethod:
-                    payment.method || null,
+                    payment.method ||
+                    null,
 
                 bankName:
-                    payment.bank || null,
+                    payment.bank ||
+                    null,
 
                 paymentVpa:
-                    payment.vpa || null,
+                    payment.vpa ||
+                    null,
 
                 paymentWallet:
-                    payment.wallet || null,
+                    payment.wallet ||
+                    null,
 
                 cardNetwork:
-                    payment.card?.network || null,
+                    payment.card?.network ||
+                    null,
 
                 cardLast4:
-                    payment.card?.last4 || null,
+                    payment.card?.last4 ||
+                    null,
 
                 cardIssuer:
-                    payment.card?.issuer || null
+                    payment.card?.issuer ||
+                    null
+
             });
 
-        } catch (error) {
+        }
+
+        catch (error) {
 
             console.error(
-                "Payment details error:",
+                "PAYMENT DETAILS ERROR:",
                 error.response?.data ||
                 error.message
             );
 
+
             return res.status(500).json({
+
                 success: false,
+
                 message:
                     "Unable to fetch payment details."
             });
+
         }
+
     }
 );
 
-/* =====================================================
-   EMAIL CONFIGURATION
-===================================================== */
-const otpStore = {};
-let transporter = null;
 
-if (EMAIL_FROM) {
+// =========================================================
+// HEALTH CHECK
+// =========================================================
 
-    transporter =
-        nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: EMAIL_FROM,
-                pass:
-                    process.env.EMAIL_PASSWORD ||
-                    ""
-            }
-        });
-}
-
-// ================= SEND OTP =================
-app.post("/send-otp", async (req, res) => {
-
-    try {
-
-        const { email } = req.body;
-
-        if (!email) {
-            return res.status(400).json({
-                success: false,
-                message: "Email is required."
-            });
-        }
-
-        const otp =
-            Math.floor(100000 + Math.random() * 900000);
-
-        otpStore[email] = {
-            otp: otp,
-            expiresAt:
-                Date.now() + 5 * 60 * 1000
-        };
-
-        console.log(otpStore);
-
-        await transporter.sendMail({
-            from:
-                '"EventSphere" <eventsphere.official2026@gmail.com>',
-            to: email,
-            subject:
-                "EventSphere Email Verification OTP",
-            text:
-                `Your EventSphere OTP is: ${otp}. It is valid for 5 minutes.`,
-        });
+app.get(
+    "/",
+    (req, res) => {
 
         res.json({
+
             success: true,
-            message: "OTP sent successfully!"
-        });
-
-    } catch (error) {
-
-        console.error(error);
-
-        res.status(500).json({
-            success: false,
-            message: "Failed to send OTP."
-        });
-
-    }
-
-});
-
-
-// ================= VERIFY OTP =================
-app.post("/verify-otp", (req, res) => {
-
-    const { email, otp } = req.body;
-
-    if (!otpStore[email]) {
-        return res.status(400).json({
-            success: false,
-            message: "OTP not found."
-        });
-    }
-
-    if (
-        Date.now() >
-        otpStore[email].expiresAt
-    ) {
-        delete otpStore[email];
-
-        return res.status(400).json({
-            success: false,
-            message: "OTP expired."
-        });
-    }
-
-    if (
-        Number(otp) !==
-        otpStore[email].otp
-    ) {
-        return res.status(400).json({
-            success: false,
-            message: "Invalid OTP."
-        });
-    }
-
-    delete otpStore[email];
-
-    return res.json({
-        success: true,
-        message: "OTP verified successfully!"
-    });
-
-});
-
-/* =====================================================
-   BREVO EMAIL HELPER
-===================================================== */
-
-async function sendBrevoEmail({
-    to,
-    subject,
-    html
-}) {
-
-    if (!BREVO_API_KEY) {
-
-        console.log(
-            "BREVO_API_KEY is not configured"
-        );
-
-        return false;
-    }
-
-    try {
-
-        const response =
-            await fetch(
-                "https://api.brevo.com/v3/smtp/email",
-                {
-
-                    method: "POST",
-
-                    headers: {
-
-                        "accept":
-                            "application/json",
-
-                        "api-key":
-                            BREVO_API_KEY,
-
-                        "content-type":
-                            "application/json"
-                    },
-
-                    body:
-                        JSON.stringify({
-
-                            sender: {
-
-                                name:
-                                    EMAIL_FROM_NAME,
-
-                                email:
-                                    EMAIL_FROM
-                            },
-
-                            to: [
-                                {
-                                    email:
-                                        to
-                                }
-                            ],
-
-                            subject:
-                                subject,
-
-                            htmlContent:
-                                html
-                        })
-                }
-            );
-
-        if (!response.ok) {
-
-            const errorText =
-                await response.text();
-
-            console.error(
-                "Brevo email error:",
-                errorText
-            );
-
-            return false;
-        }
-
-        return true;
-
-    } catch (error) {
-
-        console.error(
-            "Brevo send error:",
-            error.message
-        );
-
-        return false;
-    }
-}
-
-/* =====================================================
-   PAYMENT RECEIPT EMAIL
-===================================================== */
-
-async function sendPaymentReceiptEmail({
-    bookingId,
-    booking,
-    paymentAmount,
-    amountPaid,
-    amountDue,
-    paymentStatus,
-    razorpayPaymentId,
-    razorpayOrderId,
-    paymentMethod
-}) {
-
-    try {
-
-        const customerEmail =
-            booking.email ||
-            booking.userEmail ||
-            booking.customerEmail;
-
-        if (!customerEmail) {
-
-            console.log(
-                "No customer email found for booking:",
-                bookingId
-            );
-
-            return false;
-        }
-
-        const eventName =
-            booking.eventName ||
-            booking.eventTitle ||
-            booking.title ||
-            "Event";
-
-        const customerName =
-            booking.name ||
-            booking.userName ||
-            booking.customerName ||
-            "Customer";
-
-        const statusText =
-            paymentStatus === "Paid"
-                ? "Paid"
-                : "Partially Paid";
-
-        const html = `
-
-<!DOCTYPE html>
-
-<html>
-
-<head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width,initial-scale=1.0">
-
-<title>EventSphere Payment Receipt</title>
-
-</head>
-
-<body style="
-margin:0;
-padding:0;
-font-family:Arial,sans-serif;
-background:#f5f7fb;
-">
-
-<div style="
-max-width:650px;
-margin:30px auto;
-background:#ffffff;
-border-radius:12px;
-overflow:hidden;
-box-shadow:0 4px 20px rgba(0,0,0,0.08);
-">
-
-<div style="
-padding:25px;
-background:#172554;
-color:#ffffff;
-">
-
-<h1 style="
-margin:0;
-font-size:24px;
-">
-EventSphere
-</h1>
-
-<p style="
-margin:8px 0 0;
-font-size:14px;
-opacity:.9;
-">
-Payment Receipt
-</p>
-
-</div>
-
-<div style="padding:25px;">
-
-<h2 style="
-margin-top:0;
-color:#172554;
-">
-Payment Successful
-</h2>
-
-<p>
-Hello ${customerName},
-</p>
-
-<p>
-Your payment for
-<strong>${eventName}</strong>
-has been successfully received.
-</p>
-
-<table style="
-width:100%;
-border-collapse:collapse;
-margin-top:20px;
-">
-
-<tr>
-<td style="padding:10px 0;">
-Booking ID
-</td>
-<td style="
-padding:10px 0;
-text-align:right;
-font-weight:bold;
-">
-${bookingId}
-</td>
-</tr>
-
-<tr>
-<td style="padding:10px 0;">
-This Payment
-</td>
-<td style="
-padding:10px 0;
-text-align:right;
-font-weight:bold;
-">
-₹${Number(paymentAmount).toLocaleString("en-IN")}
-</td>
-</tr>
-
-<tr>
-<td style="padding:10px 0;">
-Total Amount
-</td>
-<td style="
-padding:10px 0;
-text-align:right;
-font-weight:bold;
-">
-₹${Number(amountPaid + amountDue).toLocaleString("en-IN")}
-</td>
-</tr>
-
-<tr>
-<td style="padding:10px 0;">
-Total Paid
-</td>
-<td style="
-padding:10px 0;
-text-align:right;
-font-weight:bold;
-color:#15803d;
-">
-₹${Number(amountPaid).toLocaleString("en-IN")}
-</td>
-</tr>
-
-<tr>
-<td style="padding:10px 0;">
-Amount Due
-</td>
-<td style="
-padding:10px 0;
-text-align:right;
-font-weight:bold;
-color:#dc2626;
-">
-₹${Number(amountDue).toLocaleString("en-IN")}
-</td>
-</tr>
-
-<tr>
-<td style="padding:10px 0;">
-Status
-</td>
-<td style="
-padding:10px 0;
-text-align:right;
-font-weight:bold;
-">
-${statusText}
-</td>
-</tr>
-
-<tr>
-<td style="padding:10px 0;">
-Payment Method
-</td>
-<td style="
-padding:10px 0;
-text-align:right;
-font-weight:bold;
-">
-${paymentMethod || "Razorpay"}
-</td>
-</tr>
-
-<tr>
-<td style="padding:10px 0;">
-Payment ID
-</td>
-<td style="
-padding:10px 0;
-text-align:right;
-word-break:break-all;
-font-size:12px;
-">
-${razorpayPaymentId}
-</td>
-</tr>
-
-<tr>
-<td style="padding:10px 0;">
-Order ID
-</td>
-<td style="
-padding:10px 0;
-text-align:right;
-word-break:break-all;
-font-size:12px;
-">
-${razorpayOrderId}
-</td>
-</tr>
-
-</table>
-
-<p style="
-margin-top:25px;
-color:#64748b;
-font-size:13px;
-">
-
-${
-    amountDue > 0
-        ? `₹${Number(amountDue).toLocaleString("en-IN")} remains to be paid for this booking.`
-        : "Your booking has been fully paid."
-}
-
-</p>
-
-</div>
-
-</div>
-
-</body>
-
-</html>
-
-`;
-
-        return await sendBrevoEmail({
-
-            to:
-                customerEmail,
-
-            subject:
-                `EventSphere Payment Receipt - ${eventName}`,
-
-            html:
-                html
-        });
-
-    } catch (error) {
-
-        console.error(
-            "Payment receipt email error:",
-            error
-        );
-
-        return false;
-    }
-}
-
-/* =====================================================
-   ADMIN - GET ALL BOOKINGS
-===================================================== */
-
-app.get(
-    "/admin/bookings",
-    verifyAdmin,
-    async (req, res) => {
-
-        try {
-
-            const snapshot =
-                await db
-                    .collection("bookings")
-                    .orderBy(
-                        "createdAt",
-                        "desc"
-                    )
-                    .get();
-
-            const bookings =
-                snapshot.docs.map(
-                    (doc) => ({
-                        id: doc.id,
-                        ...doc.data()
-                    })
-                );
-
-            return res.json({
-                success: true,
-                bookings: bookings
-            });
-
-        } catch (error) {
-
-            console.error(
-                "Admin bookings error:",
-                error
-            );
-
-            return res.status(500).json({
-                success: false,
-                message:
-                    "Unable to load bookings",
-                error:
-                    error.message
-            });
-        }
-    }
-);
-
-/* =====================================================
-   ADMIN - GET SINGLE BOOKING PAYMENT HISTORY
-===================================================== */
-
-app.get(
-    "/admin/payment-history/:bookingId",
-    verifyAdmin,
-    async (req, res) => {
-
-        try {
-
-            const bookingId =
-                req.params.bookingId;
-
-            const bookingRef =
-                db.collection("bookings")
-                    .doc(bookingId);
-
-            const bookingSnap =
-                await bookingRef.get();
-
-            if (!bookingSnap.exists) {
-
-                return res.status(404).json({
-                    success: false,
-                    message:
-                        "Booking not found"
-                });
-            }
-
-            const paymentsSnapshot =
-                await bookingRef
-                    .collection("payments")
-                    .orderBy(
-                        "paidAt",
-                        "asc"
-                    )
-                    .get();
-
-            const payments =
-                paymentsSnapshot.docs.map(
-                    (paymentDoc) => ({
-                        id:
-                            paymentDoc.id,
-                        ...paymentDoc.data()
-                    })
-                );
-
-            return res.json({
-
-                success: true,
-
-                bookingId:
-                    bookingId,
-
-                payments:
-                    payments
-            });
-
-        } catch (error) {
-
-            console.error(
-                "Admin payment history error:",
-                error
-            );
-
-            return res.status(500).json({
-                success: false,
-                message:
-                    "Unable to load payment history",
-                error:
-                    error.message
-            });
-        }
-    }
-);
-
-/* =====================================================
-   ADMIN - UPDATE BOOKING STATUS
-===================================================== */
-
-app.put(
-    "/admin/bookings/:bookingId/status",
-    verifyAdmin,
-    async (req, res) => {
-
-        try {
-
-            const bookingId =
-                req.params.bookingId;
-
-            const {
-                status
-            } = req.body;
-
-            if (!status) {
-
-                return res.status(400).json({
-                    success: false,
-                    message:
-                        "Booking status is required"
-                });
-            }
-
-            const bookingRef =
-                db.collection("bookings")
-                    .doc(bookingId);
-
-            const bookingSnap =
-                await bookingRef.get();
-
-            if (!bookingSnap.exists) {
-
-                return res.status(404).json({
-                    success: false,
-                    message:
-                        "Booking not found"
-                });
-            }
-
-            await bookingRef.update({
-
-                status:
-                    status,
-
-                updatedAt:
-                    FieldValue.serverTimestamp()
-            });
-
-            return res.json({
-
-                success: true,
-
-                message:
-                    "Booking status updated successfully"
-            });
-
-        } catch (error) {
-
-            console.error(
-                "Update booking status error:",
-                error
-            );
-
-            return res.status(500).json({
-                success: false,
-                message:
-                    "Unable to update booking status",
-                error:
-                    error.message
-            });
-        }
-    }
-);
-
-/* =====================================================
-   ADMIN - DELETE BOOKING
-===================================================== */
-
-app.delete(
-    "/admin/bookings/:bookingId",
-    verifyAdmin,
-    async (req, res) => {
-
-        try {
-
-            const bookingId =
-                req.params.bookingId;
-
-            const bookingRef =
-                db.collection("bookings")
-                    .doc(bookingId);
-
-            const bookingSnap =
-                await bookingRef.get();
-
-            if (!bookingSnap.exists) {
-
-                return res.status(404).json({
-                    success: false,
-                    message:
-                        "Booking not found"
-                });
-            }
-
-            /* -----------------------------------------
-               DELETE PAYMENT HISTORY FIRST
-            ----------------------------------------- */
-
-            const paymentsSnapshot =
-                await bookingRef
-                    .collection("payments")
-                    .get();
-
-            const batch =
-                db.batch();
-
-            paymentsSnapshot.docs.forEach(
-                (paymentDoc) => {
-
-                    batch.delete(
-                        paymentDoc.ref
-                    );
-                }
-            );
-
-            batch.delete(
-                bookingRef
-            );
-
-            await batch.commit();
-
-            return res.json({
-
-                success: true,
-
-                message:
-                    "Booking deleted successfully"
-            });
-
-        } catch (error) {
-
-            console.error(
-                "Delete booking error:",
-                error
-            );
-
-            return res.status(500).json({
-                success: false,
-                message:
-                    "Unable to delete booking",
-                error:
-                    error.message
-            });
-        }
-    }
-);
-
-/* =====================================================
-   USER - GET BOOKINGS
-===================================================== */
-
-app.get(
-    "/my-bookings",
-    verifyFirebaseToken,
-    async (req, res) => {
-
-        try {
-
-            const snapshot =
-                await db
-                    .collection("bookings")
-                    .where(
-                        "userId",
-                        "==",
-                        req.user.uid
-                    )
-                    .get();
-
-            const bookings =
-                snapshot.docs.map(
-                    (doc) => ({
-                        id: doc.id,
-                        ...doc.data()
-                    })
-                );
-
-            bookings.sort(
-                (a, b) => {
-
-                    const aTime =
-                        a.createdAt?.toMillis
-                            ? a.createdAt.toMillis()
-                            : 0;
-
-                    const bTime =
-                        b.createdAt?.toMillis
-                            ? b.createdAt.toMillis()
-                            : 0;
-
-                    return bTime - aTime;
-                }
-            );
-
-            return res.json({
-
-                success: true,
-
-                bookings:
-                    bookings
-            });
-
-        } catch (error) {
-
-            console.error(
-                "My bookings error:",
-                error
-            );
-
-            return res.status(500).json({
-                success: false,
-                message:
-                    "Unable to load your bookings",
-                error:
-                    error.message
-            });
-        }
-    }
-);
-
-/* =====================================================
-   SEND BOOKING CONFIRMATION EMAIL
-===================================================== */
-
-async function sendBookingConfirmationEmail(
-    booking
-) {
-
-    try {
-
-        const customerEmail =
-            booking.email ||
-            booking.userEmail ||
-            booking.customerEmail;
-
-        if (!customerEmail) {
-            return false;
-        }
-
-        const customerName =
-            booking.name ||
-            booking.userName ||
-            booking.customerName ||
-            "Customer";
-
-        const eventName =
-            booking.eventName ||
-            booking.eventTitle ||
-            booking.title ||
-            "Event";
-
-        const totalAmount =
-            Number(
-                booking.price ||
-                booking.amount ||
-                booking.totalAmount ||
-                0
-            );
-
-        const html = `
-
-<!DOCTYPE html>
-
-<html>
-
-<head>
-
-<meta charset="UTF-8">
-
-</head>
-
-<body style="
-font-family:Arial,sans-serif;
-background:#f5f7fb;
-padding:20px;
-">
-
-<div style="
-max-width:650px;
-margin:auto;
-background:#ffffff;
-padding:30px;
-border-radius:12px;
-">
-
-<h1 style="color:#172554;">
-EventSphere
-</h1>
-
-<h2>
-Booking Confirmed
-</h2>
-
-<p>
-Hello ${customerName},
-</p>
-
-<p>
-Your booking for
-<strong>${eventName}</strong>
-has been confirmed.
-</p>
-
-<hr>
-
-<p>
-<strong>Booking ID:</strong>
-${booking.id || "N/A"}
-</p>
-
-<p>
-<strong>Total Amount:</strong>
-₹${totalAmount.toLocaleString("en-IN")}
-</p>
-
-<p>
-<strong>Payment Status:</strong>
-${booking.paymentStatus || "Unpaid"}
-</p>
-
-<p>
-<strong>Amount Paid:</strong>
-₹${Number(
-    booking.amountPaid || 0
-).toLocaleString("en-IN")}
-</p>
-
-<p>
-<strong>Amount Due:</strong>
-₹${Number(
-    booking.amountDue || totalAmount
-).toLocaleString("en-IN")}
-</p>
-
-<p style="
-margin-top:30px;
-color:#64748b;
-">
-
-Thank you for choosing EventSphere.
-
-</p>
-
-</div>
-
-</body>
-
-</html>
-
-`;
-
-        return await sendBrevoEmail({
-
-            to:
-                customerEmail,
-
-            subject:
-                `EventSphere Booking Confirmation - ${eventName}`,
-
-            html:
-                html
-        });
-
-    } catch (error) {
-
-        console.error(
-            "Booking confirmation email error:",
-            error
-        );
-
-        return false;
-    }
-}
-
-/* =====================================================
-   TEST EMAIL
-===================================================== */
-
-app.post(
-    "/test-email",
-    verifyAdmin,
-    async (req, res) => {
-
-        try {
-
-            const {
-                email
-            } = req.body;
-
-            if (!email) {
-
-                return res.status(400).json({
-                    success: false,
-                    message:
-                        "Email address is required"
-                });
-            }
-
-            const sent =
-                await sendBrevoEmail({
-
-                    to:
-                        email,
-
-                    subject:
-                        "EventSphere Test Email",
-
-                    html: `
-
-                        <h2>
-                            EventSphere Email Test
-                        </h2>
-
-                        <p>
-                            Your email configuration
-                            is working correctly.
-                        </p>
-
-                    `
-                });
-
-            return res.json({
-
-                success:
-                    sent,
-
-                message:
-                    sent
-                        ? "Test email sent successfully"
-                        : "Test email could not be sent"
-            });
-
-        } catch (error) {
-
-            console.error(
-                "Test email error:",
-                error
-            );
-
-            return res.status(500).json({
-                success: false,
-                message:
-                    "Unable to send test email",
-                error:
-                    error.message
-            });
-        }
-    }
-);
-
-/* =====================================================
-   ERROR HANDLER
-===================================================== */
-
-app.use(
-    (error, req, res, next) => {
-
-        console.error(
-            "Unhandled server error:",
-            error
-        );
-
-        res.status(500).json({
-
-            success: false,
 
             message:
-                "Internal server error",
+                "EventSphere Backend Running"
 
-            error:
-                error.message
         });
+
     }
 );
 
-/* =====================================================
-   404 HANDLER
-===================================================== */
+
+// =========================================================
+// UNKNOWN API ROUTE
+// =========================================================
 
 app.use(
     (req, res) => {
@@ -2291,24 +2372,72 @@ app.use(
 
             path:
                 req.originalUrl
+
         });
+
     }
 );
 
-/* =====================================================
-   START SERVER
-===================================================== */
+
+// =========================================================
+// GLOBAL ERROR HANDLER
+// =========================================================
+
+app.use(
+    (error, req, res, next) => {
+
+        console.error(
+            "GLOBAL SERVER ERROR:",
+            error
+        );
+
+
+        if (res.headersSent) {
+
+            return next(error);
+
+        }
+
+
+        res.status(500).json({
+
+            success: false,
+
+            message:
+                "Internal server error."
+
+        });
+
+    }
+);
+
+
+// =========================================================
+// START SERVER
+// =========================================================
 
 app.listen(
     PORT,
     () => {
 
         console.log(
-            `EventSphere server running on port ${PORT}`
+            `EventSphere Backend Running on port ${PORT}`
         );
 
         console.log(
-            "Partial payment system enabled"
+            `Brevo configured: ${
+                BREVO_API_KEY
+                    ? "YES"
+                    : "NO"
+            }`
+        );
+
+        console.log(
+            `Razorpay configured: ${
+                razorpay
+                    ? "YES"
+                    : "NO"
+            }`
         );
 
     }
