@@ -1150,7 +1150,7 @@ app.get(
 /* =====================================================
    EMAIL CONFIGURATION
 ===================================================== */
-
+const otpStore = {};
 let transporter = null;
 
 if (EMAIL_FROM) {
@@ -1166,6 +1166,103 @@ if (EMAIL_FROM) {
             }
         });
 }
+
+// ================= SEND OTP =================
+app.post("/send-otp", async (req, res) => {
+
+    try {
+
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                message: "Email is required."
+            });
+        }
+
+        const otp =
+            Math.floor(100000 + Math.random() * 900000);
+
+        otpStore[email] = {
+            otp: otp,
+            expiresAt:
+                Date.now() + 5 * 60 * 1000
+        };
+
+        console.log(otpStore);
+
+        await transporter.sendMail({
+            from:
+                '"EventSphere" <eventsphere.official2026@gmail.com>',
+            to: email,
+            subject:
+                "EventSphere Email Verification OTP",
+            text:
+                `Your EventSphere OTP is: ${otp}. It is valid for 5 minutes.`,
+        });
+
+        res.json({
+            success: true,
+            message: "OTP sent successfully!"
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to send OTP."
+        });
+
+    }
+
+});
+
+
+// ================= VERIFY OTP =================
+app.post("/verify-otp", (req, res) => {
+
+    const { email, otp } = req.body;
+
+    if (!otpStore[email]) {
+        return res.status(400).json({
+            success: false,
+            message: "OTP not found."
+        });
+    }
+
+    if (
+        Date.now() >
+        otpStore[email].expiresAt
+    ) {
+        delete otpStore[email];
+
+        return res.status(400).json({
+            success: false,
+            message: "OTP expired."
+        });
+    }
+
+    if (
+        Number(otp) !==
+        otpStore[email].otp
+    ) {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid OTP."
+        });
+    }
+
+    delete otpStore[email];
+
+    return res.json({
+        success: true,
+        message: "OTP verified successfully!"
+    });
+
+});
 
 /* =====================================================
    BREVO EMAIL HELPER
