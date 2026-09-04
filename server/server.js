@@ -444,6 +444,7 @@ app.post(
 
                         userId:
                             String(
+                                booking.userId ||
                                 req.user.uid
                             ),
 
@@ -809,18 +810,13 @@ catch (paymentDetailsError) {
                Both remain in Firestore.
             ----------------------------------------- */
 
-           const paymentHistoryRef =
-    bookingRef
-        .collection("payments")
-        .doc(razorpay_payment_id);
+            const paymentHistoryRef =
+                bookingRef
+                    .collection("payments")
+                    .doc(razorpay_payment_id);
 
-console.log("PAYMENT USER DEBUG:", {
-    reqUser: req.user,
-    bookingUserId: booking.userId,
-    reqUserUid: req.user?.uid
-});
+            await paymentHistoryRef.set({
 
-await paymentHistoryRef.set({
                 razorpayPaymentId:
                     razorpay_payment_id,
 
