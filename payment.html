@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,6 +16,7 @@
 
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
 
     <style>
 
@@ -520,7 +522,9 @@
 
 
                 <h1>
+
                     Secure Payment
+
                 </h1>
 
             </div>
@@ -528,7 +532,7 @@
 
             <p class="payment-subtitle">
 
-                Complete your payment securely using Razorpay.
+                Complete your payment securely using Razorpay or Demo Payment.
 
             </p>
 
@@ -548,20 +552,27 @@
             <div class="booking-summary">
 
                 <h2>
+
                     Booking Summary
+
                 </h2>
 
 
                 <div class="summary-row">
 
                     <span class="summary-label">
+
                         Event
+
                     </span>
+
 
                     <span
                         class="summary-value"
                         id="eventName">
+
                         Loading...
+
                     </span>
 
                 </div>
@@ -570,13 +581,18 @@
                 <div class="summary-row">
 
                     <span class="summary-label">
+
                         Event Date
+
                     </span>
+
 
                     <span
                         class="summary-value"
                         id="eventDate">
+
                         Loading...
+
                     </span>
 
                 </div>
@@ -585,13 +601,18 @@
                 <div class="summary-row">
 
                     <span class="summary-label">
+
                         Guests
+
                     </span>
+
 
                     <span
                         class="summary-value"
                         id="guestCount">
+
                         Loading...
+
                     </span>
 
                 </div>
@@ -600,13 +621,18 @@
                 <div class="summary-row">
 
                     <span class="summary-label">
+
                         Location
+
                     </span>
+
 
                     <span
                         class="summary-value"
                         id="eventLocation">
+
                         Loading...
+
                     </span>
 
                 </div>
@@ -615,13 +641,18 @@
                 <div class="summary-row">
 
                     <span class="summary-label">
+
                         Amount
+
                     </span>
+
 
                     <span
                         class="summary-value summary-price"
                         id="eventPrice">
+
                         ₹0
+
                     </span>
 
                 </div>
@@ -639,12 +670,19 @@
                 <div>
 
                     <strong>
+
                         Secure Razorpay Checkout
+
                     </strong>
 
+
                     <p>
-                        You will be redirected to Razorpay's secure
-                        checkout to complete your payment.
+
+                        You can use Razorpay Test Mode
+                        or choose one of the Demo Payment
+                        methods below. Demo payments never
+                        transfer real money.
+
                     </p>
 
                 </div>
@@ -698,7 +736,9 @@
 
 <!-- ================= RAZORPAY CHECKOUT ================= -->
 
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script
+    src="https://checkout.razorpay.com/v1/checkout.js">
+</script>
 
 
 <!-- ================= AUTH ================= -->
@@ -716,6 +756,16 @@
     src="js/payment.js">
 </script>
 
+
+<!-- ================= DEMO PAYMENT JS ================= -->
+
+<script
+    type="module"
+    src="js/demo-payment.js">
+</script>
+
+
 </body>
 
 </html>
+```

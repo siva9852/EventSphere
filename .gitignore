@@ -67,3 +67,5 @@ node_modules/
 
 # dataconnect generated files
 .dataconnect
+
+server/eventsphere-9b964-firebase-adminsdk-fbsvc-27aa96e9dc.json
