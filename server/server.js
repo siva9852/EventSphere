@@ -3046,6 +3046,254 @@ app.get(
     }
 );
 
+// =========================================================
+// COUPON MANAGEMENT
+// =========================================================
+
+// CREATE COUPON
+app.post(
+    "/admin/coupons",
+    async (req, res) => {
+
+        try {
+
+            if (!firebaseDb) {
+
+                return res.status(500).json({
+                    success: false,
+                    message:
+                        "Firebase database is not initialized."
+                });
+
+            }
+
+            const {
+                code,
+                discountType,
+                discountValue,
+                minimumAmount,
+                maximumDiscount,
+                expiryDate,
+                usageLimit
+            } = req.body;
+
+
+            const couponCode =
+                String(code || "")
+                    .trim()
+                    .toUpperCase();
+
+
+            if (!couponCode) {
+
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Coupon code is required."
+                });
+
+            }
+
+
+            if (
+                !["percentage", "fixed"]
+                    .includes(discountType)
+            ) {
+
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Invalid discount type."
+                });
+
+            }
+
+
+            const value =
+                Number(discountValue);
+
+
+            const minimum =
+                Number(minimumAmount || 0);
+
+
+            const maximum =
+                Number(maximumDiscount || 0);
+
+
+            const limit =
+                Number(usageLimit);
+
+
+            if (
+                !Number.isFinite(value) ||
+                value <= 0
+            ) {
+
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Invalid discount value."
+                });
+
+            }
+
+
+            if (
+                discountType === "percentage" &&
+                value > 100
+            ) {
+
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Percentage discount cannot exceed 100%."
+                });
+
+            }
+
+
+            if (
+                !Number.isFinite(minimum) ||
+                minimum < 0
+            ) {
+
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Invalid minimum booking amount."
+                });
+
+            }
+
+
+            if (
+                !Number.isFinite(maximum) ||
+                maximum < 0
+            ) {
+
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Invalid maximum discount."
+                });
+
+            }
+
+
+            if (
+                !Number.isFinite(limit) ||
+                limit <= 0
+            ) {
+
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Invalid usage limit."
+                });
+
+            }
+
+
+            if (!expiryDate) {
+
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Expiry date is required."
+                });
+
+            }
+
+
+            const existingCoupon =
+                await firebaseDb
+                    .collection("coupons")
+                    .doc(couponCode)
+                    .get();
+
+
+            if (existingCoupon.exists) {
+
+                return res.status(409).json({
+                    success: false,
+                    message:
+                        "Coupon code already exists."
+                });
+
+            }
+
+
+            await firebaseDb
+                .collection("coupons")
+                .doc(couponCode)
+                .set({
+
+                    code:
+                        couponCode,
+
+                    discountType:
+                        discountType,
+
+                    discountValue:
+                        value,
+
+                    minimumAmount:
+                        minimum,
+
+                    maximumDiscount:
+                        maximum,
+
+                    expiryDate:
+                        expiryDate,
+
+                    usageLimit:
+                        limit,
+
+                    usedCount:
+                        0,
+
+                    active:
+                        true,
+
+                    createdAt:
+                        new Date().toISOString()
+
+                });
+
+
+            return res.json({
+
+                success: true,
+
+                message:
+                    "Coupon created successfully."
+
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "CREATE COUPON ERROR:",
+                error
+            );
+
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    "Unable to create coupon."
+
+            });
+
+        }
+
+    }
+);
 
 // =========================================================
 // UNKNOWN API ROUTE
