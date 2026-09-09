@@ -157,8 +157,24 @@ if (
 
 const otpStore = new Map();
 
+// =========================================================
+// BREVO SMTP MAIL TRANSPORTER
+// =========================================================
+
+const mailTransporter = nodemailer.createTransport({
+    host: "smtp-relay.brevo.com",
+    port: 587,
+    secure: false,
+    auth: {
+        user: BREVO_SMTP_USER,
+        pass: BREVO_SMTP_PASS
+    }
+});
 
 
+// =========================================================
+// SEND EMAIL USING BREVO API
+// =========================================================
 
 async function sendEmail({
     to,
@@ -166,44 +182,47 @@ async function sendEmail({
     text
 }) {
 
-    if (
-        !BREVO_SMTP_USER ||
-        !BREVO_SMTP_PASS
-    ) {
+    const BREVO_API_KEY =
+        process.env.BREVO_API_KEY || "";
 
+    if (!BREVO_API_KEY) {
         throw new Error(
-            "Brevo SMTP credentials are not configured."
+            "BREVO_API_KEY is not configured."
         );
-
     }
 
+    await axios.post(
+        "https://api.brevo.com/v3/smtp/email",
 
-    await mailTransporter.sendMail({
+        {
+            sender: {
+                name: "EventSphere",
+                email: EMAIL_FROM
+            },
 
-        from: {
+            to: [
+                {
+                    email: to
+                }
+            ],
 
-            name:
-                "EventSphere",
+            subject: subject,
 
-            address:
-                EMAIL_FROM
-
+            textContent: text
         },
 
-        to:
+        {
+            headers: {
+                "api-key": BREVO_API_KEY,
+                "Content-Type":
+                    "application/json",
+                "Accept":
+                    "application/json"
+            },
 
-            to,
-
-        subject:
-
-            subject,
-
-        text:
-
-            text
-
-    });
-
+            timeout: 15000
+        }
+    );
 }
 // =========================================================
 // SEND OTP
