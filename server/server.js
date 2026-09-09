@@ -416,14 +416,13 @@ EventSphere Admin Security`;
             );
 
 
-            return res.status(500).json({
+           return res.status(500).json({
 
-                success: false,
+    success: false,
 
-                message:
-                    "Failed to send OTP. Check BREVO_API_KEY in server environment variables."
-            });
-
+    message:
+        "Failed to send OTP. Check Brevo SMTP configuration."
+});
         }
 
     }
