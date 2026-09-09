@@ -13,6 +13,8 @@ import {
 const API_BASE_URL =
     "https://eventsphere-dndh.onrender.com";
 
+    const demoFirebaseAuth = auth;
+
 // =========================================================
 // VARIABLES
 // =========================================================
