@@ -55,6 +55,9 @@ const EMAIL_FROM =
 let firebaseAuth = null;
 let firebaseDb = null;
 
+let demoFirebaseAuth = null;
+let demoFirebaseDb = null;
+
 const localServiceAccountPath =
     require("path").join(
         __dirname,
@@ -154,33 +157,7 @@ if (
 
 const otpStore = new Map();
 
-// =========================================================
-// SEND EMAIL USING BREVO SMTP
-// =========================================================
 
-const mailTransporter =
-    nodemailer.createTransport({
-
-        host:
-            "smtp-relay.brevo.com",
-
-        port:
-            587,
-
-        secure:
-            false,
-
-        auth: {
-
-            user:
-                BREVO_SMTP_USER,
-
-            pass:
-                BREVO_SMTP_PASS
-
-        }
-
-    });
 
 
 async function sendEmail({
@@ -1328,12 +1305,8 @@ app.post(
 
 }
 
-const demoFirebaseAuth =
-    getAuth();
-
-const demoFirebaseDb =
-    getFirestore();
-
+demoFirebaseAuth = getAuth();
+demoFirebaseDb = getFirestore();
 
             // =================================================
             // REQUEST DATA
