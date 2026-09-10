@@ -37,7 +37,6 @@ function startInactivityTimer() {
 
     }
 
-
     inactivityTimer =
         setTimeout(
             async () => {
@@ -48,33 +47,27 @@ function startInactivityTimer() {
                         auth
                     );
 
-
                     sessionStorage.removeItem(
                         "adminOtpVerified"
                     );
-
 
                     sessionStorage.removeItem(
                         "adminUid"
                     );
 
-
                     localStorage.removeItem(
                         "adminOtpEmail"
                     );
 
-
                     alert(
                         "You have been logged out due to inactivity."
                     );
-
 
                     window.location.replace(
                         "admin-login.html"
                     );
 
                 }
-
 
                 catch (error) {
 
@@ -202,11 +195,9 @@ if (adminLoginForm) {
                     "adminOtpVerified"
                 );
 
-
                 sessionStorage.removeItem(
                     "adminUid"
                 );
-
 
                 localStorage.removeItem(
                     "adminOtpEmail"
@@ -231,11 +222,6 @@ if (adminLoginForm) {
 
                 // =================================================
                 // SAVE ADMIN UID
-                //
-                // IMPORTANT:
-                // OTP PAGE WILL USE THIS UID.
-                // It will NOT depend on auth.currentUser
-                // after moving to the OTP page.
                 // =================================================
 
                 sessionStorage.setItem(
@@ -271,16 +257,13 @@ if (adminLoginForm) {
                         "Access Denied! You are not an Admin."
                     );
 
-
                     sessionStorage.removeItem(
                         "adminUid"
                     );
 
-
                     await signOut(
                         auth
                     );
-
 
                     return;
 
@@ -336,16 +319,13 @@ if (adminLoginForm) {
                         "Unable to send OTP."
                     );
 
-
                     sessionStorage.removeItem(
                         "adminUid"
                     );
 
-
                     await signOut(
                         auth
                     );
-
 
                     return;
 
@@ -361,10 +341,6 @@ if (adminLoginForm) {
                     email
                 );
 
-
-                // =================================================
-                // ADMIN OTP NOT VERIFIED YET
-                // =================================================
 
                 sessionStorage.removeItem(
                     "adminOtpVerified"
@@ -394,13 +370,9 @@ if (adminLoginForm) {
                     error
                 );
 
-
-                // Clear UID if login process failed
-
                 sessionStorage.removeItem(
                     "adminUid"
                 );
-
 
                 alert(
                     error.message
@@ -591,7 +563,6 @@ async function loadDashboardStats() {
 
                 }
 
-
                 // =================================================
                 // ACTIVE
                 // =================================================
@@ -691,10 +662,6 @@ window.logout =
             );
 
 
-            // =================================================
-            // CLEAR ADMIN OTP SESSION
-            // =================================================
-
             sessionStorage.removeItem(
                 "adminOtpVerified"
             );
@@ -721,7 +688,6 @@ window.logout =
 
         }
 
-
         catch (error) {
 
             alert(
@@ -731,3 +697,225 @@ window.logout =
         }
 
     };
+
+
+// =====================================================
+// COUPON CREATION
+// =====================================================
+
+const couponForm =
+    document.getElementById(
+        "couponForm"
+    );
+
+
+if (couponForm) {
+
+    couponForm.addEventListener(
+        "submit",
+        async (e) => {
+
+            e.preventDefault();
+
+
+            // =================================================
+            // GET FORM VALUES
+            // =================================================
+
+            const code =
+                document
+                    .getElementById(
+                        "couponCode"
+                    )
+                    .value
+                    .trim()
+                    .toUpperCase();
+
+
+            const discountType =
+                document
+                    .getElementById(
+                        "discountType"
+                    )
+                    .value;
+
+
+            const discountValue =
+                Number(
+                    document
+                        .getElementById(
+                            "discountValue"
+                        )
+                        .value
+                );
+
+
+            const minimumAmount =
+                Number(
+                    document
+                        .getElementById(
+                            "minimumAmount"
+                        )
+                        .value ||
+                    0
+                );
+
+
+            const maximumDiscount =
+                Number(
+                    document
+                        .getElementById(
+                            "maximumDiscount"
+                        )
+                        .value ||
+                    0
+                );
+
+
+            const expiryDate =
+                document
+                    .getElementById(
+                        "couponExpiry"
+                    )
+                    .value;
+
+
+            const usageLimit =
+                Number(
+                    document
+                        .getElementById(
+                            "usageLimit"
+                        )
+                        .value
+                );
+
+
+            try {
+
+                // =================================================
+                // CURRENT ADMIN
+                // =================================================
+
+                const user =
+                    auth.currentUser;
+
+
+                if (!user) {
+
+                    alert(
+                        "Admin login session expired. Please login again."
+                    );
+
+                    return;
+
+                }
+
+
+                // =================================================
+                // FIREBASE ID TOKEN
+                // =================================================
+
+                const idToken =
+                    await user.getIdToken();
+
+
+                // =================================================
+                // CREATE COUPON
+                // =================================================
+
+                const response =
+                    await fetch(
+                        "https://eventsphere-dndh.onrender.com/admin/coupons",
+                        {
+
+                            method:
+                                "POST",
+
+                            headers: {
+
+                                "Content-Type":
+                                    "application/json",
+
+                                "Authorization":
+                                    `Bearer ${idToken}`
+
+                            },
+
+                            body:
+                                JSON.stringify({
+
+                                    code:
+                                        code,
+
+                                    discountType:
+                                        discountType,
+
+                                    discountValue:
+                                        discountValue,
+
+                                    minimumAmount:
+                                        minimumAmount,
+
+                                    maximumDiscount:
+                                        maximumDiscount,
+
+                                    expiryDate:
+                                        expiryDate,
+
+                                    usageLimit:
+                                        usageLimit
+
+                                })
+
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+
+                    alert(
+                        data.message ||
+                        "Unable to create coupon."
+                    );
+
+                    return;
+
+                }
+
+
+                alert(
+                    "Coupon created successfully! 🎉"
+                );
+
+
+                couponForm.reset();
+
+            }
+
+
+            catch (error) {
+
+                console.error(
+                    "COUPON ERROR:",
+                    error
+                );
+
+
+                alert(
+                    error.message ||
+                    "Unable to connect to the server."
+                );
+
+            }
+
+        }
+    );
+
+}

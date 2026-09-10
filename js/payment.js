@@ -31,14 +31,39 @@ let currentPaymentAmount = 0;
 
 
 // =========================================================
+// COUPON SYSTEM
+// =========================================================
+
+const COUPONS = {
+
+    TEST11: {
+        type: "percentage",
+        value: 11,
+        minAmount: 0,
+        maxDiscount: null,
+        expiresAt: null,
+        usageLimit: null
+    }
+
+};
+
+let appliedCoupon = null;
+let currentDiscount = 0;
+let currentDiscountedAmount = 0;
+
+
+// =========================================================
 // LOAD RAZORPAY SCRIPT
 // =========================================================
 
 function loadRazorpayScript() {
+
     return new Promise((resolve, reject) => {
 
         if (window.Razorpay) {
+
             resolve(true);
+
             return;
         }
 
@@ -49,19 +74,25 @@ function loadRazorpayScript() {
             "https://checkout.razorpay.com/v1/checkout.js";
 
         script.onload = () => {
+
             resolve(true);
+
         };
 
         script.onerror = () => {
+
             reject(
                 new Error(
                     "Unable to load Razorpay Checkout."
                 )
             );
+
         };
 
         document.head.appendChild(script);
+
     });
+
 }
 
 
@@ -70,6 +101,7 @@ function loadRazorpayScript() {
 // =========================================================
 
 function loadJsPDF() {
+
     return new Promise(
         (resolve, reject) => {
 
@@ -77,6 +109,7 @@ function loadJsPDF() {
                 window.jspdf &&
                 window.jspdf.jsPDF
             ) {
+
                 resolve(
                     window.jspdf.jsPDF
                 );
@@ -96,26 +129,33 @@ function loadJsPDF() {
                     window.jspdf &&
                     window.jspdf.jsPDF
                 ) {
+
                     resolve(
                         window.jspdf.jsPDF
                     );
+
                 }
 
                 else {
+
                     reject(
                         new Error(
                             "Unable to load PDF generator."
                         )
                     );
+
                 }
+
             };
 
             script.onerror = () => {
+
                 reject(
                     new Error(
                         "Unable to load PDF generator."
                     )
                 );
+
             };
 
             document.head.appendChild(
@@ -124,6 +164,7 @@ function loadJsPDF() {
 
         }
     );
+
 }
 
 
@@ -140,9 +181,537 @@ function setElementText(
         document.getElementById(id);
 
     if (element) {
+
         element.textContent =
             value ?? "Not specified";
+
     }
+
+}
+
+
+// =========================================================
+// COUPON SYSTEM FUNCTIONS
+// =========================================================
+
+function formatINR(amount) {
+
+    return "₹" +
+        Number(
+            amount || 0
+        ).toLocaleString(
+            "en-IN"
+        );
+
+}
+
+
+function couponElements() {
+
+    return {
+
+        input:
+            document.getElementById(
+                "couponCodeInput"
+            ),
+
+        button:
+            document.getElementById(
+                "applyCouponButton"
+            ),
+
+        message:
+            document.getElementById(
+                "couponMessage"
+            ),
+
+        discountRow:
+            document.getElementById(
+                "couponDiscountRow"
+            ),
+
+        discountAmount:
+            document.getElementById(
+                "couponDiscountAmount"
+            ),
+
+        finalRow:
+            document.getElementById(
+                "couponFinalRow"
+            ),
+
+        finalAmount:
+            document.getElementById(
+                "couponFinalAmount"
+            )
+
+    };
+
+}
+
+
+function showCouponMessage(
+    message,
+    success = false
+) {
+
+    const elements =
+        couponElements();
+
+    if (elements.message) {
+
+        elements.message.textContent =
+            message;
+
+        elements.message.style.color =
+            success
+                ? "#15803d"
+                : "#dc2626";
+
+    }
+
+}
+
+
+function updateCouponDisplay() {
+
+    const elements =
+        couponElements();
+
+    if (
+        !elements.discountRow ||
+        !elements.finalRow
+    ) {
+
+        return;
+    }
+
+
+    if (
+        appliedCoupon &&
+        currentDiscount > 0
+    ) {
+
+        elements.discountRow.style.display =
+            "flex";
+
+        elements.finalRow.style.display =
+            "flex";
+
+
+        elements.discountAmount.textContent =
+            "-" +
+            formatINR(
+                currentDiscount
+            );
+
+
+        elements.finalAmount.textContent =
+            formatINR(
+                currentDiscountedAmount
+            );
+
+    }
+
+    else {
+
+        elements.discountRow.style.display =
+            "none";
+
+        elements.finalRow.style.display =
+            "none";
+
+    }
+
+}
+
+
+function clearAppliedCoupon(
+    message = ""
+) {
+
+    appliedCoupon = null;
+
+    currentDiscount = 0;
+
+    currentDiscountedAmount =
+        currentAmountDue;
+
+    currentPaymentAmount =
+        currentAmountDue;
+
+    window.currentPaymentAmountBeforeCoupon =
+        currentAmountDue;
+
+    window.currentCouponDiscount =
+        0;
+
+    window.currentCouponCode =
+        "";
+
+    window.currentPaymentAmount =
+        currentAmountDue;
+
+    updateCouponDisplay();
+
+    if (message) {
+
+        showCouponMessage(
+            message
+        );
+
+    }
+
+}
+
+
+function calculateCouponDiscount(
+    coupon,
+    amount
+) {
+
+    const safeAmount =
+        Math.max(
+            0,
+            Number(
+                amount || 0
+            )
+        );
+
+
+    if (
+        Number.isFinite(
+            coupon.minAmount
+        ) &&
+        safeAmount <
+            coupon.minAmount
+    ) {
+
+        throw new Error(
+            "Minimum amount for this coupon is " +
+            formatINR(
+                coupon.minAmount
+            )
+        );
+
+    }
+
+
+    let discount = 0;
+
+
+    if (
+        coupon.type ===
+        "percentage"
+    ) {
+
+        discount =
+            safeAmount *
+            (
+                Number(
+                    coupon.value
+                ) / 100
+            );
+
+    }
+
+    else if (
+        coupon.type ===
+        "fixed"
+    ) {
+
+        discount =
+            Number(
+                coupon.value
+            );
+
+    }
+
+    else {
+
+        throw new Error(
+            "Invalid coupon configuration."
+        );
+
+    }
+
+
+    if (
+        Number.isFinite(
+            coupon.maxDiscount
+        )
+    ) {
+
+        discount =
+            Math.min(
+                discount,
+                Number(
+                    coupon.maxDiscount
+                )
+            );
+
+    }
+
+
+    discount =
+        Math.max(
+            0,
+            Math.min(
+                discount,
+                safeAmount
+            )
+        );
+
+
+    return Number(
+        discount.toFixed(2)
+    );
+
+}
+
+
+// =========================================================
+// APPLY COUPON
+// =========================================================
+
+function applyCoupon() {
+
+    const elements =
+        couponElements();
+
+    if (!elements.input) {
+
+        return;
+    }
+
+
+    const code =
+        elements.input.value
+            .trim()
+            .toUpperCase();
+
+
+    if (!code) {
+
+        clearAppliedCoupon();
+
+        showCouponMessage(
+            "Please enter a coupon code."
+        );
+
+        return;
+    }
+
+
+    const coupon =
+        COUPONS[code];
+
+
+    if (!coupon) {
+
+        clearAppliedCoupon();
+
+        showCouponMessage(
+            "Invalid coupon code."
+        );
+
+        return;
+    }
+
+
+    // =====================================================
+    // IMPORTANT:
+    // DISCOUNT IS CALCULATED FROM THE AMOUNT
+    // ENTERED BY THE CUSTOMER.
+    // =====================================================
+
+    const enteredAmount =
+        Number(
+            paymentAmountInput?.value ||
+            0
+        );
+
+
+    if (
+        !Number.isFinite(
+            enteredAmount
+        ) ||
+        enteredAmount <= 0
+    ) {
+
+        showCouponMessage(
+            "Please enter the amount you want to pay first."
+        );
+
+        return;
+    }
+
+
+    if (
+        enteredAmount >
+        currentAmountDue + 0.01
+    ) {
+
+        showCouponMessage(
+            "Payment amount cannot be greater than the amount due."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const discount =
+            calculateCouponDiscount(
+                coupon,
+                enteredAmount
+            );
+
+
+        currentDiscount =
+            discount;
+
+
+        currentDiscountedAmount =
+            Number(
+                (
+                    enteredAmount -
+                    currentDiscount
+                ).toFixed(2)
+            );
+
+
+        appliedCoupon = {
+
+            code:
+                code,
+
+            ...coupon
+
+        };
+
+
+        // =================================================
+        // IMPORTANT FIX
+        // =================================================
+        // DO NOT change paymentAmountInput.value here.
+        //
+        // Example:
+        // Customer enters ₹10,000
+        // Discount = ₹1,100
+        // Final = ₹8,900
+        //
+        // Input remains ₹10,000.
+        // Final amount shown separately = ₹8,900.
+        // Razorpay receives ₹8,900.
+        // =================================================
+
+        currentPaymentAmount =
+            currentDiscountedAmount;
+
+
+        window.currentPaymentAmountBeforeCoupon =
+            enteredAmount;
+
+        window.currentCouponDiscount =
+            currentDiscount;
+
+        window.currentCouponCode =
+            code;
+
+        window.currentPaymentAmount =
+            currentPaymentAmount;
+
+
+        updateCouponDisplay();
+
+
+        showCouponMessage(
+
+            code +
+            " applied successfully. You saved " +
+            formatINR(
+                currentDiscount
+            ) +
+            ".",
+
+            true
+
+        );
+
+    }
+
+    catch (error) {
+
+        clearAppliedCoupon();
+
+        showCouponMessage(
+
+            error.message ||
+            "Unable to apply coupon."
+
+        );
+
+    }
+
+}
+
+
+// =========================================================
+// INITIALIZE COUPON UI
+// =========================================================
+
+function initializeCouponUI() {
+
+    const elements =
+        couponElements();
+
+
+    if (elements.button) {
+
+        elements.button.addEventListener(
+
+            "click",
+
+            function(event) {
+
+                event.preventDefault();
+
+                applyCoupon();
+
+            }
+
+        );
+
+    }
+
+
+    if (elements.input) {
+
+        elements.input.addEventListener(
+
+            "keydown",
+
+            function(event) {
+
+                if (
+                    event.key ===
+                    "Enter"
+                ) {
+
+                    event.preventDefault();
+
+                    applyCoupon();
+
+                }
+
+            }
+
+        );
+
+    }
+
 }
 
 
@@ -152,26 +721,39 @@ function setElementText(
 
 function ensurePartialPaymentUI() {
 
-    if (document.getElementById("partialPaymentBox")) {
+    if (
+        document.getElementById(
+            "partialPaymentBox"
+        )
+    ) {
 
         paymentAmountInput =
-            document.getElementById("paymentAmountInput");
+            document.getElementById(
+                "paymentAmountInput"
+            );
 
         return;
     }
+
 
     if (
         !payButton ||
         !payButton.parentElement
     ) {
+
         return;
     }
 
+
     const box =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     box.id =
         "partialPaymentBox";
+
 
     box.style.cssText = `
         margin: 18px 0;
@@ -181,7 +763,9 @@ function ensurePartialPaymentUI() {
         background: #f8fafc;
     `;
 
+
     box.innerHTML = `
+
         <div style="
             font-weight:700;
             color:#1e3a8a;
@@ -190,6 +774,7 @@ function ensurePartialPaymentUI() {
         ">
             Payment Summary
         </div>
+
 
         <div style="
             display:grid;
@@ -205,6 +790,7 @@ function ensurePartialPaymentUI() {
                 border-radius:9px;
                 border:1px solid #e2e8f0;
             ">
+
                 <div style="
                     font-size:12px;
                     color:#64748b;
@@ -222,6 +808,7 @@ function ensurePartialPaymentUI() {
                 >
                     ₹0
                 </div>
+
             </div>
 
 
@@ -231,6 +818,7 @@ function ensurePartialPaymentUI() {
                 border-radius:9px;
                 border:1px solid #e2e8f0;
             ">
+
                 <div style="
                     font-size:12px;
                     color:#64748b;
@@ -248,6 +836,7 @@ function ensurePartialPaymentUI() {
                 >
                     ₹0
                 </div>
+
             </div>
 
 
@@ -257,6 +846,7 @@ function ensurePartialPaymentUI() {
                 border-radius:9px;
                 border:1px solid #e2e8f0;
             ">
+
                 <div style="
                     font-size:12px;
                     color:#64748b;
@@ -274,6 +864,7 @@ function ensurePartialPaymentUI() {
                 >
                     ₹0
                 </div>
+
             </div>
 
         </div>
@@ -289,9 +880,11 @@ function ensurePartialPaymentUI() {
                 margin-bottom:7px;
             "
         >
+
             <span id="paymentAmountLabel">
                 Amount to Pay Now
             </span>
+
         </label>
 
 
@@ -319,20 +912,166 @@ function ensurePartialPaymentUI() {
             color:#64748b;
             margin-top:7px;
         ">
+
             You can pay any amount up to the current due amount.
             You can pay the remaining amount later.
+
         </div>
+
+
+        <!-- =================================================
+             COUPON SECTION
+        ================================================== -->
+
+        <div style="
+            margin-top:16px;
+            padding-top:16px;
+            border-top:1px solid #e2e8f0;
+        ">
+
+            <label
+                for="couponCodeInput"
+                style="
+                    display:block;
+                    font-size:13px;
+                    font-weight:600;
+                    color:#334155;
+                    margin-bottom:7px;
+                "
+            >
+                Coupon Code
+            </label>
+
+
+            <div style="
+                display:flex;
+                gap:8px;
+                width:100%;
+            ">
+
+                <input
+                    type="text"
+                    id="couponCodeInput"
+                    placeholder="Enter coupon code"
+                    autocomplete="off"
+                    style="
+                        flex:1;
+                        min-width:0;
+                        padding:11px 12px;
+                        border:1px solid #cbd5e1;
+                        border-radius:8px;
+                        font-size:14px;
+                        outline:none;
+                        background:#fff;
+                        text-transform:uppercase;
+                    "
+                >
+
+
+                <button
+                    type="button"
+                    id="applyCouponButton"
+                    style="
+                        padding:11px 15px;
+                        border:0;
+                        border-radius:8px;
+                        background:#2563eb;
+                        color:#fff;
+                        font-size:14px;
+                        font-weight:700;
+                        cursor:pointer;
+                        white-space:nowrap;
+                    "
+                >
+                    Apply
+                </button>
+
+            </div>
+
+
+            <div
+                id="couponMessage"
+                style="
+                    min-height:18px;
+                    margin-top:7px;
+                    font-size:12px;
+                    font-weight:600;
+                "
+            ></div>
+
+
+            <div
+                id="couponDiscountRow"
+                style="
+                    display:none;
+                    justify-content:space-between;
+                    align-items:center;
+                    margin-top:8px;
+                    font-size:14px;
+                "
+            >
+
+                <span>
+                    Coupon Discount
+                </span>
+
+
+                <strong
+                    id="couponDiscountAmount"
+                    style="
+                        color:#15803d;
+                    "
+                >
+                    -₹0
+                </strong>
+
+            </div>
+
+
+            <div
+                id="couponFinalRow"
+                style="
+                    display:none;
+                    justify-content:space-between;
+                    align-items:center;
+                    margin-top:8px;
+                    font-size:16px;
+                    font-weight:700;
+                "
+            >
+
+                <span>
+                    Final Amount
+                </span>
+
+
+                <strong
+                    id="couponFinalAmount"
+                    style="
+                        color:#1e3a8a;
+                    "
+                >
+                    ₹0
+                </strong>
+
+            </div>
+
+        </div>
+
     `;
+
 
     payButton.parentElement.insertBefore(
         box,
         payButton
     );
 
+
     paymentAmountInput =
         document.getElementById(
             "paymentAmountInput"
         );
+
 }
 
 
@@ -346,10 +1085,6 @@ async function loadPaymentBooking() {
         auth.currentUser;
 
 
-    // =====================================================
-    // CHECK LOGIN
-    // =====================================================
-
     if (!user) {
 
         window.location.href =
@@ -359,14 +1094,11 @@ async function loadPaymentBooking() {
     }
 
 
-    // =====================================================
-    // GET BOOKING ID
-    // =====================================================
-
     const urlParams =
         new URLSearchParams(
             window.location.search
         );
+
 
     const urlBookingId =
         urlParams.get(
@@ -387,12 +1119,9 @@ async function loadPaymentBooking() {
             "paymentBookingId",
             urlBookingId
         );
+
     }
 
-
-    // =====================================================
-    // CHECK BOOKING ID
-    // =====================================================
 
     if (!bookingId) {
 
@@ -435,7 +1164,9 @@ async function loadPaymentBooking() {
 
             payButton.disabled =
                 true;
+
         }
+
 
         return;
     }
@@ -448,10 +1179,6 @@ async function loadPaymentBooking() {
 
 
     try {
-
-        // =================================================
-        // GET BOOKING
-        // =================================================
 
         const bookingReference =
             doc(
@@ -466,10 +1193,6 @@ async function loadPaymentBooking() {
                 bookingReference
             );
 
-
-        // =================================================
-        // BOOKING NOT FOUND
-        // =================================================
 
         if (
             !bookingSnapshot.exists()
@@ -515,16 +1238,13 @@ async function loadPaymentBooking() {
 
                 payButton.disabled =
                     true;
+
             }
 
 
             return;
         }
 
-
-        // =================================================
-        // BOOKING DATA
-        // =================================================
 
         const booking =
             bookingSnapshot.data();
@@ -535,10 +1255,6 @@ async function loadPaymentBooking() {
             booking
         );
 
-
-        // =================================================
-        // SECURITY CHECK
-        // =================================================
 
         if (
             booking.customerId &&
@@ -584,16 +1300,13 @@ async function loadPaymentBooking() {
 
                 payButton.disabled =
                     true;
+
             }
 
 
             return;
         }
 
-
-        // =================================================
-        // DISPLAY EVENT
-        // =================================================
 
         setElementText(
             "eventName",
@@ -603,20 +1316,12 @@ async function loadPaymentBooking() {
         );
 
 
-        // =================================================
-        // DISPLAY DATE
-        // =================================================
-
         setElementText(
             "eventDate",
             booking.eventDate ||
             "Not specified"
         );
 
-
-        // =================================================
-        // DISPLAY GUESTS
-        // =================================================
 
         setElementText(
             "guestCount",
@@ -627,10 +1332,6 @@ async function loadPaymentBooking() {
         );
 
 
-        // =================================================
-        // DISPLAY LOCATION
-        // =================================================
-
         setElementText(
             "eventLocation",
             booking.location ||
@@ -638,10 +1339,6 @@ async function loadPaymentBooking() {
             "Not specified"
         );
 
-
-        // =================================================
-        // DISPLAY PRICE
-        // =================================================
 
         const amount =
             Number(
@@ -652,17 +1349,18 @@ async function loadPaymentBooking() {
             );
 
 
-        // =================================================
-        // PREVIOUSLY PAID AMOUNT
-        // =================================================
-
         const storedPaid =
             booking.amountPaid !== undefined
+
                 ? Number(
                     booking.amountPaid || 0
                 )
-                : booking.paymentStatus === "Paid"
+
+                : booking.paymentStatus ===
+                  "Paid"
+
                     ? amount
+
                     : 0;
 
 
@@ -675,10 +1373,6 @@ async function loadPaymentBooking() {
                 )
             );
 
-
-        // =================================================
-        // CURRENT DUE AMOUNT
-        // =================================================
 
         const due =
             Math.max(
@@ -695,19 +1389,43 @@ async function loadPaymentBooking() {
         currentTotalAmount =
             amount;
 
+
         currentAmountPaid =
             paid;
 
+
         currentAmountDue =
             due;
+
 
         currentPaymentAmount =
             due;
 
 
-        // =================================================
-        // DISPLAY CURRENT DUE
-        // =================================================
+        appliedCoupon =
+            null;
+
+
+        currentDiscount =
+            0;
+
+
+        currentDiscountedAmount =
+            due;
+
+
+        window.currentPaymentAmountBeforeCoupon =
+            due;
+
+        window.currentCouponDiscount =
+            0;
+
+        window.currentCouponCode =
+            "";
+
+        window.currentPaymentAmount =
+            due;
+
 
         setElementText(
             "eventPrice",
@@ -717,10 +1435,6 @@ async function loadPaymentBooking() {
             )
         );
 
-
-        // =================================================
-        // DISPLAY PAYMENT SUMMARY
-        // =================================================
 
         setElementText(
             "paymentTotalAmount",
@@ -757,10 +1471,6 @@ async function loadPaymentBooking() {
         );
 
 
-        // =================================================
-        // PAYMENT INPUT
-        // =================================================
-
         if (paymentAmountInput) {
 
             paymentAmountInput.value =
@@ -770,27 +1480,22 @@ async function loadPaymentBooking() {
 
             paymentAmountInput.max =
                 due;
+
         }
 
-
-        // =================================================
-        // SAVE BOOKING ID
-        // =================================================
 
         if (payButton) {
 
             payButton.dataset.bookingId =
                 bookingId;
+
         }
 
 
-        // =================================================
-        // FULLY PAID
-        // =================================================
-
         if (
             due <= 0 ||
-            booking.paymentStatus === "Paid"
+            booking.paymentStatus ===
+            "Paid"
         ) {
 
             if (payButton) {
@@ -800,16 +1505,13 @@ async function loadPaymentBooking() {
 
                 payButton.innerHTML =
                     "✓ Fully Paid";
+
             }
 
 
             return;
         }
 
-
-        // =================================================
-        // APPROVAL CHECK
-        // =================================================
 
         if (
             booking.status !==
@@ -823,16 +1525,13 @@ async function loadPaymentBooking() {
 
                 payButton.innerHTML =
                     "Payment Not Available";
+
             }
 
 
             return;
         }
 
-
-        // =================================================
-        // PAYMENT AVAILABLE
-        // =================================================
 
         if (payButton) {
 
@@ -843,6 +1542,7 @@ async function loadPaymentBooking() {
                 <i class="fa-solid fa-lock"></i>
                 Pay Now
             `;
+
         }
 
     }
@@ -890,8 +1590,11 @@ async function loadPaymentBooking() {
 
             payButton.disabled =
                 true;
+
         }
+
     }
+
 }
 
 
@@ -920,6 +1623,7 @@ async function createPaymentOrder(
 
                     "Authorization":
                         `Bearer ${idToken}`
+
                 },
 
                 body:
@@ -929,8 +1633,19 @@ async function createPaymentOrder(
                             bookingId,
 
                         paymentAmount:
-                            paymentAmount
+                            paymentAmount,
+
+                        couponCode:
+                            appliedCoupon?.code ||
+                            null,
+
+                        couponDiscount:
+                            appliedCoupon
+                                ? currentDiscount
+                                : 0
+
                     })
+
             }
         );
 
@@ -962,6 +1677,7 @@ async function createPaymentOrder(
         throw new Error(
             `Server error (${response.status}).`
         );
+
     }
 
 
@@ -971,6 +1687,7 @@ async function createPaymentOrder(
             data.message ||
             `Payment order failed (${response.status}).`
         );
+
     }
 
 
@@ -980,12 +1697,13 @@ async function createPaymentOrder(
             data.message ||
             "Unable to create payment order."
         );
+
     }
 
 
     return data;
-}
 
+}
 
 // =========================================================
 // VERIFY RAZORPAY PAYMENT
@@ -1012,6 +1730,7 @@ async function verifyPayment(
 
                     "Authorization":
                         `Bearer ${idToken}`
+
                 },
 
                 body:
@@ -1030,8 +1749,19 @@ async function verifyPayment(
 
                         razorpay_signature:
                             paymentResponse
-                                .razorpay_signature
+                                .razorpay_signature,
+
+                        couponCode:
+                            appliedCoupon?.code ||
+                            null,
+
+                        couponDiscount:
+                            appliedCoupon
+                                ? currentDiscount
+                                : 0
+
                     })
+
             }
         );
 
@@ -1063,6 +1793,7 @@ async function verifyPayment(
         throw new Error(
             `Payment verification server error (${response.status}).`
         );
+
     }
 
 
@@ -1072,6 +1803,7 @@ async function verifyPayment(
             data.message ||
             `Payment verification failed (${response.status}).`
         );
+
     }
 
 
@@ -1081,10 +1813,12 @@ async function verifyPayment(
             data.message ||
             "Payment verification failed."
         );
+
     }
 
 
     return data;
+
 }
 
 
@@ -1110,10 +1844,6 @@ async function generatePaymentReceipt(
             new jsPDF();
 
 
-        // =================================================
-        // DATA
-        // =================================================
-
         const eventName =
             booking.eventName ||
             booking.event ||
@@ -1138,10 +1868,6 @@ async function generatePaymentReceipt(
             "Not specified";
 
 
-        // =================================================
-        // CURRENT PAYMENT AMOUNT
-        // =================================================
-
         const amount =
             Number(
                 verification.paymentAmount ||
@@ -1153,20 +1879,12 @@ async function generatePaymentReceipt(
             );
 
 
-        // =================================================
-        // TOTAL PAID SO FAR
-        // =================================================
-
         const totalPaid =
             Number(
                 verification.amountPaid ||
                 0
             );
 
-
-        // =================================================
-        // REMAINING AMOUNT
-        // =================================================
 
         const amountDue =
             Number(
@@ -1175,30 +1893,20 @@ async function generatePaymentReceipt(
             );
 
 
-        // =================================================
-        // PAYMENT STATUS
-        // =================================================
-
         const receiptStatus =
             verification.paymentStatus ===
             "Paid"
+
                 ? "PAID"
+
                 : "PARTIALLY PAID";
 
-
-        // =================================================
-        // PAYMENT ID
-        // =================================================
 
         const paymentId =
             razorpayResponse
                 ?.razorpay_payment_id ||
             "Not available";
 
-
-        // =================================================
-        // ORDER ID
-        // =================================================
 
         const orderId =
             razorpayResponse
@@ -1207,29 +1915,17 @@ async function generatePaymentReceipt(
             "Not available";
 
 
-        // =================================================
-        // CUSTOMER NAME
-        // =================================================
-
         const customerName =
             user.displayName ||
             booking.customerName ||
             "Customer";
 
 
-        // =================================================
-        // CUSTOMER EMAIL
-        // =================================================
-
         const customerEmail =
             user.email ||
             booking.customerEmail ||
             "Not available";
 
-
-        // =================================================
-        // RECEIPT DATE
-        // =================================================
 
         const receiptDate =
             new Date()
@@ -1238,10 +1934,6 @@ async function generatePaymentReceipt(
                 );
 
 
-        // =================================================
-        // FORMATTED AMOUNT
-        // =================================================
-
         const formattedAmount =
             "Rs. " +
             amount.toLocaleString(
@@ -1249,19 +1941,11 @@ async function generatePaymentReceipt(
             );
 
 
-        // =================================================
-        // PAGE
-        // =================================================
-
         pdf.setFont(
             "helvetica",
             "normal"
         );
 
-
-        // =================================================
-        // HEADER
-        // =================================================
 
         pdf.setFontSize(
             25
@@ -1314,10 +1998,6 @@ async function generatePaymentReceipt(
         );
 
 
-        // =================================================
-        // PAYMENT STATUS
-        // =================================================
-
         pdf.setFontSize(
             13
         );
@@ -1339,10 +2019,6 @@ async function generatePaymentReceipt(
             }
         );
 
-
-        // =================================================
-        // CUSTOMER DETAILS
-        // =================================================
 
         pdf.setFontSize(
             12
@@ -1381,10 +2057,6 @@ async function generatePaymentReceipt(
             106
         );
 
-
-        // =================================================
-        // BOOKING DETAILS
-        // =================================================
 
         pdf.setFont(
             "helvetica",
@@ -1440,10 +2112,6 @@ async function generatePaymentReceipt(
         );
 
 
-        // =================================================
-        // PAYMENT DETAILS
-        // =================================================
-
         pdf.setFont(
             "helvetica",
             "bold"
@@ -1484,10 +2152,6 @@ async function generatePaymentReceipt(
         );
 
 
-        // =================================================
-        // AMOUNT
-        // =================================================
-
         pdf.setFont(
             "helvetica",
             "bold"
@@ -1525,10 +2189,6 @@ async function generatePaymentReceipt(
         );
 
 
-        // =================================================
-        // FOOTER
-        // =================================================
-
         pdf.setFontSize(
             10
         );
@@ -1562,10 +2222,6 @@ async function generatePaymentReceipt(
         );
 
 
-        // =================================================
-        // DOWNLOAD
-        // =================================================
-
         const safeEventName =
             eventName
                 .replace(
@@ -1592,7 +2248,6 @@ async function generatePaymentReceipt(
 
     }
 
-
     catch (error) {
 
         console.error(
@@ -1602,8 +2257,11 @@ async function generatePaymentReceipt(
 
 
         return false;
+
     }
+
 }
+
 
 // =========================================================
 // START RAZORPAY PAYMENT
@@ -1614,10 +2272,6 @@ async function startPayment() {
     const user =
         auth.currentUser;
 
-
-    // =====================================================
-    // CHECK LOGIN
-    // =====================================================
 
     if (!user) {
 
@@ -1634,16 +2288,14 @@ async function startPayment() {
     }
 
 
-    // =====================================================
-    // GET BOOKING ID
-    // =====================================================
-
     const bookingId =
         payButton?.dataset.bookingId ||
 
         new URLSearchParams(
             window.location.search
-        ).get("bookingId") ||
+        ).get(
+            "bookingId"
+        ) ||
 
         localStorage.getItem(
             "paymentBookingId"
@@ -1662,7 +2314,7 @@ async function startPayment() {
 
 
     // =====================================================
-    // GET PAYMENT AMOUNT
+    // GET THE ORIGINAL CUSTOMER-ENTERED AMOUNT
     // =====================================================
 
     const enteredAmount =
@@ -1671,10 +2323,6 @@ async function startPayment() {
             currentAmountDue
         );
 
-
-    // =====================================================
-    // VALIDATE AMOUNT
-    // =====================================================
 
     if (
         !Number.isFinite(
@@ -1691,10 +2339,6 @@ async function startPayment() {
         return;
     }
 
-
-    // =====================================================
-    // DO NOT ALLOW MORE THAN DUE
-    // =====================================================
 
     if (
         enteredAmount >
@@ -1714,20 +2358,77 @@ async function startPayment() {
 
 
     // =====================================================
-    // STORE CURRENT PAYMENT
+    // IMPORTANT COUPON FIX
+    // =====================================================
+    // Always recalculate the discount immediately before
+    // creating the Razorpay order.
+    //
+    // ₹10,000
+    // 11% discount = ₹1,100
+    // Razorpay amount = ₹8,900
+    //
+    // ₹20,000
+    // 11% discount = ₹2,200
+    // Razorpay amount = ₹17,800
     // =====================================================
 
-    currentPaymentAmount =
-        Number(
-            enteredAmount.toFixed(2)
-        );
+    if (appliedCoupon) {
+
+        currentDiscount =
+            calculateCouponDiscount(
+                appliedCoupon,
+                enteredAmount
+            );
+
+
+        currentDiscountedAmount =
+            Number(
+                (
+                    enteredAmount -
+                    currentDiscount
+                ).toFixed(2)
+            );
+
+
+        currentPaymentAmount =
+            currentDiscountedAmount;
+
+    }
+
+    else {
+
+        currentDiscount =
+            0;
+
+
+        currentDiscountedAmount =
+            enteredAmount;
+
+
+        currentPaymentAmount =
+            Number(
+                enteredAmount.toFixed(2)
+            );
+
+    }
+
+
+    // Keep the values available to any payment UI.
+    window.currentPaymentAmountBeforeCoupon =
+        enteredAmount;
+
+    window.currentCouponDiscount =
+        currentDiscount;
+
+    window.currentCouponCode =
+        appliedCoupon?.code ||
+        "";
+
+    window.currentPaymentAmount =
+        currentPaymentAmount;
 
 
     try {
-
-        // =================================================
-        // DISABLE BUTTON
-        // =================================================
 
         if (payButton) {
 
@@ -1738,26 +2439,20 @@ async function startPayment() {
             payButton.innerHTML = `
                 🔄 Processing Payment...
             `;
+
         }
 
-
-        // =================================================
-        // FIREBASE TOKEN
-        // =================================================
 
         const idToken =
             await user.getIdToken();
 
 
-        // =================================================
-        // LOAD RAZORPAY
-        // =================================================
-
         await loadRazorpayScript();
 
 
         // =================================================
-        // CREATE PAYMENT ORDER
+        // THIS IS THE FINAL DISCOUNTED AMOUNT.
+        // THIS VALUE IS SENT TO THE BACKEND.
         // =================================================
 
         const orderData =
@@ -1773,10 +2468,6 @@ async function startPayment() {
             orderData
         );
 
-
-        // =================================================
-        // GET FRESH BOOKING
-        // =================================================
 
         const bookingSnapshot =
             await getDoc(
@@ -1795,6 +2486,7 @@ async function startPayment() {
             throw new Error(
                 "Booking not found."
             );
+
         }
 
 
@@ -1802,19 +2494,11 @@ async function startPayment() {
             bookingSnapshot.data();
 
 
-        // =================================================
-        // RAZORPAY OPTIONS
-        // =================================================
-
         const options = {
 
             key:
                 orderData.keyId,
 
-
-            // IMPORTANT:
-            // Razorpay receives ONLY
-            // the amount selected by customer.
 
             amount:
                 orderData.amount,
@@ -1837,10 +2521,6 @@ async function startPayment() {
                 orderData.orderId,
 
 
-            // =================================================
-            // CUSTOMER DETAILS
-            // =================================================
-
             prefill: {
 
                 name:
@@ -1853,40 +2533,31 @@ async function startPayment() {
                     user.email ||
                     booking.customerEmail ||
                     ""
+
             },
 
-
-            // =================================================
-            // RAZORPAY THEME
-            // =================================================
 
             theme: {
 
                 color:
                     "#2563eb"
+
             },
 
 
-            // =================================================
-            // PAYMENT SUCCESS
-            // =================================================
-
             handler:
-                async function (
+                async function(
                     razorpayResponse
                 ) {
 
                     try {
-
-                        // =====================================
-                        // VERIFYING
-                        // =====================================
 
                         if (payButton) {
 
                             payButton.innerHTML = `
                                 🔄 Verifying Payment...
                             `;
+
                         }
 
 
@@ -1896,19 +2567,11 @@ async function startPayment() {
                         );
 
 
-                        // =====================================
-                        // FRESH FIREBASE TOKEN
-                        // =====================================
-
                         const latestToken =
                             await user.getIdToken(
                                 true
                             );
 
-
-                        // =====================================
-                        // VERIFY PAYMENT
-                        // =====================================
 
                         const verification =
                             await verifyPayment(
@@ -1924,29 +2587,18 @@ async function startPayment() {
                         );
 
 
-                        // =====================================
-// PAYMENT SUCCESS
-// =====================================
+                        // =================================================
+                        // GENERATE RECEIPT
+                        // =================================================
 
-alert(
-    verification.paymentStatus === "Paid"
-        ? "Payment successful! Your booking has been fully paid."
-        : `Payment successful! ₹${verification.amountDue.toLocaleString("en-IN")} is remaining.`
-);
-
-
-                        // =====================================
-                        // REMOVE LOCAL BOOKING ID
-                        // =====================================
-
-                        localStorage.removeItem(
-                            "paymentBookingId"
+                        await generatePaymentReceipt(
+                            bookingId,
+                            booking,
+                            razorpayResponse,
+                            user,
+                            verification
                         );
 
-
-                        // =====================================
-                        // SUCCESS MESSAGE
-                        // =====================================
 
                         if (
                             verification.paymentStatus ===
@@ -1983,12 +2635,14 @@ alert(
                                 ) +
                                 "\n\nYour payment receipt has been downloaded."
                             );
+
                         }
 
 
-                        // =====================================
-                        // GO TO MY BOOKINGS
-                        // =====================================
+                        localStorage.removeItem(
+                            "paymentBookingId"
+                        );
+
 
                         window.location.href =
                             "my-bookings.html";
@@ -2020,19 +2674,18 @@ alert(
                                 <i class="fa-solid fa-lock"></i>
                                 Pay Now
                             `;
+
                         }
+
                     }
+
                 },
 
-
-            // =================================================
-            // PAYMENT MODAL CLOSED
-            // =================================================
 
             modal: {
 
                 ondismiss:
-                    function () {
+                    function() {
 
                         console.log(
                             "Razorpay payment window closed."
@@ -2049,15 +2702,15 @@ alert(
                                 <i class="fa-solid fa-lock"></i>
                                 Pay Now
                             `;
+
                         }
+
                     }
+
             }
+
         };
 
-
-        // =================================================
-        // CREATE RAZORPAY INSTANCE
-        // =================================================
 
         const razorpay =
             new window.Razorpay(
@@ -2065,13 +2718,9 @@ alert(
             );
 
 
-        // =================================================
-        // PAYMENT FAILED
-        // =================================================
-
         razorpay.on(
             "payment.failed",
-            function (
+            function(
                 response
             ) {
 
@@ -2097,14 +2746,12 @@ alert(
                         <i class="fa-solid fa-lock"></i>
                         Pay Now
                     `;
+
                 }
+
             }
         );
 
-
-        // =================================================
-        // OPEN RAZORPAY
-        // =================================================
 
         razorpay.open();
 
@@ -2135,8 +2782,11 @@ alert(
                 <i class="fa-solid fa-lock"></i>
                 Pay Now
             `;
+
         }
+
     }
+
 }
 
 
@@ -2148,13 +2798,17 @@ if (paymentAmountInput) {
 
     paymentAmountInput.addEventListener(
         "input",
-        function () {
+        function() {
 
             const value =
                 Number(
                     this.value
                 );
 
+
+            // =================================================
+            // VALIDATE PAYMENT AMOUNT
+            // =================================================
 
             if (
                 Number.isFinite(value) &&
@@ -2172,9 +2826,120 @@ if (paymentAmountInput) {
                 this.setCustomValidity(
                     ""
                 );
+
             }
+
+
+            // =================================================
+            // IF COUPON IS APPLIED
+            // RECALCULATE DISCOUNT FOR THE NEW AMOUNT
+            // =================================================
+
+            if (
+                appliedCoupon &&
+                Number.isFinite(value) &&
+                value > 0 &&
+                value <= currentAmountDue
+            ) {
+
+                try {
+
+                    const discount =
+                        calculateCouponDiscount(
+                            appliedCoupon,
+                            value
+                        );
+
+
+                    currentDiscount =
+                        discount;
+
+
+                    currentDiscountedAmount =
+                        Number(
+                            (
+                                value -
+                                currentDiscount
+                            ).toFixed(2)
+                        );
+
+
+                    // =================================================
+                    // IMPORTANT:
+                    // The input value is NOT changed.
+                    // Customer still sees the amount they entered.
+                    // =================================================
+
+                    currentPaymentAmount =
+                        currentDiscountedAmount;
+
+
+                    window.currentPaymentAmountBeforeCoupon =
+                        value;
+
+                    window.currentCouponDiscount =
+                        currentDiscount;
+
+                    window.currentCouponCode =
+                        appliedCoupon.code;
+
+                    window.currentPaymentAmount =
+                        currentPaymentAmount;
+
+
+                    updateCouponDisplay();
+
+
+                    showCouponMessage(
+
+                        appliedCoupon.code +
+                        " applied successfully. You saved " +
+                        formatINR(
+                            currentDiscount
+                        ) +
+                        ".",
+
+                        true
+
+                    );
+
+                }
+
+                catch (error) {
+
+                    console.error(
+                        "Coupon recalculation error:",
+                        error
+                    );
+
+                }
+
+            }
+
+            else if (
+                appliedCoupon &&
+                (
+                    !Number.isFinite(value) ||
+                    value <= 0
+                )
+            ) {
+
+                currentDiscount =
+                    0;
+
+                currentDiscountedAmount =
+                    0;
+
+                currentPaymentAmount =
+                    0;
+
+                updateCouponDisplay();
+
+            }
+
         }
     );
+
 }
 
 
@@ -2186,13 +2951,15 @@ if (payButton) {
 
     payButton.addEventListener(
         "click",
-        function (event) {
+        function(event) {
 
             event.preventDefault();
 
             startPayment();
+
         }
     );
+
 }
 
 
@@ -2204,21 +2971,31 @@ ensurePartialPaymentUI();
 
 
 // =========================================================
+// INITIALIZE COUPON UI
+// =========================================================
+
+initializeCouponUI();
+
+
+// =========================================================
 // AUTH STATE
 // =========================================================
 
 auth.onAuthStateChanged(
-    function (user) {
+    function(user) {
 
         if (user) {
 
             loadPaymentBooking();
+
         }
 
         else {
 
             window.location.href =
                 "customer-login.html";
+
         }
+
     }
 );

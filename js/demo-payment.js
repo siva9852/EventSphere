@@ -13,7 +13,9 @@ import {
 const API_BASE_URL =
     "https://eventsphere-dndh.onrender.com";
 
-    const demoFirebaseAuth = auth;
+const demoFirebaseAuth =
+    auth;
+
 
 // =========================================================
 // VARIABLES
@@ -29,8 +31,11 @@ let demoPaymentModal = null;
 function formatMoney(amount) {
 
     return "₹" +
-        Number(amount || 0)
-            .toLocaleString("en-IN");
+        Number(
+            amount || 0
+        ).toLocaleString(
+            "en-IN"
+        );
 
 }
 
@@ -59,6 +64,7 @@ function createDemoPaymentUI() {
             "demoPaymentSection"
         )
     ) {
+
         return;
     }
 
@@ -70,12 +76,15 @@ function createDemoPaymentUI() {
 
 
     if (!payButton) {
+
         return;
     }
 
 
     const section =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
 
     section.id =
@@ -106,6 +115,7 @@ function createDemoPaymentUI() {
             ">
                 🧪
             </span>
+
 
             <h3 style="
                 margin:0;
@@ -140,15 +150,18 @@ function createDemoPaymentUI() {
             <button
                 type="button"
                 class="demo-payment-method"
-                data-method="upi">
+                data-method="upi"
+            >
 
                 <span style="font-size:25px;">
                     📱
                 </span>
 
+
                 <strong>
                     Demo UPI
                 </strong>
+
 
                 <small>
                     Pay using UPI
@@ -160,15 +173,18 @@ function createDemoPaymentUI() {
             <button
                 type="button"
                 class="demo-payment-method"
-                data-method="qr">
+                data-method="qr"
+            >
 
                 <span style="font-size:25px;">
                     📷
                 </span>
 
+
                 <strong>
                     Demo QR
                 </strong>
+
 
                 <small>
                     Scan QR code
@@ -180,15 +196,18 @@ function createDemoPaymentUI() {
             <button
                 type="button"
                 class="demo-payment-method"
-                data-method="card">
+                data-method="card"
+            >
 
                 <span style="font-size:25px;">
                     💳
                 </span>
 
+
                 <strong>
                     Demo Card
                 </strong>
+
 
                 <small>
                     Test card payment
@@ -200,15 +219,18 @@ function createDemoPaymentUI() {
             <button
                 type="button"
                 class="demo-payment-method"
-                data-method="netbanking">
+                data-method="netbanking"
+            >
 
                 <span style="font-size:25px;">
                     🏦
                 </span>
 
+
                 <strong>
                     Net Banking
                 </strong>
+
 
                 <small>
                     Demo banking
@@ -220,15 +242,18 @@ function createDemoPaymentUI() {
             <button
                 type="button"
                 class="demo-payment-method"
-                data-method="wallet">
+                data-method="wallet"
+            >
 
                 <span style="font-size:25px;">
                     👛
                 </span>
 
+
                 <strong>
                     Demo Wallet
                 </strong>
+
 
                 <small>
                     Test wallet
@@ -279,6 +304,7 @@ function createDemoPaymentUI() {
                         const method =
                             this.dataset.method;
 
+
                         openDemoPayment(
                             method
                         );
@@ -303,12 +329,15 @@ function addDemoPaymentStyles() {
             "demoPaymentStyles"
         )
     ) {
+
         return;
     }
 
 
     const style =
-        document.createElement("style");
+        document.createElement(
+            "style"
+        );
 
 
     style.id =
@@ -640,9 +669,67 @@ async function getBooking() {
 
     return {
 
-        id: bookingId,
+        id:
+            bookingId,
 
         ...snapshot.data()
+
+    };
+
+}
+
+
+// =========================================================
+// GET CURRENT COUPON INFORMATION
+// =========================================================
+
+function getCurrentCouponInformation() {
+
+    /*
+     * payment.js stores the coupon information
+     * on window so that demo-payment.js can
+     * display the same information.
+     */
+
+    const couponCode =
+        window.currentCouponCode ||
+        "";
+
+
+    const couponDiscount =
+        Number(
+            window.currentCouponDiscount ||
+            0
+        );
+
+
+    const enteredAmount =
+        Number(
+            window.currentPaymentAmountBeforeCoupon ||
+            0
+        );
+
+
+    const finalAmount =
+        Number(
+            window.currentPaymentAmount ||
+            0
+        );
+
+
+    return {
+
+        couponCode:
+            couponCode,
+
+        couponDiscount:
+            couponDiscount,
+
+        enteredAmount:
+            enteredAmount,
+
+        finalAmount:
+            finalAmount
 
     };
 
@@ -693,12 +780,13 @@ async function openDemoPayment(
                 "This booking is already fully paid."
             );
 
+
             return;
 
         }
 
 
-        let paymentInput =
+        const paymentInput =
             document.getElementById(
                 "paymentAmountInput"
             );
@@ -736,21 +824,109 @@ async function openDemoPayment(
                 )
             );
 
+
             return;
 
         }
 
 
+        // =====================================================
+        // GET COUPON INFORMATION FROM PAYMENT.JS
+        // =====================================================
+
+        const couponInfo =
+            getCurrentCouponInformation();
+
+
+        /*
+         * If payment.js has a coupon applied,
+         * selectedAmount is already the discounted
+         * amount.
+         *
+         * Therefore recover the original amount
+         * from window.currentPaymentAmountBeforeCoupon.
+         */
+
+        let originalEnteredAmount =
+            couponInfo.enteredAmount;
+
+
+        let couponDiscount =
+            couponInfo.couponDiscount;
+
+
+        let couponCode =
+            couponInfo.couponCode;
+
+
+        let finalAmount =
+            couponInfo.finalAmount;
+
+
+        /*
+         * If coupon information is not available,
+         * treat the selected amount as the normal
+         * payment amount.
+         */
+
+        if (
+            !couponCode ||
+            couponDiscount <= 0
+        ) {
+
+            originalEnteredAmount =
+                selectedAmount;
+
+            couponDiscount =
+                0;
+
+            finalAmount =
+                selectedAmount;
+
+        }
+
+
+        /*
+         * Make sure final amount is valid.
+         */
+
+        if (
+            !Number.isFinite(
+                finalAmount
+            ) ||
+            finalAmount <= 0
+        ) {
+
+            finalAmount =
+                selectedAmount;
+
+        }
+
+
         showDemoModal(
+
             booking,
+
             totalAmount,
+
             amountPaid,
+
             amountDue,
-            selectedAmount,
+
+            originalEnteredAmount,
+
+            couponCode,
+
+            couponDiscount,
+
+            finalAmount,
+
             method
+
         );
 
     }
+
 
     catch (error) {
 
@@ -758,6 +934,7 @@ async function openDemoPayment(
             "Demo Payment Error:",
             error
         );
+
 
         alert(
             error.message ||
@@ -810,12 +987,25 @@ function getMethodName(
 // =========================================================
 
 function showDemoModal(
+
     booking,
+
     totalAmount,
+
     amountPaid,
+
     amountDue,
-    selectedAmount,
+
+    enteredAmount,
+
+    couponCode,
+
+    couponDiscount,
+
+    finalAmount,
+
     method
+
 ) {
 
     closeDemoModal();
@@ -835,10 +1025,12 @@ function showDemoModal(
 
         <div class="demo-modal">
 
+
             <button
                 type="button"
                 class="demo-close"
-                id="demoCloseButton">
+                id="demoCloseButton"
+            >
 
                 ×
 
@@ -850,12 +1042,14 @@ function showDemoModal(
                 margin-bottom:5px;
             ">
 
+
                 <div style="
                     font-size:34px;
                     margin-bottom:7px;
                 ">
                     🧪
                 </div>
+
 
                 <h2 style="
                     margin:0;
@@ -864,6 +1058,7 @@ function showDemoModal(
                 ">
                     ${getMethodName(method)}
                 </h2>
+
 
                 <p style="
                     color:#64748b;
@@ -876,13 +1071,19 @@ function showDemoModal(
             </div>
 
 
+            <!-- =================================================
+                 BOOKING SUMMARY
+            ================================================== -->
+
             <div class="demo-summary">
+
 
                 <div class="demo-summary-row">
 
                     <span>
                         Event
                     </span>
+
 
                     <strong>
                         ${escapeHtml(
@@ -901,6 +1102,7 @@ function showDemoModal(
                         Total
                     </span>
 
+
                     <strong>
                         ${formatMoney(
                             totalAmount
@@ -915,6 +1117,7 @@ function showDemoModal(
                     <span>
                         Already Paid
                     </span>
+
 
                     <strong style="
                         color:#15803d;
@@ -933,6 +1136,7 @@ function showDemoModal(
                         Remaining
                     </span>
 
+
                     <strong style="
                         color:#dc2626;
                     ">
@@ -943,8 +1147,13 @@ function showDemoModal(
 
                 </div>
 
+
             </div>
 
+
+            <!-- =================================================
+                 PAYMENT AMOUNT
+            ================================================== -->
 
             <label style="
                 display:block;
@@ -953,7 +1162,9 @@ function showDemoModal(
                 color:#334155;
                 margin-bottom:6px;
             ">
+
                 Demo Payment Amount
+
             </label>
 
 
@@ -964,22 +1175,125 @@ function showDemoModal(
                 min="1"
                 max="${amountDue}"
                 step="0.01"
-                value="${selectedAmount}">
+                value="${enteredAmount}"
+            >
+
+
+            <!-- =================================================
+                 COUPON SUMMARY
+            ================================================== -->
+
+            <div
+                id="demoCouponSummary"
+                style="
+                    margin-top:14px;
+                    padding:13px;
+                    background:#f0fdf4;
+                    border:1px solid #bbf7d0;
+                    border-radius:10px;
+                    display:${couponDiscount > 0 ? "block" : "none"};
+                "
+            >
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    padding:5px 0;
+                    font-size:14px;
+                ">
+
+                    <span>
+                        Payment Amount
+                    </span>
+
+
+                    <strong
+                        id="demoOriginalAmount"
+                    >
+                        ${formatMoney(
+                            enteredAmount
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    padding:5px 0;
+                    font-size:14px;
+                    color:#15803d;
+                ">
+
+                    <span>
+                        Coupon
+                        ${
+                            couponCode
+                                ? `(${escapeHtml(couponCode)})`
+                                : ""
+                        }
+                    </span>
+
+
+                    <strong
+                        id="demoCouponDiscount"
+                    >
+                        -${formatMoney(
+                            couponDiscount
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    margin-top:7px;
+                    padding-top:10px;
+                    border-top:1px solid #bbf7d0;
+                    font-size:16px;
+                    font-weight:700;
+                    color:#172554;
+                ">
+
+                    <span>
+                        Final Payable
+                    </span>
+
+
+                    <strong
+                        id="demoFinalAmount"
+                    >
+                        ${formatMoney(
+                            finalAmount
+                        )}
+                    </strong>
+
+                </div>
+
+            </div>
 
 
             <div
                 id="demoMethodArea"
-                style="margin-top:15px;">
+                style="margin-top:15px;"
+            >
             </div>
 
 
             <button
                 type="button"
                 id="demoPayNowButton"
-                class="demo-pay-now">
+                class="demo-pay-now"
+            >
 
                 ✓ Demo Pay ${formatMoney(
-                    selectedAmount
+                    finalAmount
                 )}
 
             </button>
@@ -991,9 +1305,12 @@ function showDemoModal(
                 color:#64748b;
                 font-size:11px;
             ">
+
                 This is a simulated payment for
                 EventSphere testing only.
+
             </div>
+
 
         </div>
 
@@ -1016,9 +1333,13 @@ function showDemoModal(
 
 
     setupDemoMethodArea(
+
         method,
+
         booking,
-        selectedAmount
+
+        finalAmount
+
     );
 
 
@@ -1044,11 +1365,108 @@ function showDemoModal(
                 );
 
 
-            payButton.textContent =
-                "✓ Demo Pay " +
-                formatMoney(
-                    amount
-                );
+            /*
+             * IMPORTANT:
+             *
+             * The amount entered inside the
+             * Demo Payment popup is the ORIGINAL
+             * amount before coupon.
+             *
+             * If TEST11 is active, calculate
+             * 11% again from this amount.
+             */
+
+            if (
+                couponCode &&
+                couponDiscount > 0 &&
+                Number.isFinite(amount) &&
+                amount > 0
+            ) {
+
+                const newDiscount =
+                    Number(
+                        (
+                            amount *
+                            0.11
+                        ).toFixed(2)
+                    );
+
+
+                const newFinalAmount =
+                    Number(
+                        (
+                            amount -
+                            newDiscount
+                        ).toFixed(2)
+                    );
+
+
+                const originalElement =
+                    document.getElementById(
+                        "demoOriginalAmount"
+                    );
+
+
+                const discountElement =
+                    document.getElementById(
+                        "demoCouponDiscount"
+                    );
+
+
+                const finalElement =
+                    document.getElementById(
+                        "demoFinalAmount"
+                    );
+
+
+                if (originalElement) {
+
+                    originalElement.textContent =
+                        formatMoney(
+                            amount
+                        );
+
+                }
+
+
+                if (discountElement) {
+
+                    discountElement.textContent =
+                        "-" +
+                        formatMoney(
+                            newDiscount
+                        );
+
+                }
+
+
+                if (finalElement) {
+
+                    finalElement.textContent =
+                        formatMoney(
+                            newFinalAmount
+                        );
+
+                }
+
+
+                payButton.textContent =
+                    "✓ Demo Pay " +
+                    formatMoney(
+                        newFinalAmount
+                    );
+
+            }
+
+            else {
+
+                payButton.textContent =
+                    "✓ Demo Pay " +
+                    formatMoney(
+                        amount
+                    );
+
+            }
 
         }
     );
@@ -1059,15 +1477,17 @@ function showDemoModal(
         function () {
 
             processDemoPayment(
+
                 booking.id,
+
                 method
+
             );
 
         }
     );
 
 }
-
 
 // =========================================================
 // METHOD-SPECIFIC AREA
@@ -1086,7 +1506,9 @@ function setupDemoMethodArea(
 
 
     if (!area) {
+
         return;
+
     }
 
 
@@ -1101,14 +1523,18 @@ function setupDemoMethodArea(
                 margin-bottom:6px;
                 color:#334155;
             ">
+
                 Demo UPI ID
+
             </label>
+
 
             <input
                 type="text"
                 class="demo-input"
                 value="eventsphere@demo"
-                readonly>
+                readonly
+            >
 
         `;
 
@@ -1124,11 +1550,13 @@ function setupDemoMethodArea(
                 gap:10px;
             ">
 
+
                 <input
                     class="demo-input"
                     value="4111 1111 1111 1111"
                     readonly
-                    placeholder="Card Number">
+                    placeholder="Card Number"
+                >
 
 
                 <div style="
@@ -1138,18 +1566,21 @@ function setupDemoMethodArea(
                     gap:10px;
                 ">
 
+
                     <input
                         class="demo-input"
                         value="12/30"
                         readonly
-                        placeholder="Expiry">
+                        placeholder="Expiry"
+                    >
 
 
                     <input
                         class="demo-input"
                         value="123"
                         readonly
-                        placeholder="CVV">
+                        placeholder="CVV"
+                    >
 
                 </div>
 
@@ -1173,24 +1604,31 @@ function setupDemoMethodArea(
                 margin-bottom:6px;
                 color:#334155;
             ">
+
                 Select Demo Bank
+
             </label>
+
 
             <select
                 id="demoBank"
-                class="demo-input">
+                class="demo-input"
+            >
 
                 <option>
                     Demo State Bank
                 </option>
 
+
                 <option>
                     Demo HDFC Bank
                 </option>
 
+
                 <option>
                     Demo ICICI Bank
                 </option>
+
 
                 <option>
                     Demo Axis Bank
@@ -1214,20 +1652,26 @@ function setupDemoMethodArea(
                 margin-bottom:6px;
                 color:#334155;
             ">
+
                 Select Demo Wallet
+
             </label>
+
 
             <select
                 id="demoWallet"
-                class="demo-input">
+                class="demo-input"
+            >
 
                 <option>
                     Demo Wallet
                 </option>
 
+
                 <option>
                     Demo Pay
                 </option>
+
 
                 <option>
                     Demo Wallet Plus
@@ -1248,19 +1692,23 @@ function setupDemoMethodArea(
                 text-align:center;
             ">
 
+
                 <p style="
                     margin:0 0 10px;
                     color:#475569;
                     font-size:13px;
                 ">
+
                     Scan this Demo QR code with
                     your phone.
+
                 </p>
 
 
                 <div
                     id="demoQRCode"
-                    class="demo-qr">
+                    class="demo-qr"
+                >
                 </div>
 
 
@@ -1269,8 +1717,11 @@ function setupDemoMethodArea(
                     color:#64748b;
                     font-size:11px;
                 ">
+
                     No real payment will be made.
+
                 </p>
+
 
             </div>
 
@@ -1278,8 +1729,11 @@ function setupDemoMethodArea(
 
 
         generateDemoQR(
+
             booking.id,
+
             amount
+
         );
 
     }
@@ -1303,7 +1757,9 @@ function generateDemoQR(
 
 
     if (!qrContainer) {
+
         return;
+
     }
 
 
@@ -1333,11 +1789,14 @@ function generateDemoQR(
     script.onload =
         function () {
 
-            qrContainer.innerHTML = "";
+            qrContainer.innerHTML =
+                "";
 
 
             new QRCode(
+
                 qrContainer,
+
                 {
 
                     text:
@@ -1350,6 +1809,7 @@ function generateDemoQR(
                         210
 
                 }
+
             );
 
         };
@@ -1365,7 +1825,9 @@ function generateDemoQR(
                     color:#dc2626;
                     font-size:13px;
                 ">
+
                     Unable to generate QR code.
+
                 </div>
 
             `;
@@ -1376,6 +1838,113 @@ function generateDemoQR(
     document.head.appendChild(
         script
     );
+
+}
+
+
+// =========================================================
+// GET FINAL DEMO PAYMENT AMOUNT
+// =========================================================
+
+function getFinalDemoPaymentAmount() {
+
+    const amountInput =
+        document.getElementById(
+            "demoPaymentAmount"
+        );
+
+
+    const enteredAmount =
+        Number(
+            amountInput?.value ||
+            0
+        );
+
+
+    if (
+        !Number.isFinite(
+            enteredAmount
+        ) ||
+        enteredAmount <= 0
+    ) {
+
+        return {
+
+            enteredAmount:
+                0,
+
+            discount:
+                0,
+
+            finalAmount:
+                0,
+
+            couponCode:
+                ""
+
+        };
+
+    }
+
+
+    /*
+     * Read coupon information from payment.js.
+     */
+
+    const couponCode =
+        window.currentCouponCode ||
+        "";
+
+
+    let discount = 0;
+
+
+    /*
+     * TEST11 = 11% discount.
+     *
+     * Calculate the discount from the amount
+     * entered in the Demo Payment popup.
+     */
+
+    if (
+        couponCode === "TEST11"
+    ) {
+
+        discount =
+            Number(
+                (
+                    enteredAmount *
+                    0.11
+                ).toFixed(2)
+            );
+
+    }
+
+
+    const finalAmount =
+        Number(
+            (
+                enteredAmount -
+                discount
+            ).toFixed(2)
+        );
+
+
+    return {
+
+        enteredAmount:
+            enteredAmount,
+
+        discount:
+            discount,
+
+        finalAmount:
+            finalAmount,
+
+        couponCode:
+            couponCode
+
+    };
 
 }
 
@@ -1399,6 +1968,7 @@ async function processDemoPayment(
             "Please login again before making a payment."
         );
 
+
         return;
 
     }
@@ -1416,22 +1986,61 @@ async function processDemoPayment(
         );
 
 
-    const amount =
-        Number(
-            amountInput?.value
-        );
+    /*
+     * IMPORTANT:
+     *
+     * The amount inside the popup is the
+     * original amount selected by the customer.
+     */
+
+    const paymentDetails =
+        getFinalDemoPaymentAmount();
+
+
+    const enteredAmount =
+        paymentDetails.enteredAmount;
+
+
+    const couponDiscount =
+        paymentDetails.discount;
+
+
+    const finalAmount =
+        paymentDetails.finalAmount;
+
+
+    const couponCode =
+        paymentDetails.couponCode;
 
 
     if (
         !Number.isFinite(
-            amount
+            enteredAmount
         ) ||
-        amount <= 0
+        enteredAmount <= 0
     ) {
 
         alert(
             "Please enter a valid payment amount."
         );
+
+
+        return;
+
+    }
+
+
+    if (
+        !Number.isFinite(
+            finalAmount
+        ) ||
+        finalAmount <= 0
+    ) {
+
+        alert(
+            "Final payment amount is invalid."
+        );
+
 
         return;
 
@@ -1440,12 +2049,16 @@ async function processDemoPayment(
 
     try {
 
-        payButton.disabled =
-            true;
+        if (payButton) {
+
+            payButton.disabled =
+                true;
 
 
-        payButton.textContent =
-            "🔄 Processing Demo Payment...";
+            payButton.textContent =
+                "🔄 Processing Demo Payment...";
+
+        }
 
 
         const idToken =
@@ -1454,13 +2067,21 @@ async function processDemoPayment(
             );
 
 
+        /*
+         * Send the FINAL discounted amount
+         * to the backend.
+         */
+
         const response =
             await fetch(
+
                 `${API_BASE_URL}/demo-payment`,
+
                 {
 
                     method:
                         "POST",
+
 
                     headers: {
 
@@ -1472,6 +2093,7 @@ async function processDemoPayment(
 
                     },
 
+
                     body:
                         JSON.stringify({
 
@@ -1479,7 +2101,17 @@ async function processDemoPayment(
                                 bookingId,
 
                             paymentAmount:
-                                amount,
+                                finalAmount,
+
+                            originalPaymentAmount:
+                                enteredAmount,
+
+                            couponCode:
+                                couponCode ||
+                                null,
+
+                            couponDiscount:
+                                couponDiscount,
 
                             paymentMethod:
                                 method
@@ -1487,6 +2119,7 @@ async function processDemoPayment(
                         })
 
                 }
+
             );
 
 
@@ -1505,6 +2138,7 @@ async function processDemoPayment(
                 );
 
         }
+
 
         catch {
 
@@ -1528,26 +2162,81 @@ async function processDemoPayment(
         }
 
 
-        alert(
+        /*
+         * Show the user the actual amount paid.
+         */
 
+        if (
             data.paymentStatus ===
             "Paid"
+        ) {
 
-                ?
-
-                "Demo payment successful! Your booking is fully paid."
-
-                :
-
-                "Demo payment successful! ₹" +
-                Number(
-                    data.amountDue || 0
-                ).toLocaleString(
-                    "en-IN"
+            alert(
+                "Demo payment successful!\n\n" +
+                "Amount entered: " +
+                formatMoney(
+                    enteredAmount
                 ) +
-                " is remaining."
+                "\n" +
+                (
+                    couponDiscount > 0
+                        ? "Coupon discount: -" +
+                          formatMoney(
+                              couponDiscount
+                          ) +
+                          "\n"
+                        : ""
+                ) +
+                "Final amount paid: " +
+                formatMoney(
+                    finalAmount
+                ) +
+                "\n\n" +
+                "Your booking is fully paid."
+            );
 
-        );
+        }
+
+
+        else {
+
+            alert(
+
+                "Demo payment successful!\n\n" +
+
+                "Amount entered: " +
+                formatMoney(
+                    enteredAmount
+                ) +
+                "\n" +
+
+                (
+                    couponDiscount > 0
+                        ? "Coupon discount: -" +
+                          formatMoney(
+                              couponDiscount
+                          ) +
+                          "\n"
+                        : ""
+                ) +
+
+                "Final amount paid: " +
+                formatMoney(
+                    finalAmount
+                ) +
+                "\n\n" +
+
+                "Remaining amount: " +
+                formatMoney(
+                    Number(
+                        data.amountDue ||
+                        0
+                    )
+                )
+
+            );
+
+        }
 
 
         closeDemoModal();
@@ -1562,6 +2251,7 @@ async function processDemoPayment(
             "my-bookings.html";
 
     }
+
 
     catch (error) {
 
@@ -1581,6 +2271,7 @@ async function processDemoPayment(
 
             payButton.disabled =
                 false;
+
 
             payButton.textContent =
                 "✓ Demo Pay";
@@ -1623,22 +2314,27 @@ function escapeHtml(
     return String(
         value || ""
     )
+
         .replace(
             /&/g,
             "&amp;"
         )
+
         .replace(
             /</g,
             "&lt;"
         )
+
         .replace(
             />/g,
             "&gt;"
         )
+
         .replace(
             /"/g,
             "&quot;"
         )
+
         .replace(
             /'/g,
             "&#039;"
@@ -1663,6 +2359,7 @@ function initializeDemoPayment() {
 // =========================================================
 
 auth.onAuthStateChanged(
+
     function (user) {
 
         if (user) {
@@ -1672,4 +2369,5 @@ auth.onAuthStateChanged(
         }
 
     }
+
 );

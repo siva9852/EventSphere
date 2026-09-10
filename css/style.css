@@ -6778,3 +6778,114 @@ footer {
     }
 
 }
+
+/* =========================================================
+   DISCOUNTS & COUPONS
+   ========================================================= */
+
+.coupon-section {
+    margin-top: 25px;
+    padding: 25px;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.coupon-section h2 {
+    margin: 0 0 8px;
+    color: #24458f;
+    font-size: 24px;
+}
+
+.coupon-section p {
+    margin-bottom: 20px;
+    color: #666;
+}
+
+
+/* Coupon form */
+
+#couponForm {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    align-items: end;
+}
+
+
+/* Labels */
+
+#couponForm label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+
+/* Inputs and select */
+
+#couponForm input,
+#couponForm select {
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid #d5d9e2;
+    border-radius: 7px;
+    background: #f8faff;
+    color: #222;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+    transition: 0.2s;
+}
+
+
+#couponForm input:focus,
+#couponForm select:focus {
+    border-color: #315fd4;
+    box-shadow: 0 0 0 3px rgba(49, 95, 212, 0.12);
+}
+
+
+/* Create Coupon button */
+
+#couponForm button {
+    height: 42px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 7px;
+    background: #315fd4;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+
+#couponForm button:hover {
+    background: #244eb8;
+    transform: translateY(-1px);
+}
+
+
+/* Mobile */
+
+@media (max-width: 900px) {
+
+    #couponForm {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    #couponForm {
+        grid-template-columns: 1fr;
+    }
+
+}

@@ -66,6 +66,15 @@
             </li>
 
 
+            <!-- ================= COUPONS ================= -->
+
+            <li>
+                <a href="#coupons">
+                    🎟️ Discounts & Coupons
+                </a>
+            </li>
+
+
             <li>
                 <a href="#"
                    onclick="logout()">
@@ -167,6 +176,133 @@
 
 
         </div>
+
+
+        <!-- ================= DISCOUNTS & COUPONS ================= -->
+
+        <section id="coupons"
+                 class="card">
+
+            <h2>
+                🎟️ Discounts & Coupons
+            </h2>
+
+
+            <p>
+                Create and manage discount coupons for EventSphere.
+            </p>
+
+
+            <form id="couponForm">
+
+
+                <label for="couponCode">
+                    Coupon Code
+                </label>
+
+                <input
+                    type="text"
+                    id="couponCode"
+                    placeholder="Example: EVENT10"
+                    required
+                >
+
+
+                <label for="discountType">
+                    Discount Type
+                </label>
+
+                <select
+                    id="discountType"
+                    required
+                >
+
+                    <option value="percentage">
+                        Percentage (%)
+                    </option>
+
+                    <option value="fixed">
+                        Fixed Amount (₹)
+                    </option>
+
+                </select>
+
+
+                <label for="discountValue">
+                    Discount Value
+                </label>
+
+                <input
+                    type="number"
+                    id="discountValue"
+                    min="1"
+                    placeholder="Example: 10"
+                    required
+                >
+
+
+                <label for="minimumAmount">
+                    Minimum Booking Amount
+                </label>
+
+                <input
+                    type="number"
+                    id="minimumAmount"
+                    min="0"
+                    value="0"
+                    placeholder="Example: 500"
+                >
+
+
+                <label for="maximumDiscount">
+                    Maximum Discount
+                </label>
+
+                <input
+                    type="number"
+                    id="maximumDiscount"
+                    min="0"
+                    placeholder="Optional"
+                >
+
+
+                <label for="couponExpiry">
+                    Expiry Date
+                </label>
+
+                <input
+                    type="date"
+                    id="couponExpiry"
+                    required
+                >
+
+
+                <label for="usageLimit">
+                    Usage Limit
+                </label>
+
+                <input
+                    type="number"
+                    id="usageLimit"
+                    min="1"
+                    value="100"
+                    placeholder="Example: 100"
+                    required
+                >
+
+
+                <br><br>
+
+
+                <button type="submit">
+                    ➕ Create Coupon
+                </button>
+
+
+            </form>
+
+        </section>
+
 
     </div>
 
