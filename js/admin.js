@@ -919,3 +919,467 @@ if (couponForm) {
     );
 
 }
+
+// =====================================================
+// SERVICE MAINTENANCE MANAGEMENT
+// =====================================================
+
+const maintenanceForm =
+    document.getElementById(
+        "maintenanceForm"
+    );
+
+const maintenanceStatus =
+    document.getElementById(
+        "maintenanceStatus"
+    );
+
+const disableMaintenanceBtn =
+    document.getElementById(
+        "disableMaintenanceBtn"
+    );
+
+
+// =====================================================
+// LOAD MAINTENANCE SETTINGS
+// =====================================================
+
+async function loadMaintenanceSettings() {
+
+    if (!maintenanceStatus) {
+        return;
+    }
+
+    try {
+
+        const maintenanceRef =
+            doc(
+                db,
+                "settings",
+                "maintenance"
+            );
+
+
+        const maintenanceSnap =
+            await getDoc(
+                maintenanceRef
+            );
+
+
+        if (!maintenanceSnap.exists()) {
+
+            maintenanceStatus.innerHTML = `
+                <strong>🟢 Service Online</strong>
+                <br>
+                No maintenance has been scheduled.
+            `;
+
+            return;
+        }
+
+
+        const data =
+            maintenanceSnap.data();
+
+
+        const enabled =
+            data.enabled === true;
+
+
+        const message =
+            data.message ||
+            "EventSphere is currently under maintenance.";
+
+
+        const startTime =
+            data.startTime || "";
+
+
+        const endTime =
+            data.endTime || "";
+
+
+        document.getElementById(
+            "maintenanceEnabled"
+        ).value =
+            enabled
+                ? "true"
+                : "false";
+
+
+        document.getElementById(
+            "maintenanceMessage"
+        ).value =
+            message;
+
+
+        document.getElementById(
+            "maintenanceStart"
+        ).value =
+            startTime;
+
+
+        document.getElementById(
+            "maintenanceEnd"
+        ).value =
+            endTime;
+
+
+        if (enabled) {
+
+            maintenanceStatus.innerHTML = `
+                <strong style="color:#dc2626;">
+                    🔴 Maintenance Enabled
+                </strong>
+
+                <br><br>
+
+                <strong>Message:</strong>
+                ${escapeMaintenanceHtml(message)}
+
+                <br><br>
+
+                <strong>Start:</strong>
+                ${startTime || "Not specified"}
+
+                <br>
+
+                <strong>End:</strong>
+                ${endTime || "Not specified"}
+            `;
+
+        } else {
+
+            maintenanceStatus.innerHTML = `
+                <strong style="color:#16a34a;">
+                    🟢 Service Online
+                </strong>
+
+                <br><br>
+
+                Maintenance mode is currently disabled.
+            `;
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Maintenance Load Error:",
+            error
+        );
+
+
+        maintenanceStatus.innerHTML = `
+            <strong style="color:#dc2626;">
+                Unable to load maintenance status.
+            </strong>
+        `;
+
+    }
+
+}
+
+
+// =====================================================
+// ESCAPE HTML
+// =====================================================
+
+function escapeMaintenanceHtml(
+    value
+) {
+
+    return String(value)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+// =====================================================
+// SAVE MAINTENANCE SETTINGS
+// =====================================================
+
+if (maintenanceForm) {
+
+    maintenanceForm.addEventListener(
+        "submit",
+        async (e) => {
+
+            e.preventDefault();
+
+
+            const user =
+                auth.currentUser;
+
+
+            if (!user) {
+
+                alert(
+                    "Admin login session expired. Please login again."
+                );
+
+                return;
+            }
+
+
+            const enabled =
+                document.getElementById(
+                    "maintenanceEnabled"
+                ).value === "true";
+
+
+            const message =
+                document.getElementById(
+                    "maintenanceMessage"
+                ).value.trim();
+
+
+            const startTime =
+                document.getElementById(
+                    "maintenanceStart"
+                ).value;
+
+
+            const endTime =
+                document.getElementById(
+                    "maintenanceEnd"
+                ).value;
+
+
+            if (enabled && !message) {
+
+                alert(
+                    "Please enter a maintenance message."
+                );
+
+                return;
+            }
+
+
+            if (
+                enabled &&
+                startTime &&
+                endTime &&
+                new Date(endTime) <=
+                new Date(startTime)
+            ) {
+
+                alert(
+                    "Maintenance end time must be after the start time."
+                );
+
+                return;
+            }
+
+
+            try {
+
+                const maintenanceRef =
+                    doc(
+                        db,
+                        "settings",
+                        "maintenance"
+                    );
+
+
+                const { setDoc } =
+                    await import(
+                        "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js"
+                    );
+
+
+                await setDoc(
+                    maintenanceRef,
+                    {
+
+                        enabled:
+                            enabled,
+
+                        message:
+                            message ||
+                            "EventSphere is currently under maintenance.",
+
+                        startTime:
+                            startTime,
+
+                        endTime:
+                            endTime,
+
+                        updatedAt:
+                            new Date().toISOString(),
+
+                        updatedBy:
+                            user.uid
+
+                    },
+                    {
+                        merge: true
+                    }
+                );
+
+
+                alert(
+                    enabled
+                        ? "Maintenance mode enabled successfully! 🛠️"
+                        : "Service is now online! 🟢"
+                );
+
+
+                await loadMaintenanceSettings();
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Maintenance Save Error:",
+                    error
+                );
+
+
+                alert(
+                    error.message ||
+                    "Unable to save maintenance settings."
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+// =====================================================
+// DISABLE MAINTENANCE
+// =====================================================
+
+if (disableMaintenanceBtn) {
+
+    disableMaintenanceBtn.addEventListener(
+        "click",
+        async () => {
+
+            const user =
+                auth.currentUser;
+
+
+            if (!user) {
+
+                alert(
+                    "Admin login session expired. Please login again."
+                );
+
+                return;
+            }
+
+
+            const confirmDisable =
+                confirm(
+                    "Are you sure you want to make EventSphere available to customers?"
+                );
+
+
+            if (!confirmDisable) {
+                return;
+            }
+
+
+            try {
+
+                const maintenanceRef =
+                    doc(
+                        db,
+                        "settings",
+                        "maintenance"
+                    );
+
+
+                const { setDoc } =
+                    await import(
+                        "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js"
+                    );
+
+
+                await setDoc(
+                    maintenanceRef,
+                    {
+
+                        enabled:
+                            false,
+
+                        updatedAt:
+                            new Date().toISOString(),
+
+                        updatedBy:
+                            user.uid
+
+                    },
+                    {
+                        merge: true
+                    }
+                );
+
+
+                document.getElementById(
+                    "maintenanceEnabled"
+                ).value =
+                    "false";
+
+
+                alert(
+                    "Maintenance disabled. EventSphere is now online! 🟢"
+                );
+
+
+                await loadMaintenanceSettings();
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Maintenance Disable Error:",
+                    error
+                );
+
+
+                alert(
+                    error.message ||
+                    "Unable to disable maintenance."
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+// =====================================================
+// LOAD CURRENT SETTINGS
+// =====================================================
+
+loadMaintenanceSettings();

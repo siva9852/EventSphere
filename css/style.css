@@ -11110,3 +11110,199 @@ footer {
     }
 
 }
+
+/* =========================================================
+   SERVICE MAINTENANCE
+========================================================= */
+
+.maintenance-section {
+    margin-top: 20px;
+    padding: 24px;
+    border-radius: 14px;
+}
+
+.maintenance-header {
+    margin-bottom: 22px;
+}
+
+.maintenance-header h2 {
+    margin: 0 0 8px 0;
+}
+
+.maintenance-header p {
+    margin: 0;
+    color: #666;
+}
+
+
+/* ================= FORM ================= */
+
+.maintenance-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+
+/* ================= FIELD ================= */
+
+.maintenance-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.maintenance-field label {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+
+/* ================= INPUTS ================= */
+
+.maintenance-field input,
+.maintenance-field select,
+.maintenance-field textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 1px solid #d5dce8;
+    border-radius: 8px;
+    background: #ffffff;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: 0.2s ease;
+}
+
+
+.maintenance-field input:focus,
+.maintenance-field select:focus,
+.maintenance-field textarea:focus {
+    border-color: #3564d4;
+    box-shadow: 0 0 0 3px rgba(53, 100, 212, 0.10);
+}
+
+
+.maintenance-field textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+
+/* ================= MESSAGE ================= */
+
+.maintenance-message-field {
+    grid-column: span 1;
+}
+
+
+/* ================= BUTTONS ================= */
+
+.maintenance-buttons {
+    grid-column: 1 / -1;
+
+    display: flex;
+    gap: 12px;
+    align-items: center;
+
+    margin-top: 5px;
+}
+
+
+.maintenance-buttons button {
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+
+.maintenance-buttons button[type="submit"] {
+    background: #3564d4;
+    color: white;
+}
+
+
+.maintenance-buttons button[type="submit"]:hover {
+    background: #244fb5;
+}
+
+
+.disable-maintenance-button {
+    background: #e8f7ed;
+    color: #16833c;
+    border: 1px solid #b9e5c7 !important;
+}
+
+
+.disable-maintenance-button:hover {
+    background: #d9f2e1;
+}
+
+
+/* ================= STATUS ================= */
+
+.maintenance-status {
+    margin-top: 22px;
+
+    padding: 16px 18px;
+
+    border-radius: 10px;
+
+    background: #f5f7fb;
+
+    color: #333;
+
+    font-size: 14px;
+
+    border: 1px solid #e3e8f1;
+}
+
+
+/* ================= TABLET ================= */
+
+@media (max-width: 900px) {
+
+    .maintenance-form {
+        grid-template-columns: 1fr;
+    }
+
+    .maintenance-message-field {
+        grid-column: span 1;
+    }
+
+    .maintenance-buttons {
+        grid-column: span 1;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .maintenance-buttons button {
+        width: 100%;
+    }
+
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 600px) {
+
+    .maintenance-section {
+        padding: 18px;
+    }
+
+    .maintenance-field input,
+    .maintenance-field select,
+    .maintenance-field textarea {
+        font-size: 14px;
+    }
+
+}
