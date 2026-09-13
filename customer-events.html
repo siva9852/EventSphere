@@ -5,97 +5,1318 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <title>Events - EventSphere</title>
-
-    <link rel="stylesheet" href="css/style.css">
+    <title>Explore Events - EventSphere</title>
 
     <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+          href="css/style.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+
+        /* =====================================================
+           CUSTOMER EVENTS PAGE
+           ===================================================== */
+
+        .customer-events-page {
+            min-height: 100vh;
+            background:
+                linear-gradient(
+                    135deg,
+                    #f6f8ff 0%,
+                    #eef3ff 50%,
+                    #f9f7ff 100%
+                );
+            padding: 30px 35px 50px;
+        }
+
+
+        /* =====================================================
+           TOP BAR
+           ===================================================== */
+
+        .events-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+
+        .events-welcome h1 {
+            margin: 0;
+            color: #172554;
+            font-size: 30px;
+            font-weight: 750;
+            letter-spacing: -0.5px;
+        }
+
+
+        .events-welcome p {
+            margin: 7px 0 0;
+            color: #64748b;
+            font-size: 15px;
+        }
+
+
+        .events-user-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+
+        .notification-button {
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 13px;
+            background: white;
+            color: #334155;
+            font-size: 17px;
+            cursor: pointer;
+            box-shadow: 0 7px 22px rgba(35, 48, 95, 0.08);
+            position: relative;
+        }
+
+
+        .notification-button:hover {
+            transform: translateY(-2px);
+        }
+
+
+        .notification-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+            border: 2px solid white;
+        }
+
+
+        .customer-mini-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 12px 7px 7px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 7px 22px rgba(35, 48, 95, 0.08);
+        }
+
+
+        .customer-mini-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: linear-gradient(
+                135deg,
+                #5142d9,
+                #7667f5
+            );
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+
+        .customer-mini-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        .customer-mini-info strong {
+            color: #172554;
+            font-size: 13px;
+        }
+
+
+        .customer-mini-info span {
+            color: #94a3b8;
+            font-size: 11px;
+        }
+
+
+        /* =====================================================
+           HERO BANNER
+           ===================================================== */
+
+        .events-hero {
+            position: relative;
+            overflow: hidden;
+            min-height: 220px;
+            border-radius: 24px;
+            padding: 38px 42px;
+            margin-bottom: 25px;
+
+            background:
+                linear-gradient(
+                    115deg,
+                    #3026a3 0%,
+                    #5142d9 45%,
+                    #786cf2 100%
+                );
+
+            color: white;
+
+            box-shadow:
+                0 18px 40px rgba(55, 48, 170, 0.22);
+        }
+
+
+        .events-hero::before {
+            content: "";
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            right: -90px;
+            top: -110px;
+            background: rgba(255, 255, 255, 0.09);
+        }
+
+
+        .events-hero::after {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            right: 180px;
+            bottom: -120px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+
+        .events-hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 650px;
+        }
+
+
+        .events-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 13px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+
+
+        .events-hero h2 {
+            margin: 0;
+            font-size: 34px;
+            line-height: 1.15;
+            font-weight: 800;
+        }
+
+
+        .events-hero p {
+            margin: 12px 0 0;
+            color: rgba(255, 255, 255, 0.84);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+
+        .hero-decoration {
+            position: absolute;
+            right: 60px;
+            bottom: 25px;
+            z-index: 2;
+            font-size: 90px;
+            opacity: 0.18;
+            transform: rotate(-8deg);
+        }
+
+
+        /* =====================================================
+           SEARCH + FILTER
+           ===================================================== */
+
+        .events-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            background: white;
+            border-radius: 18px;
+            padding: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 28px rgba(35, 48, 95, 0.07);
+        }
+
+
+        .event-search-box {
+            flex: 1;
+            position: relative;
+        }
+
+
+        .event-search-box i {
+            position: absolute;
+            left: 17px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+
+        .event-search-box input {
+            width: 100%;
+            height: 48px;
+            box-sizing: border-box;
+            border: 1px solid #e5e7eb;
+            border-radius: 13px;
+            padding: 0 18px 0 46px;
+            outline: none;
+            font-size: 14px;
+            color: #1e293b;
+            background: #f8fafc;
+        }
+
+
+        .event-search-box input:focus {
+            border-color: #6457df;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(100, 87, 223, 0.08);
+        }
+
+
+        .event-filter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+
+        .filter-button {
+            height: 44px;
+            padding: 0 15px;
+            border: 1px solid #e5e7eb;
+            border-radius: 11px;
+            background: white;
+            color: #64748b;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+
+        .filter-button:hover,
+        .filter-button.active {
+            background: #5142d9;
+            border-color: #5142d9;
+            color: white;
+        }
+
+
+        /* =====================================================
+           SECTION HEADER
+           ===================================================== */
+
+        .events-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+
+        .events-section-header h3 {
+            margin: 0;
+            color: #172554;
+            font-size: 20px;
+        }
+
+
+        .events-section-header span {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+
+        /* =====================================================
+           FIREBASE EVENTS CONTAINER
+           ===================================================== */
+
+        #eventsContainer {
+            display: grid;
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(280px, 1fr)
+                );
+            gap: 22px;
+        }
+
+
+        #eventsContainer > p {
+            grid-column: 1 / -1;
+            background: white;
+            border-radius: 18px;
+            padding: 45px 20px;
+            text-align: center;
+            color: #64748b;
+            box-shadow: 0 8px 28px rgba(35, 48, 95, 0.07);
+        }
+
+
+        /* =====================================================
+           EVENT CARDS
+           
+           These styles also work with cards generated by
+           customer-events.js when it uses common card elements.
+           ===================================================== */
+
+        .event-card,
+        .customer-event-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow:
+                0 8px 28px rgba(35, 48, 95, 0.07);
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+
+        .event-card:hover,
+        .customer-event-card:hover {
+            transform: translateY(-6px);
+            box-shadow:
+                0 18px 40px rgba(35, 48, 95, 0.13);
+        }
+
+
+        .event-card img,
+        .customer-event-card img {
+            width: 100%;
+            height: 190px;
+            object-fit: cover;
+            display: block;
+        }
+
+
+        .event-card-content,
+        .customer-event-card-content {
+            padding: 20px;
+        }
+
+
+        .event-card h3,
+        .customer-event-card h3 {
+            margin: 0 0 9px;
+            color: #172554;
+            font-size: 19px;
+        }
+
+
+        .event-card p,
+        .customer-event-card p {
+            margin: 7px 0;
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+
+        .event-card .event-price,
+        .customer-event-card .event-price {
+            color: #5142d9;
+            font-size: 20px;
+            font-weight: 800;
+            margin-top: 14px;
+        }
+
+
+        .event-card button,
+        .customer-event-card button {
+            width: 100%;
+            margin-top: 15px;
+            height: 45px;
+            border: none;
+            border-radius: 11px;
+            background: #5142d9;
+            color: white;
+            font-weight: 650;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+
+        .event-card button:hover,
+        .customer-event-card button:hover {
+            background: #3e32bd;
+            transform: translateY(-1px);
+        }
+
+
+        /* =====================================================
+           INFORMATION STRIP
+           ===================================================== */
+
+        .events-info-strip {
+            display: grid;
+            grid-template-columns:
+                repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 28px;
+        }
+
+
+        .events-info-card {
+            background: white;
+            border-radius: 17px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow:
+                0 7px 24px rgba(35, 48, 95, 0.06);
+        }
+
+
+        .events-info-icon {
+            width: 46px;
+            height: 46px;
+            min-width: 46px;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0efff;
+            color: #5142d9;
+            font-size: 19px;
+        }
+
+
+        .events-info-card strong {
+            display: block;
+            color: #172554;
+            font-size: 14px;
+        }
+
+
+        .events-info-card span {
+            display: block;
+            margin-top: 4px;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+
+        /* =====================================================
+           SIDEBAR PROFILE
+           ===================================================== */
+
+        .customer-profile-box {
+            margin-top: auto;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 1000px) {
+
+            .customer-events-page {
+                padding: 25px;
+            }
+
+            .events-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .event-filter {
+                justify-content: flex-start;
+            }
+
+            .hero-decoration {
+                right: 20px;
+            }
+
+        }
+
+
+        @media (max-width: 750px) {
+
+            .events-topbar {
+                align-items: flex-start;
+            }
+
+            .events-welcome h1 {
+                font-size: 25px;
+            }
+
+            .events-user-area {
+                display: none;
+            }
+
+            .events-hero {
+                padding: 30px 25px;
+                min-height: 190px;
+            }
+
+            .events-hero h2 {
+                font-size: 27px;
+            }
+
+            .hero-decoration {
+                display: none;
+            }
+
+            .events-info-strip {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+
+        @media (max-width: 500px) {
+
+            .customer-events-page {
+                padding: 20px 15px 35px;
+            }
+
+            .events-hero {
+                border-radius: 18px;
+                padding: 25px 20px;
+            }
+
+            .events-hero h2 {
+                font-size: 24px;
+            }
+
+            .events-section-header {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            #eventsContainer {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
 
 </head>
+
 
 <body>
 
 <div class="dashboard">
 
-    <!-- SIDEBAR -->
 
-    <div class="sidebar">
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
 
-        <h2>EventSphere</h2>
+    <aside class="sidebar">
+
+        <h2>
+            🎉 EventSphere
+        </h2>
+
 
         <ul>
 
             <li>
+
                 <a href="customer-dashboard.html">
-                    🏠 Dashboard
+
+                    <i class="fa-solid fa-house"></i>
+
+                    Dashboard
+
                 </a>
+
             </li>
+
 
             <li class="active">
+
                 <a href="customer-events.html">
-                    🎉 Events
+
+                    <i class="fa-solid fa-calendar-days"></i>
+
+                    View Events
+
                 </a>
+
             </li>
 
+
             <li>
+
                 <a href="my-bookings.html">
-                    📅 My Bookings
-                </a>
-            </li>
 
-            <li>
-                <a href="#" onclick="logout()">
-                    🚪 Logout
+                    <i class="fa-solid fa-calendar-check"></i>
+
+                    My Bookings
+
                 </a>
+
             </li>
 
         </ul>
 
-    </div>
 
+        <!-- Customer profile -->
 
-    <!-- MAIN CONTENT -->
+        <div class="customer-profile-box">
 
-    <div class="dashboard-content customer-events-page">
+            <div class="customer-profile-icon">
 
-        <div class="events-heading">
+                <i class="fa-solid fa-user"></i>
 
-            <div class="events-heading-icon">
-                <i class="fa-solid fa-calendar-days"></i>
             </div>
 
-            <div>
 
-                <h1>Available Events</h1>
+            <div class="customer-profile-info">
+
+                <strong id="customerName">
+                    Loading...
+                </strong>
+
+                <span id="customerEmail">
+                    Loading...
+                </span>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="dashboard-content customer-events-page">
+
+
+        <!-- TOP BAR -->
+
+        <div class="events-topbar">
+
+            <div class="events-welcome">
+
+                <h1>
+                    Explore Events
+                </h1>
 
                 <p>
-                    Explore our available events and book your favorite one.
+                    Discover amazing experiences and book your next event.
                 </p>
 
             </div>
 
+
+            <div class="events-user-area">
+
+                <button
+                    type="button"
+                    class="notification-button"
+                    title="Notifications">
+
+                    <i class="fa-solid fa-bell"></i>
+
+                    <span class="notification-dot"></span>
+
+                </button>
+
+
+                <div class="customer-mini-profile">
+
+                    <div class="customer-mini-avatar">
+
+                        <i class="fa-solid fa-user"></i>
+
+                    </div>
+
+
+                    <div class="customer-mini-info">
+
+                        <strong id="topCustomerName">
+                            Customer
+                        </strong>
+
+                        <span>
+                            Event Explorer
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
 
 
-        <!-- EVENTS -->
+        <!-- HERO -->
 
-        <div id="eventsContainer" class="events-grid">
+        <section class="events-hero">
 
-            <p>Loading events...</p>
+            <div class="events-hero-content">
+
+                <div class="events-hero-badge">
+
+                    <i class="fa-solid fa-sparkles"></i>
+
+                    Discover • Book • Celebrate
+
+                </div>
+
+
+                <h2>
+                    Find Your Next
+                    Unforgettable Experience
+                </h2>
+
+
+                <p>
+                    Explore events created by EventSphere and
+                    find something perfect for you, your friends,
+                    and your family.
+                </p>
+
+            </div>
+
+
+            <div class="hero-decoration">
+
+                <i class="fa-solid fa-ticket"></i>
+
+            </div>
+
+        </section>
+
+
+        <!-- SEARCH + FILTER -->
+
+        <section class="events-toolbar">
+
+
+            <div class="event-search-box">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="text"
+                    id="eventSearch"
+                    placeholder="Search events, locations or categories...">
+
+            </div>
+
+
+            <div class="event-filter">
+
+                <button
+                    type="button"
+                    class="filter-button active"
+                    data-category="all">
+
+                    All
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="filter-button"
+                    data-category="music">
+
+                    Music
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="filter-button"
+                    data-category="wedding">
+
+                    Wedding
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="filter-button"
+                    data-category="birthday">
+
+                    Birthday
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="filter-button"
+                    data-category="corporate">
+
+                    Corporate
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- EVENT SECTION -->
+
+        <div class="events-section-header">
+
+            <div>
+
+                <h3>
+                    Available Events
+                </h3>
+
+                <span>
+                    Events published by EventSphere
+                </span>
+
+            </div>
+
+
+            <span id="eventCount">
+                Explore now
+            </span>
 
         </div>
 
-    </div>
+
+        <!-- =================================================
+             IMPORTANT
+
+             Keep this ID exactly the same.
+
+             customer-events.js uses this container to
+             display events coming from Firebase.
+             ================================================= -->
+
+        <div id="eventsContainer">
+
+            <p>
+
+                <i class="fa-solid fa-spinner fa-spin"></i>
+
+                &nbsp;
+
+                Loading events...
+
+            </p>
+
+        </div>
+
+
+        <!-- INFORMATION STRIP -->
+
+        <section class="events-info-strip">
+
+
+            <div class="events-info-card">
+
+                <div class="events-info-icon">
+
+                    <i class="fa-solid fa-shield-halved"></i>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        Secure Booking
+                    </strong>
+
+                    <span>
+                        Your booking details stay protected.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="events-info-card">
+
+                <div class="events-info-icon">
+
+                    <i class="fa-solid fa-calendar-check"></i>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        Easy Booking
+                    </strong>
+
+                    <span>
+                        Choose an event and book in a few clicks.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="events-info-card">
+
+                <div class="events-info-icon">
+
+                    <i class="fa-solid fa-heart"></i>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        Great Experiences
+                    </strong>
+
+                    <span>
+                        Discover events worth remembering.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+    </main>
 
 </div>
 
 
-<script type="module" src="js/auth.js"></script>
+<!-- =====================================================
+     EXISTING AUTHENTICATION
+     ===================================================== -->
 
-<script type="module" src="js/customer-events.js"></script>
+<script type="module"
+        src="js/auth.js">
+</script>
+
+
+<!-- =====================================================
+     EXISTING CUSTOMER EVENTS LOGIC
+     ===================================================== -->
+
+<script type="module"
+        src="js/customer-events.js">
+</script>
+
+
+<!-- =====================================================
+     CUSTOMER NAME
+     ===================================================== -->
+
+<script type="module">
+
+    import {
+        auth,
+        db
+    } from "./js/firebase-config.js";
+
+    import {
+        doc,
+        getDoc
+    } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+
+    auth.onAuthStateChanged(
+        async (user) => {
+
+            if (!user) {
+
+                window.location.href =
+                    "customer-login.html";
+
+                return;
+
+            }
+
+
+            const emailElement =
+                document.getElementById(
+                    "customerEmail"
+                );
+
+
+            const nameElement =
+                document.getElementById(
+                    "customerName"
+                );
+
+
+            const topNameElement =
+                document.getElementById(
+                    "topCustomerName"
+                );
+
+
+            if (emailElement) {
+
+                emailElement.textContent =
+                    user.email || "";
+
+            }
+
+
+            let customerName =
+                user.displayName ||
+                "Customer";
+
+
+            try {
+
+                const userSnapshot =
+                    await getDoc(
+                        doc(
+                            db,
+                            "users",
+                            user.uid
+                        )
+                    );
+
+
+                if (
+                    userSnapshot.exists()
+                ) {
+
+                    const userData =
+                        userSnapshot.data();
+
+
+                    customerName =
+                        userData.name ||
+                        userData.fullName ||
+                        userData.username ||
+                        user.displayName ||
+                        "Customer";
+
+                }
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Customer profile error:",
+                    error
+                );
+
+            }
+
+
+            if (nameElement) {
+
+                nameElement.textContent =
+                    customerName;
+
+            }
+
+
+            if (topNameElement) {
+
+                topNameElement.textContent =
+                    customerName;
+
+            }
+
+        }
+    );
+
+
+    /* =====================================================
+       SEARCH
+       ===================================================== */
+
+    const searchInput =
+        document.getElementById(
+            "eventSearch"
+        );
+
+
+    if (searchInput) {
+
+        searchInput.addEventListener(
+            "input",
+            function () {
+
+                const searchText =
+                    this.value
+                        .trim()
+                        .toLowerCase();
+
+
+                const eventCards =
+                    document.querySelectorAll(
+                        "#eventsContainer > *"
+                    );
+
+
+                eventCards.forEach(
+                    (card) => {
+
+                        const text =
+                            card.textContent
+                                .toLowerCase();
+
+
+                        if (
+                            !searchText ||
+                            text.includes(searchText)
+                        ) {
+
+                            card.style.display =
+                                "";
+
+                        }
+
+                        else {
+
+                            card.style.display =
+                                "none";
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       CATEGORY BUTTONS
+       ===================================================== */
+
+    const filterButtons =
+        document.querySelectorAll(
+            ".filter-button"
+        );
+
+
+    filterButtons.forEach(
+        (button) => {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    filterButtons.forEach(
+                        (item) => {
+
+                            item.classList.remove(
+                                "active"
+                            );
+
+                        }
+                    );
+
+
+                    this.classList.add(
+                        "active"
+                    );
+
+
+                    const category =
+                        this.dataset.category;
+
+
+                    const eventCards =
+                        document.querySelectorAll(
+                            "#eventsContainer > *"
+                        );
+
+
+                    eventCards.forEach(
+                        (card) => {
+
+                            if (
+                                category ===
+                                "all"
+                            ) {
+
+                                card.style.display =
+                                    "";
+
+                                return;
+
+                            }
+
+
+                            const text =
+                                card.textContent
+                                    .toLowerCase();
+
+
+                            if (
+                                text.includes(
+                                    category
+                                )
+                            ) {
+
+                                card.style.display =
+                                    "";
+
+                            }
+
+                            else {
+
+                                card.style.display =
+                                    "none";
+
+                            }
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+    );
+
+</script>
 
 </body>
 

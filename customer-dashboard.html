@@ -5,136 +5,145 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>Customer Dashboard - EventSphere</title>
+    <title>
+        Customer Dashboard - EventSphere
+    </title>
 
-    <link rel="stylesheet"
-          href="css/style.css">
 
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- ================= FONT AWESOME ================= -->
 
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
+    <!-- ================= EXISTING CSS ================= -->
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+
+    <!-- =========================================================
+         EVENTSPHERE CUSTOMER DASHBOARD
+         MODERN UI
+    ========================================================== -->
 
     <style>
 
-        /* ================= CUSTOMER DASHBOARD CARDS ================= */
+        /* =====================================================
+           RESET
+        ===================================================== */
 
-        .dashboard .cards {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-top: 25px;
+        #customerDashboardApp,
+        #customerDashboardApp * {
+            box-sizing: border-box;
         }
 
 
-        .dashboard .card {
-            display: flex;
-            align-items: center;
-            gap: 28px;
+        #customerDashboardApp {
+            --primary: #2463eb;
+            --primary-dark: #122b72;
+            --sidebar: #081b52;
+            --sidebar-2: #123b9a;
+            --purple: #6947ef;
+            --text: #0d1b4c;
+            --muted: #7180a4;
+            --border: #e5eaf5;
+            --page: #f4f7fd;
+            --white: #ffffff;
 
-            background: #ffffff;
+            min-height: 100vh;
 
-            padding: 30px;
-
-            border-radius: 16px;
-
-            box-shadow:
-                0 4px 15px rgba(0, 0, 0, 0.10);
-
-            min-height: 125px;
-        }
-
-
-        /* ================= ICON BOX ================= */
-
-        .dashboard-card-icon {
-            width: 96px;
-            height: 96px;
-
-            min-width: 96px;
+            width: 100%;
 
             display: flex;
-            align-items: center;
-            justify-content: center;
 
-            background: #eef2ff;
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(104, 123, 255, 0.12),
+                    transparent 30%
+                ),
+                #f4f7fd;
 
-            border-radius: 16px;
+            color: var(--text);
+
+            font-family:
+                Inter,
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            margin: 0;
+
+            padding: 0;
         }
 
 
-        .dashboard-card-icon i {
-            font-size: 48px;
-            color: #2563eb;
+        #customerDashboardApp button,
+        #customerDashboardApp input {
+            font-family: inherit;
         }
 
 
-        /* ================= CARD CONTENT ================= */
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
 
-        .dashboard-card-content {
-            flex: 1;
-        }
+        .es-sidebar {
 
+            width: 255px;
 
-        .dashboard-card-content h3 {
-            margin: 0 0 12px 0;
+            min-width: 255px;
 
-            color: #123f91;
+            min-height: 100vh;
 
-            font-size: 22px;
-        }
+            position: sticky;
 
+            top: 0;
 
-        .dashboard-card-content p {
-            margin: 0 0 16px 0;
+            height: 100vh;
 
-            color: #333;
+            overflow-y: auto;
 
-            font-size: 16px;
-        }
+            background:
+                radial-gradient(
+                    circle at 20% 10%,
+                    rgba(73, 110, 255, 0.32),
+                    transparent 28%
+                ),
+                linear-gradient(
+                    180deg,
+                    #07184a 0%,
+                    #09225f 55%,
+                    #071944 100%
+                );
 
-
-        /* ================= CARD BUTTON ================= */
-
-        .dashboard-card-content a {
-            text-decoration: none;
-        }
-
-
-        .dashboard-card-content button {
-            background: white;
-
-            color: #1d4ed8;
-
-            border: 1.5px solid #2563eb;
-
-            border-radius: 4px;
-
-            padding: 8px 16px;
-
-            font-size: 15px;
-
-            cursor: pointer;
-
-            transition: 0.2s;
-        }
-
-
-        .dashboard-card-content button:hover {
-            background: #2563eb;
             color: white;
+
+            padding: 24px 14px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            z-index: 100;
         }
 
 
-        /* ================= CUSTOMER PROFILE ================= */
+        /* =====================================================
+           LOGO
+        ===================================================== */
 
-        .customer-profile-box {
-
-            margin-top: auto;
-
-            padding: 14px;
+        .es-logo {
 
             display: flex;
 
@@ -142,22 +151,17 @@
 
             gap: 12px;
 
-            background: rgba(255,255,255,0.10);
-
-            border-radius: 14px;
-
-            color: white;
-
+            padding: 4px 10px 26px;
         }
 
 
-        .customer-profile-icon {
+        .es-logo-icon {
 
-            width: 45px;
+            width: 46px;
 
-            height: 45px;
+            height: 46px;
 
-            min-width: 45px;
+            border-radius: 14px;
 
             display: flex;
 
@@ -165,48 +169,512 @@
 
             justify-content: center;
 
-            border-radius: 50%;
+            background:
+                linear-gradient(
+                    135deg,
+                    #5b7cff,
+                    #7548ed
+                );
 
-            background: #eef4ff;
+            box-shadow:
+                0 10px 25px rgba(44, 84, 220, 0.35);
 
-            color: #2855c7;
-
-            font-size: 20px;
-
+            font-size: 23px;
         }
 
 
-        .customer-profile-info {
+        .es-logo-text {
 
             display: flex;
 
             flex-direction: column;
 
             min-width: 0;
-
         }
 
 
-        .customer-profile-info strong {
+        .es-logo-text strong {
 
-            font-size: 15px;
+            font-size: 21px;
 
-            margin-bottom: 4px;
+            font-weight: 800;
 
-            white-space: nowrap;
+            letter-spacing: -0.4px;
+        }
+
+
+        .es-logo-text span {
+
+            font-size: 10px;
+
+            color: #b9c8f2;
+
+            margin-top: 2px;
+        }
+
+
+        /* =====================================================
+           SIDEBAR NAVIGATION
+        ===================================================== */
+
+        .es-nav {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 6px;
+
+            margin-top: 5px;
+        }
+
+
+        .es-nav a {
+
+            text-decoration: none;
+
+            color: #dce5ff;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 14px;
+
+            padding: 13px 15px;
+
+            border-radius: 13px;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            transition: 0.25s ease;
+        }
+
+
+        .es-nav a i {
+
+            width: 22px;
+
+            text-align: center;
+
+            font-size: 17px;
+        }
+
+
+        .es-nav a:hover {
+
+            background:
+                rgba(255,255,255,0.10);
+
+            color: white;
+
+            transform: translateX(2px);
+        }
+
+
+        .es-nav a.active {
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #2563eb,
+                    #4f46e5
+                );
+
+            color: white;
+
+            box-shadow:
+                0 9px 24px rgba(37,99,235,0.30);
+        }
+
+
+        /* =====================================================
+           SIDEBAR BOTTOM PROMO
+        ===================================================== */
+
+        .es-sidebar-bottom {
+
+            margin-top: auto;
+
+            padding: 18px;
+
+            border-radius: 18px;
+
+            position: relative;
 
             overflow: hidden;
 
-            text-overflow: ellipsis;
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(37,99,235,0.48),
+                    rgba(94,55,190,0.35)
+                );
 
+            border:
+                1px solid rgba(255,255,255,0.10);
         }
 
 
-        .customer-profile-info span {
+        .es-sidebar-bottom::before {
+
+            content: "";
+
+            position: absolute;
+
+            width: 130px;
+
+            height: 130px;
+
+            border-radius: 50%;
+
+            right: -55px;
+
+            bottom: -65px;
+
+            background:
+                rgba(255,255,255,0.08);
+        }
+
+
+        .es-promo-icon {
+
+            width: 44px;
+
+            height: 44px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 13px;
+
+            background:
+                rgba(255,255,255,0.12);
+
+            font-size: 21px;
+
+            margin-bottom: 15px;
+        }
+
+
+        .es-sidebar-bottom h3 {
+
+            margin: 0;
+
+            color: white;
+
+            font-size: 17px;
+
+            line-height: 1.35;
+        }
+
+
+        .es-sidebar-bottom p {
+
+            margin: 8px 0 0;
+
+            color: #cdd9ff;
 
             font-size: 12px;
 
-            color: #d9e5ff;
+            line-height: 1.5;
+        }
+
+
+        .es-sidebar-line {
+
+            width: 30px;
+
+            height: 3px;
+
+            border-radius: 10px;
+
+            background: #8065ff;
+
+            margin-top: 16px;
+        }
+
+
+        /* =====================================================
+           MAIN AREA
+        ===================================================== */
+
+        .es-main {
+
+            flex: 1;
+
+            min-width: 0;
+
+            padding: 18px 24px 28px;
+
+            overflow-x: hidden;
+        }
+
+
+        /* =====================================================
+           TOP HEADER
+        ===================================================== */
+
+        .es-topbar {
+
+            width: 100%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            margin-bottom: 18px;
+        }
+
+
+        /* =====================================================
+           SEARCH
+        ===================================================== */
+
+        .es-search {
+
+            flex: 1;
+
+            max-width: 735px;
+
+            height: 50px;
+
+            background: white;
+
+            border:
+                1px solid #e2e8f4;
+
+            border-radius: 16px;
+
+            display: flex;
+
+            align-items: center;
+
+            padding: 0 15px;
+
+            box-shadow:
+                0 5px 20px rgba(31, 55, 100, 0.05);
+        }
+
+
+        .es-search i {
+
+            color: #7080a4;
+
+            font-size: 17px;
+
+            margin-right: 13px;
+        }
+
+
+        .es-search input {
+
+            width: 100%;
+
+            height: 100%;
+
+            border: none;
+
+            outline: none;
+
+            color: #24335c;
+
+            background: transparent;
+
+            font-size: 13px;
+        }
+
+
+        .es-search input::placeholder {
+
+            color: #8995b1;
+        }
+
+
+        .es-search-shortcut {
+
+            font-size: 11px;
+
+            color: #72809e;
+
+            border:
+                1px solid #dfe5f1;
+
+            border-radius: 8px;
+
+            padding: 5px 8px;
+
+            white-space: nowrap;
+        }
+
+
+        /* =====================================================
+           TOP RIGHT
+        ===================================================== */
+
+        .es-top-actions {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            position: relative;
+        }
+
+
+        .es-icon-button {
+
+            width: 48px;
+
+            height: 48px;
+
+            border: none;
+
+            border-radius: 15px;
+
+            background: white;
+
+            color: #102665;
+
+            cursor: pointer;
+
+            position: relative;
+
+            box-shadow:
+                0 5px 18px rgba(31,55,100,0.06);
+
+            font-size: 18px;
+
+            transition: 0.2s;
+        }
+
+
+        .es-icon-button:hover {
+
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 9px 24px rgba(31,55,100,0.12);
+        }
+
+
+        .es-notification-count {
+
+            position: absolute;
+
+            top: -4px;
+
+            right: -4px;
+
+            min-width: 20px;
+
+            height: 20px;
+
+            padding: 0 5px;
+
+            border-radius: 20px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: #f43f5e;
+
+            color: white;
+
+            font-size: 10px;
+
+            font-weight: 800;
+
+            border: 2px solid white;
+        }
+
+
+        /* =====================================================
+           CUSTOMER PROFILE BUTTON
+        ===================================================== */
+
+        .es-profile-button {
+
+            min-width: 188px;
+
+            height: 50px;
+
+            border: none;
+
+            border-radius: 16px;
+
+            background: white;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            padding: 5px 12px 5px 6px;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 5px 18px rgba(31,55,100,0.06);
+
+            color: #10265f;
+        }
+
+
+        .es-avatar {
+
+            width: 39px;
+
+            height: 39px;
+
+            min-width: 39px;
+
+            border-radius: 50%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #285fe6,
+                    #4e3cce
+                );
+
+            color: white;
+
+            font-size: 15px;
+
+            font-weight: 800;
+
+            box-shadow:
+                0 5px 15px rgba(37,99,235,0.25);
+        }
+
+
+        .es-profile-name {
+
+            flex: 1;
+
+            text-align: left;
 
             white-space: nowrap;
 
@@ -214,45 +682,2170 @@
 
             text-overflow: ellipsis;
 
+            font-size: 13px;
+
+            font-weight: 700;
         }
 
 
-        /* ================= MOBILE ================= */
+        .es-profile-button > i {
+
+            font-size: 12px;
+
+            color: #7381a2;
+        }
+
+
+        /* =====================================================
+           POPUPS
+        ===================================================== */
+
+        .es-popup {
+
+            position: absolute;
+
+            top: 60px;
+
+            right: 0;
+
+            width: 310px;
+
+            background: white;
+
+            border-radius: 18px;
+
+            padding: 15px;
+
+            box-shadow:
+                0 25px 60px rgba(18,37,81,0.18);
+
+            border:
+                1px solid #e5eaf4;
+
+            z-index: 9999;
+
+            display: none;
+
+            animation:
+                esPopupIn 0.18s ease;
+        }
+
+
+        .es-popup.show {
+
+            display: block;
+        }
+
+
+        @keyframes esPopupIn {
+
+            from {
+                opacity: 0;
+                transform: translateY(-7px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        }
+
+
+        .es-popup-user {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            padding: 6px 5px 15px;
+
+            border-bottom:
+                1px solid #e8edf5;
+        }
+
+
+        .es-popup-avatar {
+
+            width: 45px;
+
+            height: 45px;
+
+            min-width: 45px;
+
+            border-radius: 50%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #6844dc
+                );
+
+            color: white;
+
+            font-weight: 800;
+
+            font-size: 17px;
+        }
+
+
+        .es-popup-user-info {
+
+            min-width: 0;
+        }
+
+
+        .es-popup-user-info strong {
+
+            display: block;
+
+            font-size: 14px;
+
+            color: #10245b;
+        }
+
+
+        .es-popup-user-info span {
+
+            display: block;
+
+            margin-top: 4px;
+
+            font-size: 11px;
+
+            color: #7b88a7;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+        }
+
+
+        .es-popup-link {
+
+            width: 100%;
+
+            border: none;
+
+            background: transparent;
+
+            padding: 12px 7px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            color: #26355e;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            border-radius: 10px;
+
+            text-align: left;
+        }
+
+
+        .es-popup-link:hover {
+
+            background: #f4f7fd;
+        }
+
+
+        .es-popup-link i {
+
+            width: 20px;
+
+            text-align: center;
+
+            color: #526da9;
+        }
+
+
+        .es-popup-link.logout {
+
+            color: #ef334d;
+
+            border-top:
+                1px solid #edf0f6;
+
+            border-radius: 0;
+
+            margin-top: 3px;
+        }
+
+
+        .es-popup-link.logout i {
+
+            color: #ef334d;
+        }
+
+
+        /* =====================================================
+           HERO
+        ===================================================== */
+
+        .es-hero {
+
+            min-height: 240px;
+
+            border-radius: 20px;
+
+            overflow: hidden;
+
+            position: relative;
+
+            display: flex;
+
+            align-items: center;
+
+            padding: 32px;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(11,34,91,0.97) 0%,
+                    rgba(20,52,135,0.90) 46%,
+                    rgba(29,50,132,0.55) 100%
+                ),
+                url("images/hero.jpg");
+
+            background-size: cover;
+
+            background-position: center;
+
+            box-shadow:
+                0 15px 35px rgba(29,61,145,0.15);
+        }
+
+
+        .es-hero::after {
+
+            content: "";
+
+            position: absolute;
+
+            width: 420px;
+
+            height: 420px;
+
+            border-radius: 50%;
+
+            right: -140px;
+
+            top: -180px;
+
+            background:
+                rgba(123,91,255,0.20);
+
+            filter: blur(3px);
+        }
+
+
+        .es-hero-content {
+
+            position: relative;
+
+            z-index: 2;
+
+            max-width: 610px;
+        }
+
+
+        .es-hero-small {
+
+            text-transform: uppercase;
+
+            letter-spacing: 2px;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            color: #b9cbff;
+
+            margin-bottom: 8px;
+        }
+
+
+        .es-hero h1 {
+
+            margin: 0;
+
+            font-size: 34px;
+
+            line-height: 1.12;
+
+            letter-spacing: -1px;
+        }
+
+
+        .es-hero p {
+
+            margin: 11px 0 20px;
+
+            color: #d9e3ff;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+        }
+
+
+        .es-hero-button {
+
+            border: none;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #7354ff,
+                    #3e70f5
+                );
+
+            color: white;
+
+            border-radius: 11px;
+
+            padding: 12px 19px;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 8px 20px rgba(38,81,219,0.30);
+
+            transition: 0.2s;
+        }
+
+
+        .es-hero-button:hover {
+
+            transform: translateY(-2px);
+        }
+
+
+        .es-hero-button i {
+
+            margin-left: 8px;
+        }
+
+
+        .es-hero-message {
+
+            position: absolute;
+
+            right: 55px;
+
+            bottom: 28px;
+
+            z-index: 3;
+
+            color: white;
+
+            font-size: 22px;
+
+            font-weight: 700;
+
+            font-style: italic;
+
+            transform: rotate(-5deg);
+
+            opacity: 0.92;
+        }
+
+
+        /* =====================================================
+           STATISTICS
+        ===================================================== */
+
+        .es-stats {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 14px;
+
+            margin-top: 16px;
+        }
+
+
+        .es-stat-card {
+
+            background: white;
+
+            border-radius: 17px;
+
+            border:
+                1px solid #e7ebf4;
+
+            padding: 16px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 13px;
+
+            min-height: 95px;
+
+            box-shadow:
+                0 5px 20px rgba(31,55,100,0.05);
+
+            transition: 0.2s;
+        }
+
+
+        .es-stat-card:hover {
+
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 10px 25px rgba(31,55,100,0.09);
+        }
+
+
+        .es-stat-icon {
+
+            width: 52px;
+
+            height: 52px;
+
+            min-width: 52px;
+
+            border-radius: 15px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 21px;
+        }
+
+
+        .es-stat-blue {
+
+            background: #e8f0ff;
+
+            color: #2764e8;
+        }
+
+
+        .es-stat-purple {
+
+            background: #f0eaff;
+
+            color: #7243e7;
+        }
+
+
+        .es-stat-pink {
+
+            background: #ffe8f3;
+
+            color: #e9367c;
+        }
+
+
+        .es-stat-yellow {
+
+            background: #fff5d9;
+
+            color: #ed9a0b;
+        }
+
+
+        .es-stat-info {
+
+            min-width: 0;
+        }
+
+
+        .es-stat-info span {
+
+            display: block;
+
+            font-size: 11px;
+
+            color: #7d8aa9;
+
+            margin-bottom: 4px;
+        }
+
+
+        .es-stat-info strong {
+
+            display: block;
+
+            font-size: 23px;
+
+            color: #10255d;
+
+            line-height: 1;
+        }
+
+
+        .es-stat-info small {
+
+            display: block;
+
+            margin-top: 5px;
+
+            font-size: 10px;
+
+            color: #8995ae;
+        }
+
+
+        /* =====================================================
+           CONTENT GRID
+        ===================================================== */
+
+        .es-content-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1fr)
+                285px;
+
+            gap: 16px;
+
+            margin-top: 16px;
+
+            align-items: start;
+        }
+
+
+        /* =====================================================
+           EVENTS SECTION
+        ===================================================== */
+
+        .es-section {
+
+            background: white;
+
+            border:
+                1px solid #e5eaf4;
+
+            border-radius: 19px;
+
+            padding: 18px;
+
+            box-shadow:
+                0 5px 20px rgba(31,55,100,0.04);
+        }
+
+
+        .es-section-header {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            margin-bottom: 15px;
+        }
+
+
+        .es-section-title {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+        }
+
+
+        .es-section-title-icon {
+
+            width: 36px;
+
+            height: 36px;
+
+            border-radius: 11px;
+
+            background: #fff0d9;
+
+            color: #f59e0b;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 17px;
+        }
+
+
+        .es-section-title h2 {
+
+            margin: 0;
+
+            font-size: 19px;
+
+            color: #10255d;
+        }
+
+
+        .es-section-title p {
+
+            margin: 3px 0 0;
+
+            color: #8290ad;
+
+            font-size: 11px;
+        }
+
+
+        .es-view-all {
+
+            border: none;
+
+            background: transparent;
+
+            color: #2164eb;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            white-space: nowrap;
+        }
+
+
+        /* =====================================================
+           CATEGORY FILTERS
+        ===================================================== */
+
+        .es-category-row {
+
+            display: flex;
+
+            gap: 8px;
+
+            overflow-x: auto;
+
+            padding-bottom: 4px;
+
+            margin-bottom: 15px;
+
+            scrollbar-width: thin;
+        }
+
+
+        .es-category {
+
+            border:
+                1px solid #e1e7f2;
+
+            background: white;
+
+            color: #53617f;
+
+            border-radius: 20px;
+
+            padding: 9px 13px;
+
+            white-space: nowrap;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+
+        .es-category i {
+
+            margin-right: 5px;
+        }
+
+
+        .es-category:hover {
+
+            border-color: #aac0f4;
+
+            color: #2563eb;
+        }
+
+
+        .es-category.active {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #5845df
+                );
+
+            border-color: transparent;
+
+            color: white;
+
+            box-shadow:
+                0 6px 15px rgba(37,99,235,0.20);
+        }
+
+
+        /* =====================================================
+           EVENT CARDS
+        ===================================================== */
+
+        .es-events-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            gap: 12px;
+        }
+
+
+        .es-event-card {
+
+            border:
+                1px solid #e3e8f2;
+
+            border-radius: 15px;
+
+            overflow: hidden;
+
+            background: white;
+
+            transition: 0.25s ease;
+
+            min-width: 0;
+        }
+
+
+        .es-event-card:hover {
+
+            transform: translateY(-4px);
+
+            box-shadow:
+                0 14px 30px rgba(29,52,100,0.11);
+
+            border-color: #d2ddf5;
+        }
+
+
+        .es-event-image-wrap {
+
+            height: 145px;
+
+            position: relative;
+
+            overflow: hidden;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #e7efff,
+                    #f1e9ff
+                );
+        }
+
+
+        .es-event-image {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+
+            display: block;
+
+            transition: 0.4s;
+        }
+
+
+        .es-event-card:hover
+        .es-event-image {
+
+            transform: scale(1.05);
+        }
+
+
+        .es-event-category {
+
+            position: absolute;
+
+            top: 10px;
+
+            left: 10px;
+
+            background: white;
+
+            padding: 6px 9px;
+
+            border-radius: 15px;
+
+            font-size: 9px;
+
+            font-weight: 800;
+
+            color: #394d83;
+
+            box-shadow:
+                0 4px 12px rgba(0,0,0,0.12);
+        }
+
+
+        .es-event-heart {
+
+            position: absolute;
+
+            top: 9px;
+
+            right: 9px;
+
+            width: 31px;
+
+            height: 31px;
+
+            border: none;
+
+            border-radius: 50%;
+
+            background: white;
+
+            color: #607097;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 4px 12px rgba(0,0,0,0.12);
+
+            transition: 0.2s;
+        }
+
+
+        .es-event-heart:hover {
+
+            color: #e9367c;
+
+            transform: scale(1.05);
+        }
+
+
+        .es-event-heart.saved {
+
+            color: #e9367c;
+        }
+
+
+        .es-event-content {
+
+            padding: 13px;
+        }
+
+
+        .es-event-content h3 {
+
+            margin: 0;
+
+            font-size: 15px;
+
+            color: #10255d;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+        }
+
+
+        .es-event-description {
+
+            margin: 6px 0 9px;
+
+            color: #7a88a7;
+
+            font-size: 10px;
+
+            line-height: 1.45;
+
+            height: 29px;
+
+            overflow: hidden;
+        }
+
+
+        .es-event-meta {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 5px;
+
+            color: #6e7c9c;
+
+            font-size: 10px;
+
+            margin-bottom: 12px;
+        }
+
+
+        .es-event-meta span {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 6px;
+        }
+
+
+        .es-event-meta i {
+
+            color: #4775e6;
+
+            width: 12px;
+
+            text-align: center;
+        }
+
+
+        .es-event-bottom {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 8px;
+        }
+
+
+        .es-event-price {
+
+            background: #edf3ff;
+
+            border-radius: 9px;
+
+            padding: 7px 9px;
+
+            min-width: 75px;
+        }
+
+
+        .es-event-price small {
+
+            display: block;
+
+            color: #7b8bad;
+
+            font-size: 8px;
+
+            margin-bottom: 2px;
+        }
+
+
+        .es-event-price strong {
+
+            color: #112a68;
+
+            font-size: 14px;
+        }
+
+
+        .es-event-button {
+
+            border: none;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #5547df
+                );
+
+            color: white;
+
+            border-radius: 9px;
+
+            padding: 9px 10px;
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            white-space: nowrap;
+        }
+
+
+        .es-event-button i {
+
+            margin-left: 5px;
+        }
+
+
+        /* =====================================================
+           NO EVENTS
+        ===================================================== */
+
+        .es-no-events {
+
+            grid-column: 1 / -1;
+
+            text-align: center;
+
+            padding: 45px 20px;
+
+            color: #7483a3;
+        }
+
+
+        .es-no-events-icon {
+
+            width: 62px;
+
+            height: 62px;
+
+            border-radius: 18px;
+
+            margin: 0 auto 13px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: #edf3ff;
+
+            color: #3971e8;
+
+            font-size: 25px;
+        }
+
+
+        .es-no-events h3 {
+
+            margin: 0 0 5px;
+
+            color: #173069;
+
+            font-size: 17px;
+        }
+
+
+        .es-no-events p {
+
+            margin: 0;
+
+            font-size: 11px;
+        }
+
+
+        /* =====================================================
+           RIGHT COLUMN
+        ===================================================== */
+
+        .es-right-column {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 16px;
+        }
+
+
+        /* =====================================================
+           WELCOME CARD
+        ===================================================== */
+
+        .es-welcome-card {
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #ffffff,
+                    #f5f1ff
+                );
+
+            border:
+                1px solid #e7e5f7;
+
+            border-radius: 19px;
+
+            padding: 17px;
+        }
+
+
+        .es-welcome-top {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 11px;
+        }
+
+
+        .es-welcome-avatar {
+
+            width: 44px;
+
+            height: 44px;
+
+            border-radius: 50%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2865e9,
+                    #6540da
+                );
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: 800;
+        }
+
+
+        .es-welcome-text strong {
+
+            display: block;
+
+            font-size: 14px;
+
+            color: #11275f;
+        }
+
+
+        .es-welcome-text span {
+
+            display: block;
+
+            margin-top: 3px;
+
+            color: #8591ad;
+
+            font-size: 10px;
+        }
+
+
+        .es-quote {
+
+            margin-top: 14px;
+
+            border-radius: 13px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #f2eaff,
+                    #edf3ff
+                );
+
+            padding: 14px;
+
+            color: #38497b;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            line-height: 1.5;
+
+            position: relative;
+        }
+
+
+        .es-quote i {
+
+            color: #9a76e9;
+
+            font-size: 15px;
+
+            margin-right: 5px;
+        }
+
+
+        /* =====================================================
+           CALENDAR
+        ===================================================== */
+
+        .es-calendar-card {
+
+            background: white;
+
+            border:
+                1px solid #e5eaf4;
+
+            border-radius: 19px;
+
+            padding: 17px;
+
+            box-shadow:
+                0 5px 20px rgba(31,55,100,0.04);
+        }
+
+
+        .es-calendar-header {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            margin-bottom: 15px;
+        }
+
+
+        .es-calendar-title {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            font-size: 14px;
+
+            font-weight: 800;
+
+            color: #11275f;
+        }
+
+
+        .es-calendar-title i {
+
+            color: #2865e9;
+        }
+
+
+        .es-calendar-arrows {
+
+            display: flex;
+
+            gap: 5px;
+        }
+
+
+        .es-calendar-arrows button {
+
+            width: 26px;
+
+            height: 26px;
+
+            border:
+                1px solid #e4e9f3;
+
+            background: white;
+
+            border-radius: 8px;
+
+            color: #637292;
+
+            cursor: pointer;
+        }
+
+
+        .es-calendar-month {
+
+            text-align: center;
+
+            font-size: 12px;
+
+            font-weight: 800;
+
+            color: #253a72;
+
+            margin-bottom: 11px;
+        }
+
+
+        .es-calendar-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(7, 1fr);
+
+            gap: 5px;
+
+            text-align: center;
+        }
+
+
+        .es-calendar-day {
+
+            height: 27px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 9px;
+
+            color: #7e8aa6;
+        }
+
+
+        .es-calendar-date {
+
+            height: 27px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 10px;
+
+            color: #304475;
+
+            border-radius: 50%;
+        }
+
+
+        .es-calendar-date.today {
+
+            width: 27px;
+
+            height: 27px;
+
+            margin: auto;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #6444df
+                );
+
+            color: white;
+
+            font-weight: 800;
+
+            box-shadow:
+                0 5px 12px rgba(37,99,235,0.22);
+        }
+
+
+        .es-calendar-date.has-event {
+
+            font-weight: 800;
+
+            color: #2563eb;
+
+            position: relative;
+        }
+
+
+        .es-calendar-date.has-event::after {
+
+            content: "";
+
+            width: 3px;
+
+            height: 3px;
+
+            border-radius: 50%;
+
+            position: absolute;
+
+            bottom: 1px;
+
+            background: #e9367c;
+        }
+
+
+        /* =====================================================
+           QUICK STATS
+        ===================================================== */
+
+        .es-quick-card {
+
+            background: white;
+
+            border:
+                1px solid #e5eaf4;
+
+            border-radius: 19px;
+
+            padding: 17px;
+        }
+
+
+        .es-quick-title {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+            margin-bottom: 12px;
+
+            font-size: 14px;
+
+            font-weight: 800;
+
+            color: #11275f;
+        }
+
+
+        .es-quick-title i {
+
+            color: #2865e9;
+        }
+
+
+        .es-quick-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 8px;
+        }
+
+
+        .es-quick-item {
+
+            border-radius: 12px;
+
+            padding: 12px;
+
+            min-height: 65px;
+        }
+
+
+        .es-quick-item:nth-child(1) {
+
+            background: #eef3ff;
+        }
+
+
+        .es-quick-item:nth-child(2) {
+
+            background: #eafaf3;
+        }
+
+
+        .es-quick-item:nth-child(3) {
+
+            background: #ffedf6;
+        }
+
+
+        .es-quick-item:nth-child(4) {
+
+            background: #fff7e5;
+        }
+
+
+        .es-quick-item strong {
+
+            display: block;
+
+            font-size: 18px;
+
+            color: #11275f;
+        }
+
+
+        .es-quick-item span {
+
+            display: block;
+
+            margin-top: 2px;
+
+            font-size: 9px;
+
+            color: #72809d;
+        }
+
+
+        /* =====================================================
+           BOTTOM BENEFITS
+        ===================================================== */
+
+        .es-benefits {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            background: white;
+
+            border:
+                1px solid #e4e9f3;
+
+            border-radius: 18px;
+
+            margin-top: 16px;
+
+            padding: 15px;
+
+            box-shadow:
+                0 5px 20px rgba(31,55,100,0.04);
+        }
+
+
+        .es-benefit {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            padding: 5px 13px;
+
+            border-right:
+                1px solid #e7ebf3;
+        }
+
+
+        .es-benefit:last-child {
+
+            border-right: none;
+        }
+
+
+        .es-benefit-icon {
+
+            width: 42px;
+
+            height: 42px;
+
+            min-width: 42px;
+
+            border-radius: 12px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 17px;
+        }
+
+
+        .es-benefit:nth-child(1)
+        .es-benefit-icon {
+
+            background: #eaf1ff;
+
+            color: #2764e8;
+        }
+
+
+        .es-benefit:nth-child(2)
+        .es-benefit-icon {
+
+            background: #e9faf2;
+
+            color: #17a673;
+        }
+
+
+        .es-benefit:nth-child(3)
+        .es-benefit-icon {
+
+            background: #ffeaf5;
+
+            color: #e9367c;
+        }
+
+
+        .es-benefit:nth-child(4)
+        .es-benefit-icon {
+
+            background: #eeeaff;
+
+            color: #6845df;
+        }
+
+
+        .es-benefit strong {
+
+            display: block;
+
+            font-size: 10px;
+
+            color: #173069;
+        }
+
+
+        .es-benefit span {
+
+            display: block;
+
+            margin-top: 3px;
+
+            font-size: 9px;
+
+            color: #8793ae;
+
+            line-height: 1.3;
+        }
+
+
+        /* =====================================================
+           NOTIFICATION POPUP
+        ===================================================== */
+
+        .es-notification-popup {
+
+            position: absolute;
+
+            top: 59px;
+
+            right: 205px;
+
+            width: 285px;
+
+            background: white;
+
+            border:
+                1px solid #e5eaf4;
+
+            border-radius: 17px;
+
+            box-shadow:
+                0 25px 60px rgba(18,37,81,0.18);
+
+            padding: 14px;
+
+            z-index: 9999;
+
+            display: none;
+        }
+
+
+        .es-notification-popup.show {
+
+            display: block;
+        }
+
+
+        .es-notification-header {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding-bottom: 10px;
+
+            border-bottom:
+                1px solid #edf0f6;
+
+            margin-bottom: 10px;
+        }
+
+
+        .es-notification-header strong {
+
+            font-size: 13px;
+
+            color: #11275f;
+        }
+
+
+        .es-notification-header button {
+
+            border: none;
+
+            background: transparent;
+
+            color: #7481a0;
+
+            cursor: pointer;
+        }
+
+
+        .es-notification-item {
+
+            display: flex;
+
+            gap: 10px;
+
+            padding: 9px 5px;
+
+            border-radius: 10px;
+        }
+
+
+        .es-notification-item:hover {
+
+            background: #f6f8fd;
+        }
+
+
+        .es-notification-icon {
+
+            width: 34px;
+
+            height: 34px;
+
+            min-width: 34px;
+
+            border-radius: 10px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: #edf3ff;
+
+            color: #2563eb;
+
+            font-size: 13px;
+        }
+
+
+        .es-notification-item strong {
+
+            display: block;
+
+            font-size: 10px;
+
+            color: #263867;
+        }
+
+
+        .es-notification-item span {
+
+            display: block;
+
+            font-size: 9px;
+
+            color: #8591ad;
+
+            margin-top: 3px;
+
+            line-height: 1.4;
+        }
+
+
+        /* =====================================================
+           TOAST
+        ===================================================== */
+
+        .es-toast {
+
+            position: fixed;
+
+            right: 25px;
+
+            bottom: 25px;
+
+            background: #10275f;
+
+            color: white;
+
+            padding: 13px 17px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 15px 40px rgba(0,0,0,0.18);
+
+            font-size: 12px;
+
+            z-index: 99999;
+
+            transform:
+                translateY(20px);
+
+            opacity: 0;
+
+            pointer-events: none;
+
+            transition: 0.25s;
+        }
+
+
+        .es-toast.show {
+
+            transform:
+                translateY(0);
+
+            opacity: 1;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 1250px) {
+
+            .es-content-grid {
+
+                grid-template-columns:
+                    minmax(0, 1fr);
+            }
+
+
+            .es-right-column {
+
+                display: grid;
+
+                grid-template-columns:
+                    repeat(3, 1fr);
+            }
+
+
+            .es-welcome-card,
+            .es-calendar-card,
+            .es-quick-card {
+
+                min-width: 0;
+            }
+
+        }
+
+
+        @media (max-width: 1050px) {
+
+            .es-sidebar {
+
+                width: 215px;
+
+                min-width: 215px;
+            }
+
+
+            .es-events-grid {
+
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+
+            .es-stats {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+
+            .es-benefits {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+                gap: 10px;
+            }
+
+
+            .es-benefit:nth-child(2) {
+
+                border-right: none;
+            }
+
+        }
+
 
         @media (max-width: 800px) {
 
-            .dashboard .cards {
+            #customerDashboardApp {
+
+                display: block;
+            }
+
+
+            .es-sidebar {
+
+                width: 100%;
+
+                min-width: 100%;
+
+                height: auto;
+
+                min-height: auto;
+
+                position: relative;
+
+                padding: 14px;
+
+            }
+
+
+            .es-logo {
+
+                padding-bottom: 14px;
+            }
+
+
+            .es-nav {
+
+                display: grid;
+
+                grid-template-columns:
+                    repeat(3, 1fr);
+
+                gap: 5px;
+            }
+
+
+            .es-nav a {
+
+                justify-content: center;
+
+                flex-direction: column;
+
+                gap: 4px;
+
+                padding: 9px 5px;
+
+                font-size: 10px;
+
+            }
+
+
+            .es-nav a i {
+
+                font-size: 15px;
+            }
+
+
+            .es-sidebar-bottom {
+
+                display: none;
+            }
+
+
+            .es-main {
+
+                padding: 13px;
+            }
+
+
+            .es-topbar {
+
+                flex-wrap: wrap;
+            }
+
+
+            .es-search {
+
+                order: 2;
+
+                max-width: 100%;
+
+                flex-basis: 100%;
+            }
+
+
+            .es-top-actions {
+
+                margin-left: auto;
+            }
+
+
+            .es-hero {
+
+                min-height: 230px;
+
+                padding: 25px;
+            }
+
+
+            .es-hero h1 {
+
+                font-size: 27px;
+            }
+
+
+            .es-hero-message {
+
+                right: 20px;
+
+                bottom: 15px;
+
+                font-size: 17px;
+            }
+
+
+            .es-right-column {
+
                 grid-template-columns: 1fr;
             }
 
         }
 
 
-        @media (max-width: 500px) {
+        @media (max-width: 600px) {
 
-            .dashboard .card {
-                padding: 20px;
-                gap: 18px;
+            .es-profile-button {
+
+                min-width: 48px;
+
+                width: 48px;
+
+                padding: 4px;
             }
 
 
-            .dashboard-card-icon {
-                width: 70px;
-                height: 70px;
-                min-width: 70px;
+            .es-profile-name,
+            .es-profile-button > i {
+
+                display: none;
             }
 
 
-            .dashboard-card-icon i {
-                font-size: 34px;
+            .es-popup {
+
+                right: 0;
+
+                width: min(
+                    310px,
+                    calc(100vw - 30px)
+                );
             }
 
 
-            .dashboard-card-content h3 {
+            .es-notification-popup {
+
+                right: 0;
+
+                width: min(
+                    285px,
+                    calc(100vw - 30px)
+                );
+            }
+
+
+            .es-stats {
+
+                grid-template-columns: 1fr 1fr;
+
+                gap: 8px;
+            }
+
+
+            .es-stat-card {
+
+                padding: 12px;
+
+                min-height: 80px;
+            }
+
+
+            .es-stat-icon {
+
+                width: 43px;
+
+                height: 43px;
+
+                min-width: 43px;
+
+                font-size: 17px;
+            }
+
+
+            .es-stat-info strong {
+
                 font-size: 19px;
             }
 
+
+            .es-events-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+
+            .es-benefits {
+
+                grid-template-columns: 1fr;
+            }
+
+
+            .es-benefit {
+
+                border-right: none;
+
+                border-bottom:
+                    1px solid #e7ebf3;
+
+                padding: 10px 4px;
+            }
+
+
+            .es-benefit:last-child {
+
+                border-bottom: none;
+            }
+
+
+            .es-hero-message {
+
+                display: none;
+            }
+
         }
+
 
     </style>
 
@@ -262,333 +2855,3240 @@
 <body>
 
 
-<div class="dashboard">
+<!-- =========================================================
+     CUSTOMER DASHBOARD
+========================================================= -->
+
+<div id="customerDashboardApp">
 
 
-    <!-- ================= SIDEBAR ================= -->
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
 
-    <div class="sidebar">
-
-        <h2>
-            🎉 EventSphere
-        </h2>
+    <aside class="es-sidebar">
 
 
-        <ul>
+        <!-- LOGO -->
 
-            <li>
+        <div class="es-logo">
 
-                <a href="customer-dashboard.html">
-                    🏠 Dashboard
-                </a>
+            <div class="es-logo-icon">
 
-            </li>
-
-
-            <li>
-
-                <a href="customer-events.html">
-                    🎉 View Events
-                </a>
-
-            </li>
-
-
-            <li>
-
-                <a href="my-bookings.html">
-                    📅 My Bookings
-                </a>
-
-            </li>
-
-
-            <li>
-
-                <a href="#"
-                   onclick="logout()">
-
-                    🚪 Logout
-
-                </a>
-
-            </li>
-
-        </ul>
-
-
-        <!-- ================= CUSTOMER PROFILE ================= -->
-
-        <div class="customer-profile-box">
-
-            <div class="customer-profile-icon">
-
-                <i class="fa-solid fa-user"></i>
+                <i class="fa-solid fa-cube"></i>
 
             </div>
 
 
-            <div class="customer-profile-info">
+            <div class="es-logo-text">
 
-                <strong id="customerName">
-                    Loading...
+                <strong>
+                    EventSphere
                 </strong>
 
-
-                <span id="customerEmail">
-                    Loading...
+                <span>
+                    Events Bring People Together
                 </span>
 
             </div>
 
         </div>
 
-    </div>
+
+        <!-- NAVIGATION -->
+
+        <nav class="es-nav">
 
 
-    <!-- ================= DASHBOARD CONTENT ================= -->
+            <a
+                href="customer-dashboard.html"
+                class="active"
+            >
 
-    <div class="dashboard-content">
+                <i class="fa-solid fa-house"></i>
 
-        <h1>
-            Customer Dashboard
-        </h1>
+                <span>
+                    Dashboard
+                </span>
 
-
-        <h2>
-            Welcome to EventSphere 🎉
-        </h2>
-
-
-        <p>
-            Browse available events and book your favorite event.
-        </p>
+            </a>
 
 
-        <div class="cards">
+            <a
+                href="customer-events.html"
+            >
+
+                <i class="fa-solid fa-calendar-days"></i>
+
+                <span>
+                    View Events
+                </span>
+
+            </a>
 
 
-            <!-- ================= EVENTS CARD ================= -->
+            <a
+                href="my-bookings.html"
+            >
 
-            <div class="card">
+                <i class="fa-solid fa-ticket"></i>
 
-                <div class="dashboard-card-icon">
+                <span>
+                    My Bookings
+                </span>
+
+            </a>
+
+
+            <a
+                href="customer-events.html"
+            >
+
+                <i class="fa-regular fa-heart"></i>
+
+                <span>
+                    Saved Events
+                </span>
+
+            </a>
+
+
+            <a
+                href="#"
+                onclick="openProfilePopup(); return false;"
+            >
+
+                <i class="fa-regular fa-user"></i>
+
+                <span>
+                    Profile
+                </span>
+
+            </a>
+
+
+            <a
+                href="#"
+                onclick="showComingSoon('Settings'); return false;"
+            >
+
+                <i class="fa-solid fa-gear"></i>
+
+                <span>
+                    Settings
+                </span>
+
+            </a>
+
+
+        </nav>
+
+
+        <!-- SIDEBAR PROMO -->
+
+        <div class="es-sidebar-bottom">
+
+            <div class="es-promo-icon">
+
+                🎉
+
+            </div>
+
+
+            <h3>
+                Good Events
+                <br>
+                Brighter People
+            </h3>
+
+
+            <p>
+                Discover. Book. Celebrate.
+            </p>
+
+
+            <div class="es-sidebar-line"></div>
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="es-main">
+
+
+        <!-- =================================================
+             TOP BAR
+        ================================================== -->
+
+        <div class="es-topbar">
+
+
+            <!-- SEARCH -->
+
+            <div class="es-search">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+
+                <input
+                    type="text"
+                    id="eventSearch"
+                    placeholder="Search events, venues, or categories..."
+                    autocomplete="off"
+                >
+
+
+                <span class="es-search-shortcut">
+                    Ctrl + K
+                </span>
+
+            </div>
+
+
+            <!-- RIGHT ACTIONS -->
+
+            <div class="es-top-actions">
+
+
+                <!-- NOTIFICATION -->
+
+                <button
+                    type="button"
+                    class="es-icon-button"
+                    id="notificationButton"
+                    onclick="toggleNotificationPopup()"
+                    aria-label="Notifications"
+                >
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <span
+                        class="es-notification-count"
+                        id="notificationCount"
+                    >
+                        0
+                    </span>
+
+                </button>
+
+
+                <!-- NOTIFICATION POPUP -->
+
+                <div
+                    class="es-notification-popup"
+                    id="notificationPopup"
+                >
+
+                    <div class="es-notification-header">
+
+                        <strong>
+                            Notifications
+                        </strong>
+
+
+                        <button
+                            type="button"
+                            onclick="closeNotificationPopup()"
+                        >
+
+                            <i class="fa-solid fa-xmark"></i>
+
+                        </button>
+
+                    </div>
+
+
+                    <div id="notificationList">
+
+                        <div class="es-notification-item">
+
+                            <div class="es-notification-icon">
+
+                                <i class="fa-solid fa-calendar-check"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+                                    Welcome to EventSphere
+                                </strong>
+
+                                <span>
+                                    Explore events and create unforgettable memories.
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- PROFILE BUTTON -->
+
+                <button
+                    type="button"
+                    class="es-profile-button"
+                    onclick="toggleProfilePopup()"
+                >
+
+                    <div
+                        class="es-avatar"
+                        id="topAvatar"
+                    >
+                        S
+                    </div>
+
+
+                    <span
+                        class="es-profile-name"
+                        id="topProfileName"
+                    >
+                        Hi, Customer
+                    </span>
+
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </button>
+
+
+                <!-- PROFILE POPUP -->
+
+                <div
+                    class="es-popup"
+                    id="profilePopup"
+                >
+
+
+                    <div class="es-popup-user">
+
+
+                        <div
+                            class="es-popup-avatar"
+                            id="popupAvatar"
+                        >
+                            S
+                        </div>
+
+
+                        <div class="es-popup-user-info">
+
+                            <strong id="popupCustomerName">
+                                Customer
+                            </strong>
+
+                            <span id="popupCustomerEmail">
+                                Loading...
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="es-popup-link"
+                        onclick="showComingSoon('My Profile')"
+                    >
+
+                        <i class="fa-regular fa-user"></i>
+
+                        My Profile
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="es-popup-link"
+                        onclick="showComingSoon('Settings')"
+                    >
+
+                        <i class="fa-solid fa-gear"></i>
+
+                        Settings
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="es-popup-link logout"
+                        onclick="logoutCustomer()"
+                    >
+
+                        <i class="fa-solid fa-right-from-bracket"></i>
+
+                        Logout
+
+                    </button>
+
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             HERO
+        ================================================== -->
+
+        <section class="es-hero">
+
+
+            <div class="es-hero-content">
+
+
+                <div class="es-hero-small">
+
+                    Welcome Back ✨
+
+                </div>
+
+
+                <h1>
+
+                    Hi,
+                    <span id="heroCustomerName">
+                        Customer
+                    </span>
+                   ! 👋
+
+                </h1>
+
+
+                <p>
+                    Great events bring great people together.
+                    Discover amazing experiences and make your
+                    next moment special.
+                </p>
+
+
+                <button
+                    type="button"
+                    class="es-hero-button"
+                    onclick="window.location.href='customer-events.html'"
+                >
+
+                    Explore Events
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </button>
+
+
+            </div>
+
+
+            <div class="es-hero-message">
+
+                Live
+                <br>
+                Laugh
+                <br>
+                Celebrate
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             STATISTICS
+        ================================================== -->
+
+        <section class="es-stats">
+
+
+            <!-- TOTAL EVENTS -->
+
+            <div class="es-stat-card">
+
+                <div
+                    class="es-stat-icon es-stat-blue"
+                >
 
                     <i class="fa-solid fa-calendar-days"></i>
 
                 </div>
 
 
-                <div class="dashboard-card-content">
+                <div class="es-stat-info">
 
-                    <h3>
-                        Events
-                    </h3>
+                    <span>
+                        Total Events
+                    </span>
 
+                    <strong id="totalEventsCount">
+                        0
+                    </strong>
 
-                    <p>
-                        View all available events.
-                    </p>
-
-
-                    <a href="customer-events.html">
-
-                        <button>
-                            View Events
-                        </button>
-
-                    </a>
+                    <small>
+                        Available to explore
+                    </small>
 
                 </div>
 
             </div>
 
 
-            <!-- ================= MY BOOKINGS CARD ================= -->
+            <!-- MY BOOKINGS -->
 
-            <div class="card">
+            <div class="es-stat-card">
 
-                <div class="dashboard-card-icon">
+                <div
+                    class="es-stat-icon es-stat-purple"
+                >
 
-                    <i class="fa-solid fa-calendar-check"></i>
+                    <i class="fa-solid fa-ticket"></i>
 
                 </div>
 
 
-                <div class="dashboard-card-content">
+                <div class="es-stat-info">
 
-                    <h3>
+                    <span>
                         My Bookings
-                    </h3>
+                    </span>
 
+                    <strong id="myBookingsCount">
+                        0
+                    </strong>
 
-                    <p>
-                        View your event bookings.
-                    </p>
-
-
-                    <a href="my-bookings.html">
-
-                        <button>
-                            My Bookings
-                        </button>
-
-                    </a>
+                    <small>
+                        Events you've booked
+                    </small>
 
                 </div>
 
             </div>
+
+
+            <!-- UPCOMING -->
+
+            <div class="es-stat-card">
+
+                <div
+                    class="es-stat-icon es-stat-pink"
+                >
+
+                    <i class="fa-solid fa-clock"></i>
+
+                </div>
+
+
+                <div class="es-stat-info">
+
+                    <span>
+                        Upcoming Events
+                    </span>
+
+                    <strong id="upcomingEventsCount">
+                        0
+                    </strong>
+
+                    <small>
+                        Events to look forward to
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- SAVED -->
+
+            <div class="es-stat-card">
+
+                <div
+                    class="es-stat-icon es-stat-yellow"
+                >
+
+                    <i class="fa-solid fa-heart"></i>
+
+                </div>
+
+
+                <div class="es-stat-info">
+
+                    <span>
+                        Saved Events
+                    </span>
+
+                    <strong id="savedEventsCount">
+                        0
+                    </strong>
+
+                    <small>
+                        In your wishlist
+                    </small>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             MAIN CONTENT
+        ================================================== -->
+
+        <div class="es-content-grid">
+
+
+            <!-- =================================================
+                 EVENTS
+            ================================================== -->
+
+            <section class="es-section">
+
+
+                <div class="es-section-header">
+
+
+                    <div class="es-section-title">
+
+
+                        <div class="es-section-title-icon">
+
+                            🔥
+
+                        </div>
+
+
+                        <div>
+
+                            <h2>
+                                Featured Events
+                            </h2>
+
+                            <p>
+                                Handpicked events just for you.
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="es-view-all"
+                        onclick="window.location.href='customer-events.html'"
+                    >
+
+                        View All
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </button>
+
+
+                </div>
+
+
+
+                <!-- CATEGORY FILTERS -->
+
+                <div class="es-category-row">
+
+
+                    <button
+                        type="button"
+                        class="es-category active"
+                        data-category="All"
+                    >
+
+                        <i class="fa-solid fa-grip"></i>
+
+                        All
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="es-category"
+                        data-category="Birthday"
+                    >
+
+                        <i class="fa-solid fa-cake-candles"></i>
+
+                        Birthday
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="es-category"
+                        data-category="Family Function"
+                    >
+
+                        <i class="fa-solid fa-people-group"></i>
+
+                        Family Function
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="es-category"
+                        data-category="Marriage"
+                    >
+
+                        <i class="fa-solid fa-ring"></i>
+
+                        Marriage
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="es-category"
+                        data-category="Conference"
+                    >
+
+                        <i class="fa-solid fa-display"></i>
+
+                        Conference
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="es-category"
+                        data-category="Music"
+                    >
+
+                        <i class="fa-solid fa-music"></i>
+
+                        Music
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="es-category"
+                        data-category="Food & Culture"
+                    >
+
+                        <i class="fa-solid fa-utensils"></i>
+
+                        Food & Culture
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="es-category"
+                        data-category="Sports"
+                    >
+
+                        <i class="fa-solid fa-trophy"></i>
+
+                        Sports
+
+                    </button>
+
+
+                </div>
+
+
+
+                <!-- EVENT CARDS -->
+
+                <div
+                    class="es-events-grid"
+                    id="dashboardEventsGrid"
+                >
+
+
+                    <!-- LOADING -->
+
+                    <div class="es-no-events">
+
+                        <div class="es-no-events-icon">
+
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+
+                        </div>
+
+                        <h3>
+                            Loading Events
+                        </h3>
+
+                        <p>
+                            Finding amazing events for you...
+                        </p>
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- =================================================
+                 RIGHT COLUMN
+            ================================================== -->
+
+            <aside class="es-right-column">
+
+
+                <!-- WELCOME -->
+
+                <div class="es-welcome-card">
+
+
+                    <div class="es-welcome-top">
+
+
+                        <div
+                            class="es-welcome-avatar"
+                            id="welcomeAvatar"
+                        >
+                            S
+                        </div>
+
+
+                        <div class="es-welcome-text">
+
+                            <strong id="welcomeCardName">
+                                Hi, Customer 👋
+                            </strong>
+
+                            <span>
+                                Glad to have you here!
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="es-quote">
+
+                        <i class="fa-solid fa-quote-left"></i>
+
+                        Life is better
+                        <br>
+                        with great events.
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- CALENDAR -->
+
+                <div class="es-calendar-card">
+
+
+                    <div class="es-calendar-header">
+
+
+                        <div class="es-calendar-title">
+
+                            <i class="fa-solid fa-calendar-days"></i>
+
+                            Upcoming Events
+
+                        </div>
+
+
+                        <div class="es-calendar-arrows">
+
+                            <button
+                                type="button"
+                                onclick="changeCalendarMonth(-1)"
+                            >
+
+                                <i class="fa-solid fa-chevron-left"></i>
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                onclick="changeCalendarMonth(1)"
+                            >
+
+                                <i class="fa-solid fa-chevron-right"></i>
+
+                            </button>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <div
+                        class="es-calendar-month"
+                        id="calendarMonthTitle"
+                    >
+                        Loading...
+                    </div>
+
+
+                    <div class="es-calendar-grid">
+
+
+                        <div class="es-calendar-day">
+                            Sun
+                        </div>
+
+                        <div class="es-calendar-day">
+                            Mon
+                        </div>
+
+                        <div class="es-calendar-day">
+                            Tue
+                        </div>
+
+                        <div class="es-calendar-day">
+                            Wed
+                        </div>
+
+                        <div class="es-calendar-day">
+                            Thu
+                        </div>
+
+                        <div class="es-calendar-day">
+                            Fri
+                        </div>
+
+                        <div class="es-calendar-day">
+                            Sat
+                        </div>
+
+
+                    </div>
+
+
+                    <div
+                        class="es-calendar-grid"
+                        id="calendarDates"
+                    >
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- QUICK STATS -->
+
+                <div class="es-quick-card">
+
+
+                    <div class="es-quick-title">
+
+                        <i class="fa-solid fa-chart-column"></i>
+
+                        Quick Stats
+
+                    </div>
+
+
+                    <div class="es-quick-grid">
+
+
+                        <div class="es-quick-item">
+
+                            <strong id="quickTotalEvents">
+                                0
+                            </strong>
+
+                            <span>
+                                Total Events
+                            </span>
+
+                        </div>
+
+
+                        <div class="es-quick-item">
+
+                            <strong id="quickBookings">
+                                0
+                            </strong>
+
+                            <span>
+                                My Bookings
+                            </span>
+
+                        </div>
+
+
+                        <div class="es-quick-item">
+
+                            <strong id="quickSaved">
+                                0
+                            </strong>
+
+                            <span>
+                                Saved Events
+                            </span>
+
+                        </div>
+
+
+                        <div class="es-quick-item">
+
+                            <strong id="quickUpcoming">
+                                0
+                            </strong>
+
+                            <span>
+                                Upcoming
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </aside>
 
 
         </div>
 
-    </div>
+
+
+        <!-- =================================================
+             BENEFITS
+        ================================================== -->
+
+        <section class="es-benefits">
+
+
+            <div class="es-benefit">
+
+
+                <div class="es-benefit-icon">
+
+                    <i class="fa-solid fa-shield-halved"></i>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        Secure Booking
+                    </strong>
+
+                    <span>
+                        Your data is safe with us
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+
+            <div class="es-benefit">
+
+
+                <div class="es-benefit-icon">
+
+                    <i class="fa-solid fa-bolt"></i>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        Instant Confirmation
+                    </strong>
+
+                    <span>
+                        Get booking updates instantly
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+
+            <div class="es-benefit">
+
+
+                <div class="es-benefit-icon">
+
+                    <i class="fa-solid fa-heart"></i>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        Best Experiences
+                    </strong>
+
+                    <span>
+                        Discover events made for you
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+
+            <div class="es-benefit">
+
+
+                <div class="es-benefit-icon">
+
+                    <i class="fa-solid fa-headset"></i>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        24/7 Support
+                    </strong>
+
+                    <span>
+                        We're always here to help
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
 
 </div>
 
 
 
-<!-- ================= CUSTOMER DETAILS ================= -->
+<!-- =========================================================
+     TOAST
+========================================================= -->
+
+<div
+    class="es-toast"
+    id="dashboardToast"
+>
+    Done
+</div>
+
+
+
+<!-- =========================================================
+     FIREBASE DASHBOARD
+========================================================= -->
 
 <script type="module">
 
-import { auth, db }
-    from "./js/firebase-config.js";
-
-import {
-    doc,
-    getDoc
-} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+    import {
+        auth,
+        db
+    } from "./js/firebase-config.js";
 
 
-// ====================== AUTHENTICATION ======================
+    import {
+        doc,
+        getDoc,
+        getDocs,
+        collection,
+        query,
+        where
+    }
+    from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-auth.onAuthStateChanged(async (user) => {
 
-    if (!user) {
+    import {
+        signOut
+    }
+    from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 
-        window.location.replace(
-            "customer-login.html"
+
+    /* =====================================================
+       GLOBAL DATA
+    ===================================================== */
+
+    let currentUser = null;
+
+    let allEvents = [];
+
+    let allBookings = [];
+
+    let selectedCategory = "All";
+
+    let calendarDate = new Date();
+
+
+
+    /* =====================================================
+       ELEMENTS
+    ===================================================== */
+
+    const eventGrid =
+        document.getElementById(
+            "dashboardEventsGrid"
         );
 
-        return;
+
+    const searchInput =
+        document.getElementById(
+            "eventSearch"
+        );
+
+
+
+    /* =====================================================
+       ESCAPE HTML
+    ===================================================== */
+
+    function escapeHtml(value) {
+
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
 
     }
 
 
-    /*
-     * ================= BACK BUTTON PROTECTION =================
-     *
-     * Keep the customer on the dashboard if they press
-     * Chrome's Back button after logging in.
-     */
 
-    history.pushState(
-        { customerDashboard: true },
-        "",
-        window.location.href
-    );
+    /* =====================================================
+       FORMAT PRICE
+    ===================================================== */
+
+    function formatPrice(value) {
+
+        const amount =
+            Number(value || 0);
+
+        if (!Number.isFinite(amount)) {
+
+            return "₹0";
+
+        }
+
+        return "₹" +
+            amount.toLocaleString(
+                "en-IN"
+            );
+
+    }
 
 
-    const nameElement =
+
+    /* =====================================================
+       GET EVENT FIELD
+       Supports the existing EventSphere
+       event structure and common field names.
+    ===================================================== */
+
+    function getEventValue(
+        event,
+        names,
+        fallback = ""
+    ) {
+
+        for (
+            const name of names
+        ) {
+
+            if (
+                event[name] !== undefined &&
+                event[name] !== null &&
+                String(event[name]).trim() !== ""
+            ) {
+
+                return event[name];
+
+            }
+
+        }
+
+        return fallback;
+
+    }
+
+
+
+    /* =====================================================
+       GET CUSTOMER NAME
+    ===================================================== */
+
+    async function loadCustomerProfile(
+        user
+    ) {
+
+        let customerName =
+            user.displayName ||
+            "Customer";
+
+
+        try {
+
+            const userSnapshot =
+                await getDoc(
+                    doc(
+                        db,
+                        "users",
+                        user.uid
+                    )
+                );
+
+
+            if (
+                userSnapshot.exists()
+            ) {
+
+                const data =
+                    userSnapshot.data();
+
+
+                if (
+                    data.fullName
+                ) {
+
+                    customerName =
+                        data.fullName;
+
+                }
+
+            }
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Customer profile error:",
+                error
+            );
+
+        }
+
+
+        const email =
+            user.email ||
+            "";
+
+
+        const firstLetter =
+            customerName
+                .trim()
+                .charAt(0)
+                .toUpperCase() ||
+            "S";
+
+
+        /* TOP */
+
         document.getElementById(
-            "customerName"
-        );
+            "topProfileName"
+        ).textContent =
+            "Hi, " +
+            customerName;
 
 
-    const emailElement =
         document.getElementById(
-            "customerEmail"
-        );
+            "topAvatar"
+        ).textContent =
+            firstLetter;
 
 
-    /* Show email */
+        /* HERO */
 
-    emailElement.textContent =
-        user.email || "";
+        document.getElementById(
+            "heroCustomerName"
+        ).textContent =
+            customerName;
 
 
-    /* Get customer name from Firestore */
+        /* WELCOME */
 
-    try {
+        document.getElementById(
+            "welcomeCardName"
+        ).textContent =
+            "Hi, " +
+            customerName +
+            " 👋";
 
-        const userDoc =
-            await getDoc(
-                doc(
-                    db,
-                    "users",
-                    user.uid
-                )
+
+        document.getElementById(
+            "welcomeAvatar"
+        ).textContent =
+            firstLetter;
+
+
+        /* PROFILE POPUP */
+
+        document.getElementById(
+            "popupCustomerName"
+        ).textContent =
+            customerName;
+
+
+        document.getElementById(
+            "popupCustomerEmail"
+        ).textContent =
+            email;
+
+
+        document.getElementById(
+            "popupAvatar"
+        ).textContent =
+            firstLetter;
+
+
+        return customerName;
+
+    }
+
+
+
+    /* =====================================================
+       LOAD EVENTS
+    ===================================================== */
+
+    async function loadEvents() {
+
+        try {
+
+            const snapshot =
+                await getDocs(
+                    collection(
+                        db,
+                        "events"
+                    )
+                );
+
+
+            allEvents = [];
+
+
+            snapshot.forEach(
+                (eventDoc) => {
+
+                    allEvents.push({
+
+                        id:
+                            eventDoc.id,
+
+                        ...eventDoc.data()
+
+                    });
+
+                }
             );
 
 
+            /* NEWEST FIRST */
+
+            allEvents.sort(
+                (a, b) => {
+
+                    const aTime =
+                        a.createdAt?.toMillis
+                            ? a.createdAt.toMillis()
+                            : 0;
+
+
+                    const bTime =
+                        b.createdAt?.toMillis
+                            ? b.createdAt.toMillis()
+                            : 0;
+
+
+                    return bTime - aTime;
+
+                }
+            );
+
+
+            document.getElementById(
+                "totalEventsCount"
+            ).textContent =
+                allEvents.length;
+
+
+            document.getElementById(
+                "quickTotalEvents"
+            ).textContent =
+                allEvents.length;
+
+
+            renderEvents();
+
+
+            updateCalendar();
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Load Events Error:",
+                error
+            );
+
+
+            eventGrid.innerHTML = `
+
+                <div class="es-no-events">
+
+                    <div class="es-no-events-icon">
+
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+
+                    </div>
+
+                    <h3>
+                        Unable to Load Events
+                    </h3>
+
+                    <p>
+                        Please refresh the page and try again.
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+
+    }
+
+
+
+    /* =====================================================
+       RENDER EVENTS
+    ===================================================== */
+
+    function renderEvents() {
+
+        const search =
+            (
+                searchInput?.value ||
+                ""
+            )
+                .trim()
+                .toLowerCase();
+
+
+        let filteredEvents =
+            [...allEvents];
+
+
+        /* CATEGORY */
+
         if (
-            userDoc.exists() &&
-            userDoc.data().fullName
+            selectedCategory !==
+            "All"
         ) {
 
-            nameElement.textContent =
-                userDoc.data().fullName;
+            filteredEvents =
+                filteredEvents.filter(
+                    (event) => {
+
+                        const category =
+                            String(
+                                getEventValue(
+                                    event,
+                                    [
+                                        "category",
+                                        "eventCategory"
+                                    ],
+                                    ""
+                                )
+                            )
+                                .trim()
+                                .toLowerCase();
+
+
+                        return category ===
+                            selectedCategory
+                                .trim()
+                                .toLowerCase();
+
+                    }
+                );
+
+        }
+
+
+        /* SEARCH */
+
+        if (search) {
+
+            filteredEvents =
+                filteredEvents.filter(
+                    (event) => {
+
+                        const name =
+                            String(
+                                getEventValue(
+                                    event,
+                                    [
+                                        "eventName",
+                                        "name",
+                                        "title",
+                                        "eventTitle"
+                                    ],
+                                    ""
+                                )
+                            )
+                                .toLowerCase();
+
+
+                        const category =
+                            String(
+                                getEventValue(
+                                    event,
+                                    [
+                                        "category",
+                                        "eventCategory"
+                                    ],
+                                    ""
+                                )
+                            )
+                                .toLowerCase();
+
+
+                        const location =
+                            String(
+                                getEventValue(
+                                    event,
+                                    [
+                                        "location",
+                                        "venue"
+                                    ],
+                                    ""
+                                )
+                            )
+                                .toLowerCase();
+
+
+                        return (
+                            name.includes(search) ||
+                            category.includes(search) ||
+                            location.includes(search)
+                        );
+
+                    }
+                );
+
+        }
+
+
+        /* SHOW MAXIMUM 6 */
+
+        filteredEvents =
+            filteredEvents.slice(
+                0,
+                6
+            );
+
+
+        /* EMPTY */
+
+        if (
+            filteredEvents.length === 0
+        ) {
+
+            eventGrid.innerHTML = `
+
+                <div class="es-no-events">
+
+                    <div class="es-no-events-icon">
+
+                        <i class="fa-solid fa-calendar-xmark"></i>
+
+                    </div>
+
+                    <h3>
+                        No Events Found
+                    </h3>
+
+                    <p>
+                        Try another search or category.
+                    </p>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        eventGrid.innerHTML = "";
+
+
+        filteredEvents.forEach(
+            (event) => {
+
+                eventGrid.appendChild(
+                    createEventCard(
+                        event
+                    )
+                );
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       CREATE EVENT CARD
+    ===================================================== */
+
+    function createEventCard(
+        event
+    ) {
+
+        const card =
+            document.createElement(
+                "article"
+            );
+
+
+        card.className =
+            "es-event-card";
+
+
+        const eventId =
+            event.id;
+
+
+        const name =
+            getEventValue(
+                event,
+                [
+                    "eventName",
+                    "name",
+                    "title",
+                    "eventTitle"
+                ],
+                "Event"
+            );
+
+
+        const category =
+            getEventValue(
+                event,
+                [
+                    "category",
+                    "eventCategory"
+                ],
+                "Event"
+            );
+
+
+        const description =
+            getEventValue(
+                event,
+                [
+                    "description",
+                    "eventDescription"
+                ],
+                "Discover an amazing EventSphere experience."
+            );
+
+
+        const date =
+            getEventValue(
+                event,
+                [
+                    "eventDate",
+                    "date"
+                ],
+                "Date not specified"
+            );
+
+
+        const location =
+            getEventValue(
+                event,
+                [
+                    "location",
+                    "venue"
+                ],
+                "Location not specified"
+            );
+
+
+        const price =
+            getEventValue(
+                event,
+                [
+                    "price",
+                    "ticketPrice",
+                    "amount"
+                ],
+                0
+            );
+
+
+        const image =
+            getEventValue(
+                event,
+                [
+                    "imageUrl",
+                    "imageURL",
+                    "image",
+                    "eventImage"
+                ],
+                "images/hero.jpg"
+            );
+
+
+        const safeName =
+            escapeHtml(
+                name
+            );
+
+
+        const safeCategory =
+            escapeHtml(
+                category
+            );
+
+
+        const safeDescription =
+            escapeHtml(
+                description
+            );
+
+
+        const safeDate =
+            escapeHtml(
+                date
+            );
+
+
+        const safeLocation =
+            escapeHtml(
+                location
+            );
+
+
+        const safeImage =
+            escapeHtml(
+                image
+            );
+
+
+        const savedEvents =
+            getSavedEvents();
+
+
+        const isSaved =
+            savedEvents.includes(
+                eventId
+            );
+
+
+        card.innerHTML = `
+
+            <div class="es-event-image-wrap">
+
+                <img
+                    src="${safeImage}"
+                    class="es-event-image"
+                    alt="${safeName}"
+                    onerror="this.src='images/hero.jpg'"
+                >
+
+                <span class="es-event-category">
+
+                    ${safeCategory}
+
+                </span>
+
+
+                <button
+                    type="button"
+                    class="es-event-heart ${
+                        isSaved
+                            ? "saved"
+                            : ""
+                    }"
+                    data-event-id="${escapeHtml(eventId)}"
+                    aria-label="Save event"
+                >
+
+                    <i class="${
+                        isSaved
+                            ? "fa-solid"
+                            : "fa-regular"
+                    } fa-heart"></i>
+
+                </button>
+
+            </div>
+
+
+            <div class="es-event-content">
+
+                <h3>
+                    ${safeName}
+                </h3>
+
+
+                <div class="es-event-description">
+
+                    ${safeDescription}
+
+                </div>
+
+
+                <div class="es-event-meta">
+
+                    <span>
+
+                        <i class="fa-regular fa-calendar"></i>
+
+                        ${safeDate}
+
+                    </span>
+
+
+                    <span>
+
+                        <i class="fa-solid fa-location-dot"></i>
+
+                        ${safeLocation}
+
+                    </span>
+
+                </div>
+
+
+                <div class="es-event-bottom">
+
+
+                    <div class="es-event-price">
+
+                        <small>
+                            Price
+                        </small>
+
+                        <strong>
+                            ${formatPrice(price)}
+                        </strong>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="es-event-button"
+                        data-event-id="${escapeHtml(eventId)}"
+                    >
+
+                        View Details
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </button>
+
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        /* SAVE BUTTON */
+
+        const heart =
+            card.querySelector(
+                ".es-event-heart"
+            );
+
+
+        heart.addEventListener(
+            "click",
+            () => {
+
+                toggleSavedEvent(
+                    eventId,
+                    heart
+                );
+
+            }
+        );
+
+
+        /* VIEW DETAILS */
+
+        const detailsButton =
+            card.querySelector(
+                ".es-event-button"
+            );
+
+
+        detailsButton.addEventListener(
+            "click",
+            () => {
+
+                openEvent(
+                    eventId
+                );
+
+            }
+        );
+
+
+        return card;
+
+    }
+
+
+
+    /* =====================================================
+       OPEN EVENT
+    ===================================================== */
+
+    function openEvent(
+        eventId
+    ) {
+
+        const event =
+            allEvents.find(
+                (item) =>
+                    item.id ===
+                    eventId
+            );
+
+
+        if (!event) {
+
+            window.location.href =
+                "customer-events.html";
+
+            return;
+
+        }
+
+
+        /*
+         * Keep the selected event available
+         * to the existing customer events page.
+         */
+
+        try {
+
+            localStorage.setItem(
+                "selectedEvent",
+                JSON.stringify(
+                    event
+                )
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Unable to save selected event:",
+                error
+            );
+
+        }
+
+
+        window.location.href =
+            "customer-events.html";
+
+    }
+
+
+
+    /* =====================================================
+       SAVED EVENTS
+    ===================================================== */
+
+    function getSavedEvents() {
+
+        try {
+
+            const saved =
+                localStorage.getItem(
+                    "eventsphereSavedEvents"
+                );
+
+
+            if (!saved) {
+
+                return [];
+
+            }
+
+
+            const parsed =
+                JSON.parse(
+                    saved
+                );
+
+
+            return Array.isArray(
+                parsed
+            )
+                ? parsed
+                : [];
+
+        }
+
+        catch (error) {
+
+            return [];
+
+        }
+
+    }
+
+
+
+    function saveSavedEvents(
+        events
+    ) {
+
+        localStorage.setItem(
+            "eventsphereSavedEvents",
+            JSON.stringify(
+                events
+            )
+        );
+
+    }
+
+
+
+    function toggleSavedEvent(
+        eventId,
+        button
+    ) {
+
+        let savedEvents =
+            getSavedEvents();
+
+
+        const index =
+            savedEvents.indexOf(
+                eventId
+            );
+
+
+        if (index === -1) {
+
+            savedEvents.push(
+                eventId
+            );
+
+            button.classList.add(
+                "saved"
+            );
+
+
+            button.innerHTML = `
+                <i class="fa-solid fa-heart"></i>
+            `;
+
+
+            showToast(
+                "Event saved to your wishlist ❤️"
+            );
 
         }
 
         else {
 
-            nameElement.textContent =
-                "Customer";
+            savedEvents.splice(
+                index,
+                1
+            );
+
+            button.classList.remove(
+                "saved"
+            );
+
+
+            button.innerHTML = `
+                <i class="fa-regular fa-heart"></i>
+            `;
+
+
+            showToast(
+                "Event removed from saved events"
+            );
+
+        }
+
+
+        saveSavedEvents(
+            savedEvents
+        );
+
+
+        updateSavedCounts();
+
+    }
+
+
+
+    function updateSavedCounts() {
+
+        const count =
+            getSavedEvents().length;
+
+
+        document.getElementById(
+            "savedEventsCount"
+        ).textContent =
+            count;
+
+
+        document.getElementById(
+            "quickSaved"
+        ).textContent =
+            count;
+
+    }
+
+
+
+    /* =====================================================
+       LOAD BOOKINGS
+    ===================================================== */
+
+    async function loadBookings(
+        user
+    ) {
+
+        try {
+
+            const bookingsQuery =
+                query(
+                    collection(
+                        db,
+                        "bookings"
+                    ),
+                    where(
+                        "customerId",
+                        "==",
+                        user.uid
+                    )
+                );
+
+
+            const snapshot =
+                await getDocs(
+                    bookingsQuery
+                );
+
+
+            allBookings = [];
+
+
+            snapshot.forEach(
+                (bookingDoc) => {
+
+                    allBookings.push({
+
+                        id:
+                            bookingDoc.id,
+
+                        ...bookingDoc.data()
+
+                    });
+
+                }
+            );
+
+
+            document.getElementById(
+                "myBookingsCount"
+            ).textContent =
+                allBookings.length;
+
+
+            document.getElementById(
+                "quickBookings"
+            ).textContent =
+                allBookings.length;
+
+
+            updateUpcomingBookings();
+
+
+            updateNotifications();
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Load Bookings Error:",
+                error
+            );
+
+
+            document.getElementById(
+                "myBookingsCount"
+            ).textContent =
+                "0";
+
+
+            document.getElementById(
+                "quickBookings"
+            ).textContent =
+                "0";
 
         }
 
     }
 
-    catch (error) {
 
-        console.error(
-            "Error loading customer profile:",
-            error
+
+    /* =====================================================
+       UPCOMING BOOKINGS
+    ===================================================== */
+
+    function updateUpcomingBookings() {
+
+        const now =
+            new Date();
+
+
+        let upcoming =
+            0;
+
+
+        allBookings.forEach(
+            (booking) => {
+
+                if (
+                    !booking.eventDate
+                ) {
+
+                    return;
+
+                }
+
+
+                const eventDate =
+                    new Date(
+                        booking.eventDate +
+                        "T" +
+                        (
+                            booking.eventEndTime ||
+                            "23:59"
+                        ) +
+                        ":00"
+                    );
+
+
+                if (
+                    !Number.isNaN(
+                        eventDate.getTime()
+                    ) &&
+                    eventDate >= now
+                ) {
+
+                    upcoming++;
+
+                }
+
+            }
         );
 
-        nameElement.textContent =
-            "Customer";
+
+        document.getElementById(
+            "upcomingEventsCount"
+        ).textContent =
+            upcoming;
+
+
+        document.getElementById(
+            "quickUpcoming"
+        ).textContent =
+            upcoming;
 
     }
 
-});
 
 
-// ====================== BACK BUTTON ======================
+    /* =====================================================
+       NOTIFICATIONS
+    ===================================================== */
 
-window.addEventListener(
-    "popstate",
-    () => {
+    function updateNotifications() {
 
-        /*
-         * If the customer presses Back while logged in,
-         * keep them on the dashboard.
-         */
+        const list =
+            document.getElementById(
+                "notificationList"
+            );
 
-        if (auth.currentUser) {
 
-            history.pushState(
-                { customerDashboard: true },
-                "",
-                window.location.href
+        const notifications = [];
+
+
+        if (
+            allBookings.length > 0
+        ) {
+
+            const latest =
+                allBookings[
+                    allBookings.length - 1
+                ];
+
+
+            notifications.push({
+
+                icon:
+                    "fa-ticket",
+
+                title:
+                    "Your booking is available",
+
+                text:
+                    latest.eventName
+                        ? "Booking: " +
+                          latest.eventName
+                        : "Check My Bookings for details."
+
+            });
+
+        }
+
+
+        if (
+            allEvents.length > 0
+        ) {
+
+            notifications.push({
+
+                icon:
+                    "fa-calendar-plus",
+
+                title:
+                    "New events available",
+
+                text:
+                    allEvents.length +
+                    " events are currently available to explore."
+
+            });
+
+        }
+
+
+        if (
+            notifications.length === 0
+        ) {
+
+            notifications.push({
+
+                icon:
+                    "fa-circle-check",
+
+                title:
+                    "You're all caught up",
+
+                text:
+                    "There are no new notifications right now."
+
+            });
+
+        }
+
+
+        list.innerHTML =
+            notifications
+                .map(
+                    (notification) => `
+
+                        <div class="es-notification-item">
+
+                            <div class="es-notification-icon">
+
+                                <i class="fa-solid ${
+                                    notification.icon
+                                }"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+                                    ${
+                                        escapeHtml(
+                                            notification.title
+                                        )
+                                    }
+                                </strong>
+
+                                <span>
+                                    ${
+                                        escapeHtml(
+                                            notification.text
+                                        )
+                                    }
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    `
+                )
+                .join("");
+
+
+        document.getElementById(
+            "notificationCount"
+        ).textContent =
+            notifications.length;
+
+    }
+
+
+
+    /* =====================================================
+       CALENDAR
+    ===================================================== */
+
+    function updateCalendar() {
+
+        const year =
+            calendarDate.getFullYear();
+
+
+        const month =
+            calendarDate.getMonth();
+
+
+        const monthName =
+            calendarDate.toLocaleString(
+                "en-IN",
+                {
+                    month: "long"
+                }
+            );
+
+
+        document.getElementById(
+            "calendarMonthTitle"
+        ).textContent =
+            monthName +
+            " " +
+            year;
+
+
+        const datesContainer =
+            document.getElementById(
+                "calendarDates"
+            );
+
+
+        datesContainer.innerHTML =
+            "";
+
+
+        const firstDay =
+            new Date(
+                year,
+                month,
+                1
+            ).getDay();
+
+
+        const daysInMonth =
+            new Date(
+                year,
+                month + 1,
+                0
+            ).getDate();
+
+
+        const today =
+            new Date();
+
+
+        const eventDays =
+            new Set();
+
+
+        allEvents.forEach(
+            (event) => {
+
+                const dateValue =
+                    getEventValue(
+                        event,
+                        [
+                            "eventDate",
+                            "date"
+                        ],
+                        ""
+                    );
+
+
+                if (!dateValue) {
+
+                    return;
+
+                }
+
+
+                const date =
+                    new Date(
+                        dateValue
+                    );
+
+
+                if (
+                    !Number.isNaN(
+                        date.getTime()
+                    ) &&
+                    date.getFullYear() ===
+                        year &&
+                    date.getMonth() ===
+                        month
+                ) {
+
+                    eventDays.add(
+                        date.getDate()
+                    );
+
+                }
+
+            }
+        );
+
+
+        for (
+            let i = 0;
+            i < firstDay;
+            i++
+        ) {
+
+            const empty =
+                document.createElement(
+                    "div"
+                );
+
+
+            empty.className =
+                "es-calendar-date";
+
+
+            datesContainer.appendChild(
+                empty
+            );
+
+        }
+
+
+        for (
+            let day = 1;
+            day <= daysInMonth;
+            day++
+        ) {
+
+            const dateElement =
+                document.createElement(
+                    "div"
+                );
+
+
+            dateElement.className =
+                "es-calendar-date";
+
+
+            dateElement.textContent =
+                day;
+
+
+            if (
+                today.getFullYear() ===
+                    year &&
+                today.getMonth() ===
+                    month &&
+                today.getDate() ===
+                    day
+            ) {
+
+                dateElement.classList.add(
+                    "today"
+                );
+
+            }
+
+
+            if (
+                eventDays.has(
+                    day
+                )
+            ) {
+
+                dateElement.classList.add(
+                    "has-event"
+                );
+
+            }
+
+
+            datesContainer.appendChild(
+                dateElement
             );
 
         }
 
     }
-);
+
+
+
+    /* =====================================================
+       CHANGE CALENDAR MONTH
+    ===================================================== */
+
+    window.changeCalendarMonth =
+        function (
+            direction
+        ) {
+
+            calendarDate.setMonth(
+                calendarDate.getMonth() +
+                direction
+            );
+
+
+            updateCalendar();
+
+        };
+
+
+
+    /* =====================================================
+       CATEGORY BUTTONS
+    ===================================================== */
+
+    document
+        .querySelectorAll(
+            ".es-category"
+        )
+        .forEach(
+            (button) => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        document
+                            .querySelectorAll(
+                                ".es-category"
+                            )
+                            .forEach(
+                                (item) => {
+
+                                    item.classList.remove(
+                                        "active"
+                                    );
+
+                                }
+                            );
+
+
+                        button.classList.add(
+                            "active"
+                        );
+
+
+                        selectedCategory =
+                            button.dataset.category ||
+                            "All";
+
+
+                        renderEvents();
+
+                    }
+                );
+
+            }
+        );
+
+
+
+    /* =====================================================
+       SEARCH
+    ===================================================== */
+
+    if (searchInput) {
+
+        searchInput.addEventListener(
+            "input",
+            () => {
+
+                renderEvents();
+
+            }
+        );
+
+    }
+
+
+
+    /* =====================================================
+       CTRL + K SEARCH
+    ===================================================== */
+
+    document.addEventListener(
+        "keydown",
+        (event) => {
+
+            if (
+                (event.ctrlKey ||
+                    event.metaKey) &&
+                event.key.toLowerCase() ===
+                    "k"
+            ) {
+
+                event.preventDefault();
+
+                if (searchInput) {
+
+                    searchInput.focus();
+
+                }
+
+            }
+
+        }
+    );
+
+
+
+    /* =====================================================
+       PROFILE POPUP
+    ===================================================== */
+
+    window.toggleProfilePopup =
+        function () {
+
+            const popup =
+                document.getElementById(
+                    "profilePopup"
+                );
+
+
+            popup.classList.toggle(
+                "show"
+            );
+
+
+            document.getElementById(
+                "notificationPopup"
+            ).classList.remove(
+                "show"
+            );
+
+        };
+
+
+    window.openProfilePopup =
+        function () {
+
+            document.getElementById(
+                "profilePopup"
+            ).classList.add(
+                "show"
+            );
+
+        };
+
+
+
+    /* =====================================================
+       NOTIFICATION POPUP
+    ===================================================== */
+
+    window.toggleNotificationPopup =
+        function () {
+
+            const popup =
+                document.getElementById(
+                    "notificationPopup"
+                );
+
+
+            popup.classList.toggle(
+                "show"
+            );
+
+
+            document.getElementById(
+                "profilePopup"
+            ).classList.remove(
+                "show"
+            );
+
+        };
+
+
+    window.closeNotificationPopup =
+        function () {
+
+            document.getElementById(
+                "notificationPopup"
+            ).classList.remove(
+                "show"
+            );
+
+        };
+
+
+
+    /* =====================================================
+       CLOSE POPUPS WHEN CLICKING OUTSIDE
+    ===================================================== */
+
+    document.addEventListener(
+        "click",
+        (event) => {
+
+            const profilePopup =
+                document.getElementById(
+                    "profilePopup"
+                );
+
+
+            const notificationPopup =
+                document.getElementById(
+                    "notificationPopup"
+                );
+
+
+            const profileButton =
+                document.querySelector(
+                    ".es-profile-button"
+                );
+
+
+            const notificationButton =
+                document.getElementById(
+                    "notificationButton"
+                );
+
+
+            if (
+                profilePopup.classList.contains(
+                    "show"
+                ) &&
+                !profilePopup.contains(
+                    event.target
+                ) &&
+                !profileButton.contains(
+                    event.target
+                )
+            ) {
+
+                profilePopup.classList.remove(
+                    "show"
+                );
+
+            }
+
+
+            if (
+                notificationPopup.classList.contains(
+                    "show"
+                ) &&
+                !notificationPopup.contains(
+                    event.target
+                ) &&
+                !notificationButton.contains(
+                    event.target
+                )
+            ) {
+
+                notificationPopup.classList.remove(
+                    "show"
+                );
+
+            }
+
+        }
+    );
+
+
+
+    /* =====================================================
+       LOGOUT
+    ===================================================== */
+
+    window.logoutCustomer =
+        async function () {
+
+            try {
+
+                await signOut(
+                    auth
+                );
+
+
+                sessionStorage.removeItem(
+                    "customerOtpVerified"
+                );
+
+
+                localStorage.removeItem(
+                    "customerOtpEmail"
+                );
+
+
+                window.location.replace(
+                    "customer-login.html"
+                );
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Customer Logout Error:",
+                    error
+                );
+
+
+                alert(
+                    "Unable to logout. Please try again."
+                );
+
+            }
+
+        };
+
+
+
+    /* =====================================================
+       COMING SOON
+    ===================================================== */
+
+    window.showComingSoon =
+        function (
+            section
+        ) {
+
+            document.getElementById(
+                "profilePopup"
+            ).classList.remove(
+                "show"
+            );
+
+
+            showToast(
+                section +
+                " section will be available soon."
+            );
+
+        };
+
+
+
+    /* =====================================================
+       TOAST
+    ===================================================== */
+
+    function showToast(
+        message
+    ) {
+
+        const toast =
+            document.getElementById(
+                "dashboardToast"
+            );
+
+
+        toast.textContent =
+            message;
+
+
+        toast.classList.add(
+            "show"
+        );
+
+
+        setTimeout(
+            () => {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+            },
+            2500
+        );
+
+    }
+
+
+
+    /* =====================================================
+       AUTH STATE
+    ===================================================== */
+
+    auth.onAuthStateChanged(
+        async (user) => {
+
+            if (!user) {
+
+                window.location.replace(
+                    "customer-login.html"
+                );
+
+                return;
+
+            }
+
+
+            currentUser =
+                user;
+
+
+            /*
+             * Keep the customer on the dashboard
+             * when browser back is pressed.
+             */
+
+            history.pushState(
+                {
+                    customerDashboard: true
+                },
+                "",
+                window.location.href
+            );
+
+
+            await loadCustomerProfile(
+                user
+            );
+
+
+            await Promise.all([
+                loadEvents(),
+                loadBookings(user)
+            ]);
+
+
+            updateSavedCounts();
+
+        }
+    );
+
+
+
+    /* =====================================================
+       BACK BUTTON PROTECTION
+    ===================================================== */
+
+    window.addEventListener(
+        "popstate",
+        () => {
+
+            if (
+                auth.currentUser
+            ) {
+
+                history.pushState(
+                    {
+                        customerDashboard: true
+                    },
+                    "",
+                    window.location.href
+                );
+
+            }
+
+        }
+    );
+
 
 </script>
 
 
 
-<!-- ================= AUTH ================= -->
+<!-- =========================================================
+     EXISTING AUTH SCRIPT
+========================================================= -->
 
-<script type="module"
-        src="js/auth.js">
-</script>
+<script
+    type="module"
+    src="js/auth.js"
+></script>
 
 
 </body>

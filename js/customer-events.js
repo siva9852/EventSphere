@@ -6,8 +6,15 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
-const eventsContainer =
-    document.getElementById("eventsContainer");
+const eventsContainer = document.getElementById("eventsContainer");
+
+const eventSearch = document.getElementById("eventSearch");
+
+const filterButtons =
+    document.querySelectorAll(".filter-btn");
+
+
+let allEvents = [];
 
 
 // ====================== LOAD EVENTS ======================
@@ -22,125 +29,41 @@ async function loadEvents() {
             );
 
 
-        eventsContainer.innerHTML = "";
+        allEvents = [];
 
 
-        if (querySnapshot.empty) {
+        querySnapshot.forEach((eventDoc) => {
 
-            eventsContainer.innerHTML = `
+            const event = eventDoc.data();
 
-                <div class="no-events">
 
-                    <i class="fa-solid fa-calendar-xmark"></i>
+            allEvents.push({
 
-                    <h2>No Events Available</h2>
+                id: eventDoc.id,
 
-                    <p>
-                        There are currently no events available.
-                    </p>
+                ...event
 
-                </div>
+            });
 
-            `;
+        });
+
+
+        if (allEvents.length === 0) {
+
+            showNoEvents();
 
             return;
 
         }
 
 
-        querySnapshot.forEach((eventDoc) => {
-
-            const event =
-                eventDoc.data();
-
-
-            const eventCard =
-                document.createElement("div");
-
-
-            eventCard.className =
-                "event-card";
-
-
-            eventCard.innerHTML = `
-
-                <div class="event-image-container">
-
-                    <img
-                        src="${event.image}"
-                        alt="${event.eventName}"
-                        class="event-image"
-                    >
-
-                </div>
-
-
-                <div class="event-card-content">
-
-                    <h2>
-                        ${event.eventName}
-                    </h2>
-
-
-                    <div class="event-info">
-
-                        <p>
-
-                            <i class="fa-solid fa-tag"></i>
-
-                            <strong>Category:</strong>
-
-                            ${event.category}
-
-                        </p>
-
-
-                        <p>
-
-                            <i class="fa-solid fa-indian-rupee-sign"></i>
-
-                            <strong>Price:</strong>
-
-                            ₹${event.price}
-
-                        </p>
-
-                    </div>
-
-
-                    <p class="event-description">
-
-                        ${event.description}
-
-                    </p>
-
-
-                    <button
-                        class="book-event-button"
-                        onclick="bookEvent('${eventDoc.id}')">
-
-                        <i class="fa-solid fa-calendar-check"></i>
-
-                        Book Now
-
-                    </button>
-
-                </div>
-
-            `;
-
-
-            eventsContainer.appendChild(
-                eventCard
-            );
-
-        });
+        displayEvents(allEvents);
 
     }
 
     catch (error) {
 
-        console.error(error);
+        console.error("Error loading events:", error);
 
 
         eventsContainer.innerHTML = `
@@ -164,6 +87,248 @@ async function loadEvents() {
 }
 
 
+// ====================== DISPLAY EVENTS ======================
+
+function displayEvents(events) {
+
+    eventsContainer.innerHTML = "";
+
+
+    if (events.length === 0) {
+
+        eventsContainer.innerHTML = `
+
+            <div class="no-events">
+
+                <i class="fa-solid fa-calendar-xmark"></i>
+
+                <h2>No Events Found</h2>
+
+                <p>
+                    Try another search or category.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    events.forEach((event) => {
+
+        const eventCard =
+            document.createElement("div");
+
+
+        eventCard.className =
+            "event-card";
+
+
+        eventCard.innerHTML = `
+
+            <div class="event-image-container">
+
+                <img
+                    src="${event.image || "https://via.placeholder.com/600x350?text=EventSphere"}"
+                    alt="${event.eventName || "Event"}"
+                    class="event-image"
+                >
+
+            </div>
+
+
+            <div class="event-card-content">
+
+                <div class="event-category">
+
+                    <i class="fa-solid fa-tag"></i>
+
+                    ${event.category || "Event"}
+
+                </div>
+
+
+                <h2>
+                    ${event.eventName || "Unnamed Event"}
+                </h2>
+
+
+                <div class="event-info">
+
+                    <p>
+
+                        <i class="fa-solid fa-indian-rupee-sign"></i>
+
+                        <strong>Price:</strong>
+
+                        ₹${event.price || 0}
+
+                    </p>
+
+                </div>
+
+
+                <p class="event-description">
+
+                    ${event.description || "Join us for an amazing experience."}
+
+                </p>
+
+
+                <button
+                    class="book-event-button"
+                    onclick="bookEvent('${event.id}')">
+
+                    <i class="fa-solid fa-calendar-check"></i>
+
+                    Book Now
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </button>
+
+            </div>
+
+        `;
+
+
+        eventsContainer.appendChild(eventCard);
+
+    });
+
+}
+
+
+// ====================== NO EVENTS ======================
+
+function showNoEvents() {
+
+    eventsContainer.innerHTML = `
+
+        <div class="no-events">
+
+            <i class="fa-solid fa-calendar-xmark"></i>
+
+            <h2>No Events Available</h2>
+
+            <p>
+                There are currently no events available.
+            </p>
+
+        </div>
+
+    `;
+
+}
+
+
+// ====================== SEARCH EVENTS ======================
+
+if (eventSearch) {
+
+    eventSearch.addEventListener("input", function () {
+
+        const searchText =
+            this.value.toLowerCase().trim();
+
+
+        const activeFilter =
+            document.querySelector(".filter-btn.active");
+
+
+        const selectedCategory =
+            activeFilter
+                ? activeFilter.dataset.category
+                : "all";
+
+
+        filterEvents(
+            searchText,
+            selectedCategory
+        );
+
+    });
+
+}
+
+
+// ====================== CATEGORY FILTER ======================
+
+filterButtons.forEach((button) => {
+
+    button.addEventListener("click", function () {
+
+        filterButtons.forEach((btn) => {
+
+            btn.classList.remove("active");
+
+        });
+
+
+        this.classList.add("active");
+
+
+        const category =
+            this.dataset.category;
+
+
+        const searchText =
+            eventSearch
+                ? eventSearch.value.toLowerCase().trim()
+                : "";
+
+
+        filterEvents(
+            searchText,
+            category
+        );
+
+    });
+
+});
+
+
+// ====================== FILTER EVENTS ======================
+
+function filterEvents(searchText, category) {
+
+    const filteredEvents =
+        allEvents.filter((event) => {
+
+            const eventName =
+                String(event.eventName || "").toLowerCase();
+
+            const eventCategory =
+                String(event.category || "").toLowerCase();
+
+            const eventDescription =
+                String(event.description || "").toLowerCase();
+
+
+            const matchesSearch =
+                eventName.includes(searchText) ||
+                eventCategory.includes(searchText) ||
+                eventDescription.includes(searchText);
+
+
+            const matchesCategory =
+                category === "all" ||
+                eventCategory === category.toLowerCase();
+
+
+            return matchesSearch && matchesCategory;
+
+        });
+
+
+    displayEvents(filteredEvents);
+
+}
+
+
 // ====================== BOOK EVENT ======================
 
 window.bookEvent = function(eventId) {
@@ -172,6 +337,7 @@ window.bookEvent = function(eventId) {
         "selectedEventId",
         eventId
     );
+
 
     window.location.href =
         "booking.html";

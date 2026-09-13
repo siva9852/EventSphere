@@ -3033,7 +3033,6 @@ window.viewBookingDetails =
             const user =
                 auth.currentUser;
 
-
             if (!user) {
 
                 alert(
@@ -3084,6 +3083,10 @@ window.viewBookingDetails =
             }
 
 
+            // =================================================
+            // PAYMENT CALCULATION
+            // =================================================
+
             const totalAmount =
                 Number(
                     booking.price ||
@@ -3132,17 +3135,22 @@ window.viewBookingDetails =
 
             const paymentStatus =
                 amountDue <= 0
+
                     ? "Paid"
+
                     : amountPaid > 0
+
                         ? "Partially Paid"
+
                         : "Unpaid";
 
 
-            // =============================================
-            // GET PAYMENT HISTORY
-            // =============================================
+            // =================================================
+            // PAYMENT HISTORY
+            // =================================================
 
             let paymentHistory = [];
+
 
             try {
 
@@ -3159,25 +3167,33 @@ window.viewBookingDetails =
 
                 paymentHistory =
                     historySnapshot.docs
-                        .map((paymentDoc) => ({
-                            id: paymentDoc.id,
-                            ...paymentDoc.data()
-                        }))
-                        .sort((a, b) => {
+                        .map(
+                            (paymentDoc) => ({
+                                id:
+                                    paymentDoc.id,
 
-                            const aTime =
-                                a.paidAt?.toMillis
-                                    ? a.paidAt.toMillis()
-                                    : 0;
+                                ...paymentDoc.data()
+                            })
+                        )
+                        .sort(
+                            (a, b) => {
 
-                            const bTime =
-                                b.paidAt?.toMillis
-                                    ? b.paidAt.toMillis()
-                                    : 0;
+                                const aTime =
+                                    a.paidAt?.toMillis
+                                        ? a.paidAt.toMillis()
+                                        : 0;
 
-                            return aTime - bTime;
 
-                        });
+                                const bTime =
+                                    b.paidAt?.toMillis
+                                        ? b.paidAt.toMillis()
+                                        : 0;
+
+
+                                return bTime - aTime;
+
+                            }
+                        );
 
             }
 
@@ -3191,125 +3207,563 @@ window.viewBookingDetails =
             }
 
 
+            // =================================================
+            // OLD PAYMENT FALLBACK
+            // =================================================
+
+            if (
+                paymentHistory.length === 0 &&
+                amountPaid > 0
+            ) {
+
+                paymentHistory = [
+
+                    {
+
+                        id:
+                            booking.razorpayPaymentId ||
+                            "previous-payment",
+
+                        amount:
+                            amountPaid,
+
+                        paymentMethod:
+                            booking.paymentMethod ||
+                            "Razorpay",
+
+                        paymentVpa:
+                            booking.paymentVpa ||
+                            null,
+
+                        bankName:
+                            booking.bankName ||
+                            null,
+
+                        cardIssuer:
+                            booking.cardIssuer ||
+                            null,
+
+                        razorpayPaymentId:
+                            booking.razorpayPaymentId ||
+                            null,
+
+                        razorpayOrderId:
+                            booking.razorpayOrderId ||
+                            null,
+
+                        paidAt:
+                            booking.paidAt ||
+                            null
+
+                    }
+
+                ];
+
+            }
+
+
+            // =================================================
+            // EXTRA PAYMENT DETAILS
+            // =================================================
+
+            for (
+                const payment of paymentHistory
+            ) {
+
+                const paymentId =
+                    payment.razorpayPaymentId ||
+                    payment.id;
+
+
+                const hasPaymentDetails =
+                    payment.bankName ||
+                    payment.cardIssuer ||
+                    payment.paymentVpa ||
+                    payment.paymentWallet ||
+                    payment.cardNetwork;
+
+
+                if (
+                    paymentId &&
+                    !hasPaymentDetails &&
+                    paymentId.startsWith("pay_")
+                ) {
+
+                    try {
+
+                        const currentUser =
+                            auth.currentUser;
+
+
+                        if (currentUser) {
+
+                            const idToken =
+                                await currentUser.getIdToken();
+
+
+                            const response =
+                                await fetch(
+                                    `https://eventsphere-dndh.onrender.com/payment-details/${encodeURIComponent(bookingId)}/${encodeURIComponent(paymentId)}`,
+                                    {
+                                        method: "GET",
+
+                                        headers: {
+                                            "Authorization":
+                                                `Bearer ${idToken}`
+                                        }
+                                    }
+                                );
+
+
+                            const details =
+                                await response.json();
+
+
+                            if (
+                                response.ok &&
+                                details.success
+                            ) {
+
+                                payment.paymentMethod =
+                                    payment.paymentMethod ||
+                                    details.paymentMethod ||
+                                    null;
+
+
+                                payment.bankName =
+                                    payment.bankName ||
+                                    details.bankName ||
+                                    null;
+
+
+                                payment.paymentVpa =
+                                    payment.paymentVpa ||
+                                    details.paymentVpa ||
+                                    null;
+
+
+                                payment.paymentWallet =
+                                    payment.paymentWallet ||
+                                    details.paymentWallet ||
+                                    null;
+
+
+                                payment.cardNetwork =
+                                    payment.cardNetwork ||
+                                    details.cardNetwork ||
+                                    null;
+
+
+                                payment.cardLast4 =
+                                    payment.cardLast4 ||
+                                    details.cardLast4 ||
+                                    null;
+
+
+                                payment.cardIssuer =
+                                    payment.cardIssuer ||
+                                    details.cardIssuer ||
+                                    null;
+
+                            }
+
+                        }
+
+                    }
+
+                    catch (
+                        paymentDetailsError
+                    ) {
+
+                        console.error(
+                            "Unable to load payment details:",
+                            paymentDetailsError
+                        );
+
+                    }
+
+                }
+
+            }
+
+
+            // =================================================
+            // HELPERS
+            // =================================================
+
+            const formatMoney =
+                (value) =>
+                    `₹${Number(
+                        value || 0
+                    ).toLocaleString("en-IN")}`;
+
+
+            const formatDate =
+                (timestamp) => {
+
+                    if (
+                        timestamp?.toDate
+                    ) {
+
+                        return timestamp
+                            .toDate()
+                            .toLocaleString(
+                                "en-IN"
+                            );
+
+                    }
+
+                    return "Date not available";
+
+                };
+
+
+            const escapeHtml =
+                (value) =>
+                    String(
+                        value ?? ""
+                    )
+                        .replace(
+                            /&/g,
+                            "&amp;"
+                        )
+                        .replace(
+                            /</g,
+                            "&lt;"
+                        )
+                        .replace(
+                            />/g,
+                            "&gt;"
+                        )
+                        .replace(
+                            /"/g,
+                            "&quot;"
+                        )
+                        .replace(
+                            /'/g,
+                            "&#039;"
+                        );
+
+
+            // =================================================
+            // BOOKING DATA
+            // =================================================
+
+            const eventName =
+                booking.eventName ||
+                "Event";
+
+
+            const eventImage =
+                booking.eventImage ||
+                booking.image ||
+                "images/hero.jpg";
+
+
+            const eventDate =
+                booking.eventDate ||
+                "Not specified";
+
+
+            const guests =
+                booking.guests ||
+                "Not specified";
+
+
+            const location =
+                booking.location ||
+                "Not specified";
+
+
+            const category =
+                booking.category ||
+                "Event";
+
+
+            const requirements =
+                booking.requirements ||
+                "No special requirements";
+
+
+            const bookingStatus =
+                booking.status ||
+                "Pending";
+
+
+            const bookingDisplayId =
+                "#BK-" +
+                bookingId
+                    .substring(0, 6)
+                    .toUpperCase();
+
+
+            const paymentProgress =
+                totalAmount > 0
+
+                    ? Math.min(
+                        100,
+                        Math.max(
+                            0,
+                            (
+                                amountPaid /
+                                totalAmount
+                            ) * 100
+                        )
+                    )
+
+                    : 0;
+
+
+            const statusClass =
+                bookingStatus
+                    .toLowerCase()
+                    .replace(
+                        /\s+/g,
+                        "-"
+                    );
+
+
+            const statusIcon =
+                bookingStatus ===
+                    "Approved"
+
+                    ? "fa-circle-check"
+
+                    : bookingStatus ===
+                        "Cancelled"
+
+                        ? "fa-circle-xmark"
+
+                        : bookingStatus ===
+                            "Rejected"
+
+                            ? "fa-circle-xmark"
+
+                            : "fa-clock";
+
+
+            // =================================================
+            // PAYMENT HISTORY HTML
+            // =================================================
+
             const historyHtml =
-                paymentHistory.length
+                paymentHistory.length > 0
 
                     ? paymentHistory
-                        .map((payment, index) => {
+                        .map(
+                            (
+                                payment,
+                                index
+                            ) => {
 
-                            const date =
-                                payment.paidAt?.toDate
-                                    ? payment.paidAt
-                                        .toDate()
-                                        .toLocaleString(
-                                            "en-IN"
-                                        )
-                                    : "Date not available";
+                                const method =
+                                    payment.paymentMethod
+                                        ? String(
+                                            payment.paymentMethod
+                                        ).toUpperCase()
 
-
-                            const method =
-                                payment.paymentMethod
-                                    ? String(
-                                        payment.paymentMethod
-                                    ).toUpperCase()
-                                    : "RAZORPAY";
+                                        : "RAZORPAY";
 
 
-                            const bank =
-                                payment.paymentMethod ===
-                                "upi"
+                                let methodDetails =
+                                    "Not provided";
 
-                                    ? (
+
+                                if (
+                                    payment.paymentMethod ===
+                                    "upi"
+                                ) {
+
+                                    methodDetails =
                                         payment.paymentVpa ||
                                         payment.bankName ||
-                                        "Not provided"
-                                    )
+                                        "UPI";
 
-                                    : (
+                                }
+
+                                else if (
+                                    payment.cardLast4
+                                ) {
+
+                                    methodDetails =
+                                        `${
+                                            payment.cardNetwork ||
+                                            "Card"
+                                        } •••• ${
+                                            payment.cardLast4
+                                        }`;
+
+                                }
+
+                                else {
+
+                                    methodDetails =
                                         payment.bankName ||
                                         payment.cardIssuer ||
-                                        "Not provided"
-                                    );
+                                        payment.paymentWallet ||
+                                        "Not provided";
+
+                                }
 
 
-                            return `
-                                <div style="
-                                    padding:12px 0;
-                                    border-bottom:
-                                        1px solid #e5e7eb;
-                                ">
+                                const paymentId =
+                                    payment.razorpayPaymentId ||
+                                    payment.id ||
+                                    "Not available";
 
-                                    <div style="
-                                        display:flex;
-                                        justify-content:
-                                            space-between;
-                                        gap:10px;
+
+                                return `
+
+                                    <div class="
+                                        details-payment-item
                                     ">
 
-                                        <strong>
-                                            Payment ${index + 1}
-                                        </strong>
-
-                                        <strong style="
-                                            color:#15803d;
+                                        <div class="
+                                            details-payment-top
                                         ">
-                                            ₹${Number(
-                                                payment.amount || 0
-                                            ).toLocaleString("en-IN")}
-                                        </strong>
+
+                                            <div class="
+                                                details-payment-number
+                                            ">
+
+                                                <span class="
+                                                    details-payment-icon
+                                                ">
+
+                                                    <i class="
+                                                        fa-solid
+                                                        fa-check
+                                                    "></i>
+
+                                                </span>
+
+
+                                                <div>
+
+                                                    <strong>
+                                                        Payment ${
+                                                            index + 1
+                                                        }
+                                                    </strong>
+
+                                                    <small>
+                                                        ${
+                                                            formatDate(
+                                                                payment.paidAt
+                                                            )
+                                                        }
+                                                    </small>
+
+                                                </div>
+
+                                            </div>
+
+
+                                            <strong class="
+                                                details-payment-amount
+                                            ">
+
+                                                ${
+                                                    formatMoney(
+                                                        payment.amount
+                                                    )
+                                                }
+
+                                            </strong>
+
+                                        </div>
+
+
+                                        <div class="
+                                            details-payment-meta
+                                        ">
+
+                                            <span>
+
+                                                <i class="
+                                                    fa-solid
+                                                    fa-credit-card
+                                                "></i>
+
+                                                ${
+                                                    escapeHtml(
+                                                        method
+                                                    )
+                                                }
+
+                                            </span>
+
+
+                                            <span>
+
+                                                <i class="
+                                                    fa-solid
+                                                    fa-building-columns
+                                                "></i>
+
+                                                ${
+                                                    escapeHtml(
+                                                        methodDetails
+                                                    )
+                                                }
+
+                                            </span>
+
+
+                                            <span class="
+                                                details-payment-id
+                                            ">
+
+                                                <i class="
+                                                    fa-solid
+                                                    fa-fingerprint
+                                                "></i>
+
+                                                ${
+                                                    escapeHtml(
+                                                        paymentId
+                                                    )
+                                                }
+
+                                            </span>
+
+                                        </div>
 
                                     </div>
 
+                                `;
 
-                                    <div style="
-                                        margin-top:6px;
-                                        font-size:12px;
-                                        color:#64748b;
-                                        line-height:1.7;
-                                    ">
-
-                                        <div>
-                                            📅 ${date}
-                                        </div>
-
-                                        <div>
-                                            💳 ${method}
-                                        </div>
-
-                                        <div>
-                                            🏦 ${bank}
-                                        </div>
-
-                                        <div style="
-                                            word-break:break-all;
-                                        ">
-                                            🆔 ${
-                                                payment.razorpayPaymentId ||
-                                                payment.id
-                                            }
-                                        </div>
-
-                                    </div>
-
-                                </div>
-                            `;
-
-                        })
+                            }
+                        )
                         .join("")
 
                     : `
-                        <div style="
-                            color:#94a3b8;
-                            font-size:13px;
+
+                        <div class="
+                            details-empty-history
                         ">
-                            No payment history available.
+
+                            <i class="
+                                fa-regular
+                                fa-folder-open
+                            "></i>
+
+                            <strong>
+                                No payment history yet
+                            </strong>
+
+                            <span>
+                                Successful payments will appear here.
+                            </span>
+
                         </div>
+
                     `;
 
 
-            // =============================================
-            // DETAILS MODAL
-            // =============================================
+            // =================================================
+            // CREATE OVERLAY
+            // =================================================
 
             const overlay =
                 document.createElement(
@@ -3317,18 +3771,8 @@ window.viewBookingDetails =
                 );
 
 
-            overlay.style.cssText = `
-                position:fixed;
-                inset:0;
-                z-index:99998;
-                background:rgba(15,23,42,.72);
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                padding:20px;
-                overflow:auto;
-                box-sizing:border-box;
-            `;
+            overlay.className =
+                "booking-details-overlay";
 
 
             const modal =
@@ -3337,405 +3781,1849 @@ window.viewBookingDetails =
                 );
 
 
-            modal.style.cssText = `
-                width:100%;
-                max-width:720px;
-                max-height:92vh;
-                overflow:auto;
-                background:white;
-                border-radius:16px;
-                box-shadow:
-                    0 25px 70px rgba(0,0,0,.30);
-            `;
+            modal.className =
+                "booking-details-modal";
 
+
+            // =================================================
+            // MODAL HTML
+            // =================================================
 
             modal.innerHTML = `
 
-                <div style="
-                    background:#18366f;
-                    color:white;
-                    padding:18px 22px;
-                    display:flex;
-                    align-items:center;
-                    justify-content:space-between;
-                    position:sticky;
-                    top:0;
-                    z-index:5;
-                ">
+                <style>
 
-                    <strong style="
-                        font-size:17px;
-                    ">
-                        Booking Details
-                    </strong>
+                    .booking-details-overlay {
 
+                        position:fixed;
 
-                    <button
-                        id="closeBookingDetails"
-                        type="button"
-                        style="
-                            width:34px;
-                            height:34px;
-                            border:0;
-                            border-radius:7px;
-                            background:
-                                rgba(255,255,255,.15);
-                            color:white;
-                            font-size:22px;
-                            cursor:pointer;
-                        "
-                    >
-                        ×
-                    </button>
+                        inset:0;
 
-                </div>
+                        z-index:99998;
+
+                        display:flex;
+
+                        align-items:center;
+
+                        justify-content:center;
+
+                        padding:20px;
+
+                        box-sizing:border-box;
+
+                        background:
+                            rgba(
+                                15,
+                                23,
+                                42,
+                                0.72
+                            );
+
+                        backdrop-filter:
+                            blur(7px);
+
+                        -webkit-backdrop-filter:
+                            blur(7px);
+
+                    }
 
 
-                <div style="
-                    padding:24px;
-                ">
+                    .booking-details-modal {
+
+                        width:100%;
+
+                        max-width:820px;
+
+                        max-height:94vh;
+
+                        overflow:hidden;
+
+                        position:relative;
+
+                        border-radius:24px;
+
+                        background:#f8fafc;
+
+                        box-shadow:
+                            0 30px 90px
+                            rgba(
+                                15,
+                                23,
+                                42,
+                                .35
+                            );
+
+                        font-family:
+                            Arial,
+                            Helvetica,
+                            sans-serif;
+
+                        color:#172554;
+
+                    }
 
 
-                    <div style="
-                        text-align:center;
-                        margin-bottom:20px;
-                    ">
+                    .booking-details-scroll {
 
-                        <h2 style="
-                            margin:0;
-                            color:#172554;
-                        ">
-                            ${
-                                booking.eventName ||
-                                "Event"
-                            }
-                        </h2>
+                        max-height:94vh;
+
+                        overflow-y:auto;
+
+                        scrollbar-width:thin;
+
+                    }
 
 
-                        <div style="
-                            margin-top:6px;
-                            color:#64748b;
-                            font-size:13px;
-                        ">
-                            Booking ID:
-                            #BK-${bookingId
-                                .substring(0,6)
-                                .toUpperCase()}
-                        </div>
+                    .booking-details-header {
 
-                    </div>
+                        position:relative;
+
+                        padding:
+                            28px
+                            30px
+                            25px;
+
+                        overflow:hidden;
+
+                        color:white;
+
+                        background:
+                            linear-gradient(
+                                135deg,
+                                #18366f 0%,
+                                #2563eb 100%
+                            );
+
+                    }
 
 
-                    <div style="
+                    .booking-details-header::before,
+                    .booking-details-header::after {
+
+                        content:"";
+
+                        position:absolute;
+
+                        border-radius:50%;
+
+                        background:
+                            rgba(
+                                255,
+                                255,
+                                255,
+                                .10
+                            );
+
+                        pointer-events:none;
+
+                    }
+
+
+                    .booking-details-header::before {
+
+                        width:190px;
+
+                        height:190px;
+
+                        right:-70px;
+
+                        top:-100px;
+
+                    }
+
+
+                    .booking-details-header::after {
+
+                        width:110px;
+
+                        height:110px;
+
+                        right:100px;
+
+                        bottom:-75px;
+
+                    }
+
+
+                    .booking-details-header-content {
+
+                        position:relative;
+
+                        z-index:2;
+
+                        display:flex;
+
+                        align-items:flex-start;
+
+                        justify-content:
+                            space-between;
+
+                        gap:20px;
+
+                    }
+
+
+                    .booking-details-title-wrap {
+
+                        display:flex;
+
+                        gap:16px;
+
+                        align-items:center;
+
+                        min-width:0;
+
+                    }
+
+
+                    .booking-details-title-icon {
+
+                        width:54px;
+
+                        height:54px;
+
+                        flex:0 0 54px;
+
+                        display:flex;
+
+                        align-items:center;
+
+                        justify-content:center;
+
+                        border-radius:16px;
+
+                        background:
+                            rgba(
+                                255,
+                                255,
+                                255,
+                                .16
+                            );
+
+                        border:
+                            1px solid
+                            rgba(
+                                255,
+                                255,
+                                255,
+                                .20
+                            );
+
+                        font-size:22px;
+
+                    }
+
+
+                    .booking-details-kicker {
+
+                        margin:
+                            0
+                            0
+                            5px;
+
+                        font-size:11px;
+
+                        font-weight:800;
+
+                        letter-spacing:
+                            1.4px;
+
+                        opacity:.78;
+
+                    }
+
+
+                    .booking-details-title {
+
+                        margin:0;
+
+                        font-size:24px;
+
+                        line-height:1.2;
+
+                        font-weight:800;
+
+                        color:#fff;
+
+                        word-break:break-word;
+
+                    }
+
+
+                    .booking-details-id {
+
+                        margin-top:6px;
+
+                        font-size:12px;
+
+                        opacity:.82;
+
+                    }
+
+
+                    .booking-details-close {
+
+                        width:40px;
+
+                        height:40px;
+
+                        flex:0 0 40px;
+
+                        border:0;
+
+                        border-radius:12px;
+
+                        display:flex;
+
+                        align-items:center;
+
+                        justify-content:center;
+
+                        cursor:pointer;
+
+                        color:white;
+
+                        background:
+                            rgba(
+                                255,
+                                255,
+                                255,
+                                .15
+                            );
+
+                        font-size:18px;
+
+                        transition:.2s ease;
+
+                    }
+
+
+                    .booking-details-close:hover {
+
+                        background:
+                            rgba(
+                                255,
+                                255,
+                                255,
+                                .25
+                            );
+
+                        transform:
+                            rotate(4deg);
+
+                    }
+
+
+                    .booking-details-event-banner {
+
+                        position:relative;
+
+                        z-index:3;
+
                         display:grid;
+
+                        grid-template-columns:
+                            112px
+                            1fr
+                            auto;
+
+                        align-items:center;
+
+                        gap:17px;
+
+                        margin:
+                            -5px
+                            24px
+                            0;
+
+                        padding:14px;
+
+                        border:
+                            1px solid
+                            #e2e8f0;
+
+                        border-radius:18px;
+
+                        background:white;
+
+                        box-shadow:
+                            0 12px 30px
+                            rgba(
+                                15,
+                                23,
+                                42,
+                                .10
+                            );
+
+                    }
+
+
+                    .booking-details-event-image {
+
+                        width:112px;
+
+                        height:82px;
+
+                        object-fit:cover;
+
+                        border-radius:13px;
+
+                        background:#e2e8f0;
+
+                    }
+
+
+                    .booking-details-event-name {
+
+                        margin:
+                            0
+                            0
+                            7px;
+
+                        font-size:18px;
+
+                        line-height:1.25;
+
+                        color:#172554;
+
+                        word-break:break-word;
+
+                    }
+
+
+                    .booking-details-event-category {
+
+                        display:inline-flex;
+
+                        align-items:center;
+
+                        gap:6px;
+
+                        padding:
+                            6px
+                            10px;
+
+                        border-radius:999px;
+
+                        color:#1d4ed8;
+
+                        background:#eff6ff;
+
+                        font-size:11px;
+
+                        font-weight:800;
+
+                    }
+
+
+                    .booking-details-status {
+
+                        display:inline-flex;
+
+                        align-items:center;
+
+                        gap:7px;
+
+                        padding:
+                            9px
+                            12px;
+
+                        border-radius:999px;
+
+                        white-space:nowrap;
+
+                        font-size:11px;
+
+                        font-weight:800;
+
+                    }
+
+
+                    .booking-details-status.approved {
+
+                        color:#166534;
+
+                        background:#dcfce7;
+
+                    }
+
+
+                    .booking-details-status.pending {
+
+                        color:#9a3412;
+
+                        background:#ffedd5;
+
+                    }
+
+
+                    .booking-details-status.cancelled,
+                    .booking-details-status.rejected {
+
+                        color:#991b1b;
+
+                        background:#fee2e2;
+
+                    }
+
+
+                    .booking-details-body {
+
+                        padding:25px;
+
+                    }
+
+
+                    .booking-details-section {
+
+                        margin-bottom:20px;
+
+                        padding:20px;
+
+                        border:
+                            1px solid
+                            #e2e8f0;
+
+                        border-radius:18px;
+
+                        background:white;
+
+                    }
+
+
+                    .booking-details-section:last-child {
+
+                        margin-bottom:0;
+
+                    }
+
+
+                    .booking-details-section-title {
+
+                        display:flex;
+
+                        align-items:center;
+
+                        gap:9px;
+
+                        margin:
+                            0
+                            0
+                            15px;
+
+                        font-size:15px;
+
+                        color:#172554;
+
+                    }
+
+
+                    .booking-details-section-title i {
+
+                        color:#2563eb;
+
+                    }
+
+
+                    .booking-details-grid {
+
+                        display:grid;
+
                         grid-template-columns:
                             repeat(
                                 2,
-                                minmax(0,1fr)
+                                minmax(
+                                    0,
+                                    1fr
+                                )
                             );
+
                         gap:12px;
-                    ">
+
+                    }
 
 
-                        <div style="
-                            padding:13px;
-                            background:#f8fafc;
-                            border-radius:9px;
-                        ">
+                    .booking-details-info-box {
 
-                            <small>
-                                Event Date
-                            </small>
+                        min-width:0;
 
-                            <strong style="
-                                display:block;
-                                margin-top:5px;
-                            ">
-                                ${
-                                    booking.eventDate ||
-                                    "Not specified"
-                                }
-                            </strong>
+                        padding:14px;
 
-                        </div>
+                        border:
+                            1px solid
+                            #edf2f7;
 
+                        border-radius:13px;
 
-                        <div style="
-                            padding:13px;
-                            background:#f8fafc;
-                            border-radius:9px;
-                        ">
-
-                            <small>
-                                Guests
-                            </small>
-
-                            <strong style="
-                                display:block;
-                                margin-top:5px;
-                            ">
-                                ${
-                                    booking.guests ||
-                                    0
-                                }
-                            </strong>
-
-                        </div>
-
-
-                        <div style="
-                            padding:13px;
-                            background:#f8fafc;
-                            border-radius:9px;
-                        ">
-
-                            <small>
-                                Location
-                            </small>
-
-                            <strong style="
-                                display:block;
-                                margin-top:5px;
-                            ">
-                                ${
-                                    booking.location ||
-                                    "Not specified"
-                                }
-                            </strong>
-
-                        </div>
-
-
-                        <div style="
-                            padding:13px;
-                            background:#f8fafc;
-                            border-radius:9px;
-                        ">
-
-                            <small>
-                                Booking Status
-                            </small>
-
-                            <strong style="
-                                display:block;
-                                margin-top:5px;
-                            ">
-                                ${
-                                    booking.status ||
-                                    "Pending"
-                                }
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- PAYMENT SUMMARY -->
-
-                    <div style="
-                        margin-top:20px;
-                        padding:18px;
-                        border-radius:10px;
                         background:#f8fafc;
-                        border:1px solid #e2e8f0;
+
+                    }
+
+
+                    .booking-details-info-label {
+
+                        display:block;
+
+                        margin-bottom:6px;
+
+                        color:#94a3b8;
+
+                        font-size:10px;
+
+                        font-weight:800;
+
+                        letter-spacing:.6px;
+
+                        text-transform:uppercase;
+
+                    }
+
+
+                    .booking-details-info-value {
+
+                        display:block;
+
+                        color:#334155;
+
+                        font-size:13px;
+
+                        font-weight:700;
+
+                        line-height:1.45;
+
+                        word-break:break-word;
+
+                    }
+
+
+                    .booking-details-money-grid {
+
+                        display:grid;
+
+                        grid-template-columns:
+                            repeat(
+                                3,
+                                minmax(
+                                    0,
+                                    1fr
+                                )
+                            );
+
+                        gap:12px;
+
+                    }
+
+
+                    .booking-details-money-box {
+
+                        padding:16px;
+
+                        border-radius:14px;
+
+                        background:#f8fafc;
+
+                        border:
+                            1px solid
+                            #e2e8f0;
+
+                    }
+
+
+                    .booking-details-money-box.paid {
+
+                        background:#f0fdf4;
+
+                        border-color:#bbf7d0;
+
+                    }
+
+
+                    .booking-details-money-box.due {
+
+                        background:#fff7ed;
+
+                        border-color:#fed7aa;
+
+                    }
+
+
+                    .booking-details-money-label {
+
+                        display:block;
+
+                        margin-bottom:6px;
+
+                        color:#64748b;
+
+                        font-size:11px;
+
+                        font-weight:700;
+
+                    }
+
+
+                    .booking-details-money-value {
+
+                        display:block;
+
+                        font-size:18px;
+
+                        font-weight:800;
+
+                        color:#172554;
+
+                    }
+
+
+                    .booking-details-money-box.paid
+                    .booking-details-money-value {
+
+                        color:#15803d;
+
+                    }
+
+
+                    .booking-details-money-box.due
+                    .booking-details-money-value {
+
+                        color:#c2410c;
+
+                    }
+
+
+                    .booking-details-progress-wrap {
+
+                        margin-top:16px;
+
+                        padding:16px;
+
+                        border-radius:14px;
+
+                        background:#f8fafc;
+
+                        border:
+                            1px solid
+                            #e2e8f0;
+
+                    }
+
+
+                    .booking-details-progress-top,
+                    .booking-details-progress-bottom {
+
+                        display:flex;
+
+                        align-items:center;
+
+                        justify-content:
+                            space-between;
+
+                        gap:10px;
+
+                    }
+
+
+                    .booking-details-progress-top {
+
+                        margin-bottom:9px;
+
+                        color:#334155;
+
+                        font-size:12px;
+
+                        font-weight:800;
+
+                    }
+
+
+                    .booking-details-progress-percent {
+
+                        color:#2563eb;
+
+                    }
+
+
+                    .booking-details-progress-track {
+
+                        height:9px;
+
+                        overflow:hidden;
+
+                        border-radius:99px;
+
+                        background:#e2e8f0;
+
+                    }
+
+
+                    .booking-details-progress-fill {
+
+                        height:100%;
+
+                        width:
+                            ${paymentProgress}%;
+
+                        border-radius:inherit;
+
+                        background:
+                            linear-gradient(
+                                90deg,
+                                #2563eb,
+                                #60a5fa
+                            );
+
+                    }
+
+
+                    .booking-details-progress-bottom {
+
+                        margin-top:8px;
+
+                        color:#64748b;
+
+                        font-size:11px;
+
+                    }
+
+
+                    .booking-details-progress-bottom strong {
+
+                        color:#334155;
+
+                    }
+
+
+                    .details-payment-item {
+
+                        padding:14px 0;
+
+                        border-bottom:
+                            1px solid
+                            #eef2f7;
+
+                    }
+
+
+                    .details-payment-item:last-child {
+
+                        border-bottom:0;
+
+                        padding-bottom:0;
+
+                    }
+
+
+                    .details-payment-top {
+
+                        display:flex;
+
+                        align-items:center;
+
+                        justify-content:
+                            space-between;
+
+                        gap:15px;
+
+                    }
+
+
+                    .details-payment-number {
+
+                        display:flex;
+
+                        align-items:center;
+
+                        gap:10px;
+
+                        min-width:0;
+
+                    }
+
+
+                    .details-payment-icon {
+
+                        width:34px;
+
+                        height:34px;
+
+                        flex:0 0 34px;
+
+                        display:flex;
+
+                        align-items:center;
+
+                        justify-content:center;
+
+                        border-radius:10px;
+
+                        color:#15803d;
+
+                        background:#dcfce7;
+
+                    }
+
+
+                    .details-payment-number strong,
+                    .details-payment-number small {
+
+                        display:block;
+
+                    }
+
+
+                    .details-payment-number strong {
+
+                        color:#172554;
+
+                        font-size:13px;
+
+                    }
+
+
+                    .details-payment-number small {
+
+                        margin-top:3px;
+
+                        color:#94a3b8;
+
+                        font-size:10px;
+
+                    }
+
+
+                    .details-payment-amount {
+
+                        color:#15803d;
+
+                        font-size:14px;
+
+                        white-space:nowrap;
+
+                    }
+
+
+                    .details-payment-meta {
+
+                        display:grid;
+
+                        grid-template-columns:
+                            repeat(
+                                2,
+                                minmax(
+                                    0,
+                                    1fr
+                                )
+                            );
+
+                        gap:7px 15px;
+
+                        margin:
+                            10px
+                            0
+                            0
+                            44px;
+
+                        color:#64748b;
+
+                        font-size:10px;
+
+                    }
+
+
+                    .details-payment-meta span {
+
+                        min-width:0;
+
+                        display:flex;
+
+                        align-items:flex-start;
+
+                        gap:6px;
+
+                        word-break:break-word;
+
+                    }
+
+
+                    .details-payment-meta i {
+
+                        width:12px;
+
+                        margin-top:1px;
+
+                        color:#94a3b8;
+
+                    }
+
+
+                    .details-payment-id {
+
+                        grid-column:
+                            1 / -1;
+
+                    }
+
+
+                    .details-empty-history {
+
+                        display:flex;
+
+                        align-items:center;
+
+                        flex-direction:column;
+
+                        gap:5px;
+
+                        padding:
+                            20px
+                            10px;
+
+                        color:#94a3b8;
+
+                        text-align:center;
+
+                    }
+
+
+                    .details-empty-history i {
+
+                        margin-bottom:3px;
+
+                        font-size:25px;
+
+                    }
+
+
+                    .details-empty-history strong {
+
+                        color:#64748b;
+
+                        font-size:13px;
+
+                    }
+
+
+                    .details-empty-history span {
+
+                        font-size:11px;
+
+                    }
+
+
+                    .booking-details-requirements {
+
+                        padding:14px;
+
+                        border-radius:13px;
+
+                        color:#475569;
+
+                        background:#f8fafc;
+
+                        border:
+                            1px solid
+                            #e2e8f0;
+
+                        font-size:12px;
+
+                        line-height:1.6;
+
+                        white-space:pre-wrap;
+
+                    }
+
+
+                    .booking-details-footer {
+
+                        position:sticky;
+
+                        bottom:0;
+
+                        z-index:4;
+
+                        display:flex;
+
+                        justify-content:flex-end;
+
+                        padding:
+                            15px
+                            25px;
+
+                        border-top:
+                            1px solid
+                            #e2e8f0;
+
+                        background:
+                            rgba(
+                                255,
+                                255,
+                                255,
+                                .96
+                            );
+
+                        backdrop-filter:
+                            blur(8px);
+
+                    }
+
+
+                    .booking-details-footer button {
+
+                        display:inline-flex;
+
+                        align-items:center;
+
+                        justify-content:center;
+
+                        gap:8px;
+
+                        padding:
+                            11px
+                            20px;
+
+                        border:0;
+
+                        border-radius:11px;
+
+                        color:white;
+
+                        background:#18366f;
+
+                        font-size:12px;
+
+                        font-weight:800;
+
+                        cursor:pointer;
+
+                        transition:.2s ease;
+
+                    }
+
+
+                    .booking-details-footer button:hover {
+
+                        background:#2563eb;
+
+                        transform:
+                            translateY(-1px);
+
+                    }
+
+
+                    @media (
+                        max-width:680px
+                    ) {
+
+                        .booking-details-overlay {
+
+                            padding:10px;
+
+                            align-items:
+                                flex-start;
+
+                        }
+
+
+                        .booking-details-modal {
+
+                            max-height:96vh;
+
+                            border-radius:18px;
+
+                        }
+
+
+                        .booking-details-header {
+
+                            padding:
+                                20px
+                                18px
+                                22px;
+
+                        }
+
+
+                        .booking-details-title-icon {
+
+                            width:46px;
+
+                            height:46px;
+
+                            flex-basis:46px;
+
+                        }
+
+
+                        .booking-details-title {
+
+                            font-size:19px;
+
+                        }
+
+
+                        .booking-details-event-banner {
+
+                            grid-template-columns:
+                                78px
+                                1fr;
+
+                            margin:
+                                -4px
+                                12px
+                                0;
+
+                            padding:10px;
+
+                        }
+
+
+                        .booking-details-event-image {
+
+                            width:78px;
+
+                            height:68px;
+
+                        }
+
+
+                        .booking-details-status {
+
+                            grid-column:
+                                1 / -1;
+
+                            justify-self:
+                                start;
+
+                        }
+
+
+                        .booking-details-body {
+
+                            padding:14px;
+
+                        }
+
+
+                        .booking-details-section {
+
+                            padding:15px;
+
+                            border-radius:15px;
+
+                        }
+
+
+                        .booking-details-grid,
+                        .booking-details-money-grid,
+                        .details-payment-meta {
+
+                            grid-template-columns:
+                                1fr;
+
+                        }
+
+
+                        .details-payment-id {
+
+                            grid-column:auto;
+
+                        }
+
+
+                        .details-payment-meta {
+
+                            margin-left:44px;
+
+                        }
+
+
+                        .booking-details-footer {
+
+                            padding:
+                                12px
+                                14px;
+
+                        }
+
+
+                        .booking-details-footer button {
+
+                            width:100%;
+
+                        }
+
+                    }
+
+                </style>
+
+
+                <div class="
+                    booking-details-scroll
+                ">
+
+
+                    <!-- HEADER -->
+
+                    <div class="
+                        booking-details-header
                     ">
 
-                        <h3 style="
-                            margin:0 0 15px;
-                            color:#172554;
-                        ">
-                            Payment Summary
-                        </h3>
-
-
-                        <div style="
-                            display:flex;
-                            justify-content:
-                                space-between;
-                            margin-bottom:10px;
+                        <div class="
+                            booking-details-header-content
                         ">
 
-                            <span>
-                                Total Amount
-                            </span>
-
-                            <strong>
-                                ₹${totalAmount.toLocaleString("en-IN")}
-                            </strong>
-
-                        </div>
-
-
-                        <div style="
-                            display:flex;
-                            justify-content:
-                                space-between;
-                            margin-bottom:10px;
-                        ">
-
-                            <span>
-                                Amount Paid
-                            </span>
-
-                            <strong style="
-                                color:#15803d;
+                            <div class="
+                                booking-details-title-wrap
                             ">
-                                ₹${amountPaid.toLocaleString("en-IN")}
-                            </strong>
 
-                        </div>
+                                <div class="
+                                    booking-details-title-icon
+                                ">
 
+                                    <i class="
+                                        fa-solid
+                                        fa-calendar-check
+                                    "></i>
 
-                        <div style="
-                            display:flex;
-                            justify-content:
-                                space-between;
-                        ">
-
-                            <span>
-                                Amount Due
-                            </span>
-
-                            <strong style="
-                                color:${
-                                    amountDue > 0
-                                        ? "#dc2626"
-                                        : "#15803d"
-                                };
-                            ">
-                                ₹${amountDue.toLocaleString("en-IN")}
-                            </strong>
-
-                        </div>
+                                </div>
 
 
-                        <div style="
-                            margin-top:15px;
-                            padding-top:15px;
-                            border-top:
-                                1px solid #e2e8f0;
-                            display:flex;
-                            justify-content:
-                                space-between;
-                        ">
+                                <div>
 
-                            <span>
-                                Payment Status
-                            </span>
+                                    <p class="
+                                        booking-details-kicker
+                                    ">
+                                        BOOKING DETAILS
+                                    </p>
 
-                            <strong>
-                                ${paymentStatus}
-                            </strong>
+
+                                    <h2 class="
+                                        booking-details-title
+                                    ">
+                                        ${
+                                            escapeHtml(
+                                                eventName
+                                            )
+                                        }
+                                    </h2>
+
+
+                                    <div class="
+                                        booking-details-id
+                                    ">
+                                        ${
+                                            bookingDisplayId
+                                        }
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                class="
+                                    booking-details-close
+                                "
+                                id="
+                                    closeBookingDetails
+                                "
+                                aria-label="Close"
+                            >
+
+                                <i class="
+                                    fa-solid
+                                    fa-xmark
+                                "></i>
+
+                            </button>
 
                         </div>
 
                     </div>
 
 
-                    <!-- PAYMENT HISTORY -->
+                    <!-- EVENT -->
 
-                    <div style="
-                        margin-top:20px;
-                        padding:18px;
-                        border:1px solid #e2e8f0;
-                        border-radius:10px;
+                    <div class="
+                        booking-details-event-banner
                     ">
 
-                        <h3 style="
-                            margin:0;
-                            color:#172554;
+                        <img
+                            src="${
+                                escapeHtml(
+                                    eventImage
+                                )
+                            }"
+                            class="
+                                booking-details-event-image
+                            "
+                            alt="${
+                                escapeHtml(
+                                    eventName
+                                )
+                            }"
+                            onerror="
+                                this.src='images/hero.jpg'
+                            "
+                        >
+
+
+                        <div>
+
+                            <h3 class="
+                                booking-details-event-name
+                            ">
+                                ${
+                                    escapeHtml(
+                                        eventName
+                                    )
+                                }
+                            </h3>
+
+
+                            <span class="
+                                booking-details-event-category
+                            ">
+
+                                <i class="
+                                    fa-solid
+                                    fa-tag
+                                "></i>
+
+                                ${
+                                    escapeHtml(
+                                        category
+                                    )
+                                }
+
+                            </span>
+
+                        </div>
+
+
+                        <span class="
+                            booking-details-status
+                            ${statusClass}
                         ">
 
                             <i class="
                                 fa-solid
-                                fa-clock-rotate-left
+                                ${statusIcon}
                             "></i>
 
-                            Payment History
+                            ${
+                                escapeHtml(
+                                    bookingStatus
+                                )
+                            }
 
-                        </h3>
-
-
-                        <p style="
-                            margin:5px 0 10px;
-                            color:#94a3b8;
-                            font-size:12px;
-                        ">
-                            All successful installments
-                            are listed below.
-                        </p>
-
-
-                        ${historyHtml}
+                        </span>
 
                     </div>
 
 
-                    ${
-                        booking.requirements
-                            ? `
+                    <!-- BODY -->
 
-                                <div style="
-                                    margin-top:20px;
-                                    padding:18px;
-                                    background:#f8fafc;
-                                    border-radius:10px;
+                    <div class="
+                        booking-details-body
+                    ">
+
+
+                        <!-- EVENT INFORMATION -->
+
+                        <section class="
+                            booking-details-section
+                        ">
+
+                            <h3 class="
+                                booking-details-section-title
+                            ">
+
+                                <i class="
+                                    fa-solid
+                                    fa-circle-info
+                                "></i>
+
+                                Event Information
+
+                            </h3>
+
+
+                            <div class="
+                                booking-details-grid
+                            ">
+
+
+                                <div class="
+                                    booking-details-info-box
                                 ">
 
-                                    <h3 style="
-                                        margin-top:0;
-                                        color:#172554;
+                                    <span class="
+                                        booking-details-info-label
                                     ">
-                                        Requirements
-                                    </h3>
+                                        Event Date
+                                    </span>
 
-                                    <p style="
-                                        margin-bottom:0;
-                                        color:#475569;
-                                        line-height:1.6;
+                                    <span class="
+                                        booking-details-info-value
                                     ">
                                         ${
-                                            booking.requirements
+                                            escapeHtml(
+                                                eventDate
+                                            )
                                         }
-                                    </p>
+                                    </span>
 
                                 </div>
 
-                            `
-                            : ""
-                    }
+
+                                <div class="
+                                    booking-details-info-box
+                                ">
+
+                                    <span class="
+                                        booking-details-info-label
+                                    ">
+                                        Guests
+                                    </span>
+
+                                    <span class="
+                                        booking-details-info-value
+                                    ">
+                                        ${
+                                            escapeHtml(
+                                                guests
+                                            )
+                                        }
+                                        People
+                                    </span>
+
+                                </div>
 
 
-                </div>
+                                <div class="
+                                    booking-details-info-box
+                                ">
+
+                                    <span class="
+                                        booking-details-info-label
+                                    ">
+                                        Location
+                                    </span>
+
+                                    <span class="
+                                        booking-details-info-value
+                                    ">
+                                        ${
+                                            escapeHtml(
+                                                location
+                                            )
+                                        }
+                                    </span>
+
+                                </div>
 
 
-                <div style="
-                    padding:15px 22px;
-                    border-top:1px solid #e2e8f0;
-                    text-align:right;
-                ">
+                                <div class="
+                                    booking-details-info-box
+                                ">
 
-                    <button
-                        id="closeBookingDetailsBottom"
-                        type="button"
-                        style="
-                            padding:10px 18px;
-                            border:0;
-                            border-radius:8px;
-                            background:#18366f;
-                            color:white;
-                            font-weight:700;
-                            cursor:pointer;
-                        "
-                    >
-                        Close
-                    </button>
+                                    <span class="
+                                        booking-details-info-label
+                                    ">
+                                        Event End Time
+                                    </span>
+
+                                    <span class="
+                                        booking-details-info-value
+                                    ">
+                                        ${
+                                            escapeHtml(
+                                                booking.eventEndTime ||
+                                                "Not specified"
+                                            )
+                                        }
+                                    </span>
+
+                                </div>
+
+
+                            </div>
+
+                        </section>
+
+
+                        <!-- PAYMENT SUMMARY -->
+
+                        <section class="
+                            booking-details-section
+                        ">
+
+                            <h3 class="
+                                booking-details-section-title
+                            ">
+
+                                <i class="
+                                    fa-solid
+                                    fa-wallet
+                                "></i>
+
+                                Payment Summary
+
+                            </h3>
+
+
+                            <div class="
+                                booking-details-money-grid
+                            ">
+
+
+                                <div class="
+                                    booking-details-money-box
+                                ">
+
+                                    <span class="
+                                        booking-details-money-label
+                                    ">
+                                        Total Amount
+                                    </span>
+
+                                    <span class="
+                                        booking-details-money-value
+                                    ">
+                                        ${
+                                            formatMoney(
+                                                totalAmount
+                                            )
+                                        }
+                                    </span>
+
+                                </div>
+
+
+                                <div class="
+                                    booking-details-money-box
+                                    paid
+                                ">
+
+                                    <span class="
+                                        booking-details-money-label
+                                    ">
+                                        Amount Paid
+                                    </span>
+
+                                    <span class="
+                                        booking-details-money-value
+                                    ">
+                                        ${
+                                            formatMoney(
+                                                amountPaid
+                                            )
+                                        }
+                                    </span>
+
+                                </div>
+
+
+                                <div class="
+                                    booking-details-money-box
+                                    due
+                                ">
+
+                                    <span class="
+                                        booking-details-money-label
+                                    ">
+                                        Amount Due
+                                    </span>
+
+                                    <span class="
+                                        booking-details-money-value
+                                    ">
+                                        ${
+                                            formatMoney(
+                                                amountDue
+                                            )
+                                        }
+                                    </span>
+
+                                </div>
+
+
+                            </div>
+
+
+                            <!-- PROGRESS -->
+
+                            <div class="
+                                booking-details-progress-wrap
+                            ">
+
+                                <div class="
+                                    booking-details-progress-top
+                                ">
+
+                                    <span>
+                                        Payment Progress
+                                    </span>
+
+                                    <span class="
+                                        booking-details-progress-percent
+                                    ">
+                                        ${
+                                            paymentProgress.toFixed(
+                                                0
+                                            )
+                                        }%
+                                    </span>
+
+                                </div>
+
+
+                                <div class="
+                                    booking-details-progress-track
+                                ">
+
+                                    <div class="
+                                        booking-details-progress-fill
+                                    "></div>
+
+                                </div>
+
+
+                                <div class="
+                                    booking-details-progress-bottom
+                                ">
+
+                                    <span>
+                                        Paid:
+                                        <strong>
+                                            ${
+                                                formatMoney(
+                                                    amountPaid
+                                                )
+                                            }
+                                        </strong>
+                                    </span>
+
+
+                                    <span>
+                                        Due:
+                                        <strong>
+                                            ${
+                                                formatMoney(
+                                                    amountDue
+                                                )
+                                            }
+                                        </strong>
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </section>
+
+
+                        <!-- PAYMENT HISTORY -->
+
+                        <section class="
+                            booking-details-section
+                        ">
+
+                            <h3 class="
+                                booking-details-section-title
+                            ">
+
+                                <i class="
+                                    fa-solid
+                                    fa-clock-rotate-left
+                                "></i>
+
+                                Payment History
+
+                            </h3>
+
+
+                            ${
+                                historyHtml
+                            }
+
+                        </section>
+
+
+                        <!-- REQUIREMENTS -->
+
+                        <section class="
+                            booking-details-section
+                        ">
+
+                            <h3 class="
+                                booking-details-section-title
+                            ">
+
+                                <i class="
+                                    fa-solid
+                                    fa-clipboard-list
+                                "></i>
+
+                                Requirements
+
+                            </h3>
+
+
+                            <div class="
+                                booking-details-requirements
+                            ">
+
+                                ${
+                                    escapeHtml(
+                                        requirements
+                                    )
+                                }
+
+                            </div>
+
+                        </section>
+
+
+                    </div>
+
+
+                    <!-- FOOTER -->
+
+                    <div class="
+                        booking-details-footer
+                    ">
+
+                        <button
+                            type="button"
+                            id="
+                                closeBookingDetailsBottom
+                            "
+                        >
+
+                            <i class="
+                                fa-solid
+                                fa-xmark
+                            "></i>
+
+                            Close Details
+
+                        </button>
+
+                    </div>
+
 
                 </div>
 
             `;
 
+
+            // =================================================
+            // SHOW MODAL
+            // =================================================
 
             overlay.appendChild(
                 modal
@@ -3747,29 +5635,51 @@ window.viewBookingDetails =
             );
 
 
+            // =================================================
+            // CLOSE MODAL
+            // =================================================
+
             const closeModal =
-                () => overlay.remove();
+                () => {
+
+                    overlay.remove();
+
+                };
 
 
-            document
-                .getElementById(
-                    "closeBookingDetails"
-                )
-                .addEventListener(
+            const closeTop =
+                modal.querySelector(
+                    "#closeBookingDetails"
+                );
+
+
+            const closeBottom =
+                modal.querySelector(
+                    "#closeBookingDetailsBottom"
+                );
+
+
+            if (closeTop) {
+
+                closeTop.addEventListener(
                     "click",
                     closeModal
                 );
 
+            }
 
-            document
-                .getElementById(
-                    "closeBookingDetailsBottom"
-                )
-                .addEventListener(
+
+            if (closeBottom) {
+
+                closeBottom.addEventListener(
                     "click",
                     closeModal
                 );
 
+            }
+
+
+            // Close by clicking outside.
 
             overlay.addEventListener(
                 "click",
@@ -3786,6 +5696,19 @@ window.viewBookingDetails =
 
                 }
             );
+
+
+            const scrollArea =
+                modal.querySelector(
+                    ".booking-details-scroll"
+                );
+
+
+            if (scrollArea) {
+
+                scrollArea.scrollTop = 0;
+
+            }
 
         }
 
