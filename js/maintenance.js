@@ -1,7 +1,8 @@
 /* =========================================================
    EVENTSPHERE
-   PREMIUM SERVICE MAINTENANCE PAGE
-========================================================= */
+   SERVICE MAINTENANCE SYSTEM
+   PREMIUM SCHEDULED MAINTENANCE
+   ========================================================= */
 
 import { db } from "./firebase-config.js";
 
@@ -13,19 +14,1545 @@ import {
 
 /* =========================================================
    FIRESTORE
-========================================================= */
+   ========================================================= */
 
-const maintenanceRef =
-    doc(
-        db,
-        "settings",
-        "maintenance"
-    );
+const maintenanceRef = doc(
+    db,
+    "settings",
+    "maintenance"
+);
 
 
 /* =========================================================
-   CHECK MAINTENANCE STATUS
-========================================================= */
+   SETTINGS
+   ========================================================= */
+
+const CHECK_INTERVAL = 10000;
+
+let maintenanceTimer = null;
+
+let countdownTimer = null;
+
+let scheduledPopupShown = false;
+
+
+/* =========================================================
+   FORMAT DATE
+   ========================================================= */
+
+function formatDateTime(date) {
+
+    if (!date || isNaN(date.getTime())) {
+        return "Not specified";
+    }
+
+    return date.toLocaleString(
+        "en-IN",
+        {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true
+        }
+    );
+
+}
+
+
+/* =========================================================
+   GET DATE
+   ========================================================= */
+
+function getDate(value) {
+
+    if (!value) {
+        return null;
+    }
+
+
+    if (
+        typeof value === "object" &&
+        typeof value.toDate === "function"
+    ) {
+
+        return value.toDate();
+
+    }
+
+
+    const date = new Date(value);
+
+
+    if (isNaN(date.getTime())) {
+        return null;
+    }
+
+
+    return date;
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+   ========================================================= */
+
+function escapeHtml(value) {
+
+    return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* =========================================================
+   CREATE UNIQUE MAINTENANCE ID
+   ========================================================= */
+
+function createMaintenanceId(
+    startDate,
+    endDate,
+    message
+) {
+
+    return [
+        startDate
+            ? startDate.getTime()
+            : "no-start",
+
+        endDate
+            ? endDate.getTime()
+            : "no-end",
+
+        message || ""
+    ].join("|");
+
+}
+
+
+/* =========================================================
+   CHECK WHETHER POPUP WAS ALREADY DISMISSED
+   ========================================================= */
+
+function wasPopupDismissed(
+    maintenanceId
+) {
+
+    return false;
+
+}
+
+
+/* =========================================================
+   SAVE DISMISSED MAINTENANCE
+   ========================================================= */
+
+function savePopupDismissed(
+    maintenanceId
+) {
+
+    // Do not remember the popup.
+    // It should appear again after every refresh.
+
+}
+
+/* =========================================================
+   ADD PREMIUM CSS
+   ========================================================= */
+
+function addMaintenanceStyles() {
+
+    if (
+        document.getElementById(
+            "eventSphereMaintenanceStyles"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const style =
+        document.createElement("style");
+
+
+    style.id =
+        "eventSphereMaintenanceStyles";
+
+
+    style.textContent = `
+
+        /* ===============================================
+           POPUP OVERLAY
+           =============================================== */
+
+        .es-maintenance-overlay {
+
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 999999;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 24px;
+
+            background:
+                rgba(8, 18, 45, 0.58);
+
+            backdrop-filter:
+                blur(12px);
+
+            -webkit-backdrop-filter:
+                blur(12px);
+
+            animation:
+                esFadeIn 0.35s ease;
+
+        }
+
+
+        /* ===============================================
+           POPUP
+           =============================================== */
+
+        .es-maintenance-popup {
+
+            position: relative;
+
+            width: 100%;
+
+            max-width: 520px;
+
+            padding:
+                34px 34px 30px;
+
+            border:
+                1px solid
+                rgba(255,255,255,0.7);
+
+            border-radius: 28px;
+
+            background:
+                rgba(255,255,255,0.98);
+
+            box-shadow:
+                0 30px 80px
+                rgba(5,18,50,0.30);
+
+            text-align: center;
+
+            animation:
+                esPopupIn 0.45s
+                cubic-bezier(
+                    0.22,
+                    1,
+                    0.36,
+                    1
+                );
+
+        }
+
+
+        /* ===============================================
+           CLOSE BUTTON
+           =============================================== */
+
+        .es-maintenance-close {
+
+            position: absolute;
+
+            top: 18px;
+
+            right: 18px;
+
+            width: 38px;
+
+            height: 38px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border: none;
+
+            border-radius: 50%;
+
+            background:
+                #f1f5f9;
+
+            color:
+                #64748b;
+
+            font-size: 20px;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.2s ease,
+                background 0.2s ease,
+                color 0.2s ease;
+
+        }
+
+
+        .es-maintenance-close:hover {
+
+            background:
+                #e2e8f0;
+
+            color:
+                #0f172a;
+
+            transform:
+                rotate(90deg);
+
+        }
+
+
+        /* ===============================================
+           ICON
+           =============================================== */
+
+        .es-maintenance-icon {
+
+            width: 72px;
+
+            height: 72px;
+
+            margin:
+                0 auto 20px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 22px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #eef4ff,
+                    #e4eaff
+                );
+
+            color:
+                #3264df;
+
+        }
+
+
+        .es-maintenance-icon svg {
+
+            width: 34px;
+
+            height: 34px;
+
+        }
+
+
+        /* ===============================================
+           LABEL
+           =============================================== */
+
+        .es-maintenance-label {
+
+            margin-bottom: 10px;
+
+            color:
+                #3264df;
+
+            font-size: 12px;
+
+            font-weight: 800;
+
+            letter-spacing: 2px;
+
+            text-transform: uppercase;
+
+        }
+
+
+        /* ===============================================
+           TITLE
+           =============================================== */
+
+        .es-maintenance-title {
+
+            margin: 0;
+
+            color:
+                #172033;
+
+            font-size: 30px;
+
+            font-weight: 800;
+
+            line-height: 1.15;
+
+        }
+
+
+        /* ===============================================
+           MESSAGE
+           =============================================== */
+
+        .es-maintenance-message {
+
+            max-width: 430px;
+
+            margin:
+                14px auto 26px;
+
+            color:
+                #64748b;
+
+            font-size: 15px;
+
+            line-height: 1.7;
+
+        }
+
+
+        /* ===============================================
+           DATE CARDS
+           =============================================== */
+
+        .es-maintenance-dates {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 12px;
+
+            margin-bottom: 24px;
+
+        }
+
+
+        .es-maintenance-date {
+
+            padding: 16px;
+
+            border:
+                1px solid #e7edf6;
+
+            border-radius: 16px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #f8fafc,
+                    #f3f6fb
+                );
+
+            text-align: left;
+
+        }
+
+
+        .es-maintenance-date-label {
+
+            margin-bottom: 7px;
+
+            color:
+                #94a3b8;
+
+            font-size: 10px;
+
+            font-weight: 800;
+
+            letter-spacing: 1px;
+
+            text-transform: uppercase;
+
+        }
+
+
+        .es-maintenance-date-value {
+
+            color:
+                #1e293b;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            line-height: 1.4;
+
+        }
+
+
+        /* ===============================================
+           BUTTON
+           =============================================== */
+
+        .es-maintenance-button {
+
+            width: 100%;
+
+            min-height: 48px;
+
+            border: none;
+
+            border-radius: 14px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #3264df,
+                    #4c46e8
+                );
+
+            color:
+                #ffffff;
+
+            font-size: 14px;
+
+            font-weight: 750;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 10px 24px
+                rgba(50,100,223,0.24);
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+
+        }
+
+
+        .es-maintenance-button:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 14px 30px
+                rgba(50,100,223,0.30);
+
+        }
+
+
+        /* ===============================================
+           BRAND
+           =============================================== */
+
+        .es-maintenance-brand {
+
+            margin-top: 20px;
+
+            color:
+                #94a3b8;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+        }
+
+
+        /* ===============================================
+           FULL MAINTENANCE PAGE
+           =============================================== */
+
+        .es-full-maintenance {
+
+            min-height: 100vh;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            box-sizing: border-box;
+
+            padding: 30px;
+
+            background:
+                radial-gradient(
+                    circle at 20% 20%,
+                    rgba(65,100,220,0.25),
+                    transparent 35%
+                ),
+                radial-gradient(
+                    circle at 80% 80%,
+                    rgba(95,75,220,0.20),
+                    transparent 35%
+                ),
+                linear-gradient(
+                    135deg,
+                    #08142f,
+                    #101e46 55%,
+                    #111b3b
+                );
+
+            color:
+                #ffffff;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+        }
+
+
+        /* ===============================================
+           MAINTENANCE CARD
+           =============================================== */
+
+        .es-full-maintenance-card {
+
+            width: 100%;
+
+            max-width: 680px;
+
+            padding:
+                54px 44px;
+
+            box-sizing: border-box;
+
+            border:
+                1px solid
+                rgba(255,255,255,0.12);
+
+            border-radius: 30px;
+
+            background:
+                rgba(255,255,255,0.075);
+
+            backdrop-filter:
+                blur(18px);
+
+            -webkit-backdrop-filter:
+                blur(18px);
+
+            box-shadow:
+                0 35px 100px
+                rgba(0,0,0,0.30);
+
+            text-align: center;
+
+            animation:
+                esPopupIn 0.55s
+                cubic-bezier(
+                    0.22,
+                    1,
+                    0.36,
+                    1
+                );
+
+        }
+
+
+        /* ===============================================
+           FULL PAGE ICON
+           =============================================== */
+
+        .es-full-icon {
+
+            width: 82px;
+
+            height: 82px;
+
+            margin:
+                0 auto 25px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 25px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(70,113,235,0.25),
+                    rgba(95,77,230,0.22)
+                );
+
+            border:
+                1px solid
+                rgba(255,255,255,0.12);
+
+        }
+
+
+        .es-full-icon svg {
+
+            width: 40px;
+
+            height: 40px;
+
+        }
+
+
+        /* ===============================================
+           FULL PAGE LABEL
+           =============================================== */
+
+        .es-full-label {
+
+            margin-bottom: 10px;
+
+            color:
+                #9db8ff;
+
+            font-size: 12px;
+
+            font-weight: 800;
+
+            letter-spacing: 2px;
+
+            text-transform: uppercase;
+
+        }
+
+
+        /* ===============================================
+           FULL PAGE TITLE
+           =============================================== */
+
+        .es-full-title {
+
+            margin: 0;
+
+            font-size: 42px;
+
+            font-weight: 800;
+
+            letter-spacing: -1px;
+
+        }
+
+
+        /* ===============================================
+           FULL PAGE MESSAGE
+           =============================================== */
+
+        .es-full-message {
+
+            max-width: 520px;
+
+            margin:
+                18px auto 30px;
+
+            color:
+                rgba(255,255,255,0.72);
+
+            font-size: 15px;
+
+            line-height: 1.8;
+
+        }
+
+
+        /* ===============================================
+           RESUME
+           =============================================== */
+
+        .es-resume-label {
+
+            margin-bottom: 9px;
+
+            color:
+                rgba(255,255,255,0.48);
+
+            font-size: 10px;
+
+            font-weight: 800;
+
+            letter-spacing: 1.5px;
+
+            text-transform: uppercase;
+
+        }
+
+
+        .es-resume-time {
+
+            margin-bottom: 28px;
+
+            color:
+                #ffffff;
+
+            font-size: 16px;
+
+            font-weight: 700;
+
+        }
+
+
+        /* ===============================================
+           COUNTDOWN
+           =============================================== */
+
+        .es-countdown-label {
+
+            margin-bottom: 10px;
+
+            color:
+                rgba(255,255,255,0.50);
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            letter-spacing: 1px;
+
+            text-transform: uppercase;
+
+        }
+
+
+        .es-countdown {
+
+            margin-bottom: 28px;
+
+            color:
+                #ffffff;
+
+            font-size: 34px;
+
+            font-weight: 800;
+
+            letter-spacing: 3px;
+
+        }
+
+
+        /* ===============================================
+           FOOTER
+           =============================================== */
+
+        .es-full-footer {
+
+            padding-top: 22px;
+
+            border-top:
+                1px solid
+                rgba(255,255,255,0.10);
+
+            color:
+                rgba(255,255,255,0.40);
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+        }
+
+
+        /* ===============================================
+           ANIMATIONS
+           =============================================== */
+
+        @keyframes esFadeIn {
+
+            from {
+
+                opacity: 0;
+
+            }
+
+            to {
+
+                opacity: 1;
+
+            }
+
+        }
+
+
+        @keyframes esPopupIn {
+
+            from {
+
+                opacity: 0;
+
+                transform:
+                    translateY(20px)
+                    scale(0.96);
+
+            }
+
+            to {
+
+                opacity: 1;
+
+                transform:
+                    translateY(0)
+                    scale(1);
+
+            }
+
+        }
+
+
+        /* ===============================================
+           MOBILE
+           =============================================== */
+
+        @media (max-width: 600px) {
+
+            .es-maintenance-overlay {
+
+                padding: 15px;
+
+            }
+
+
+            .es-maintenance-popup {
+
+                padding:
+                    30px 20px 24px;
+
+                border-radius: 23px;
+
+            }
+
+
+            .es-maintenance-title {
+
+                font-size: 26px;
+
+            }
+
+
+            .es-maintenance-dates {
+
+                grid-template-columns: 1fr;
+
+            }
+
+
+            .es-full-maintenance {
+
+                padding: 16px;
+
+            }
+
+
+            .es-full-maintenance-card {
+
+                padding:
+                    38px 22px;
+
+                border-radius: 24px;
+
+            }
+
+
+            .es-full-title {
+
+                font-size: 32px;
+
+            }
+
+
+            .es-countdown {
+
+                font-size: 26px;
+
+                letter-spacing: 2px;
+
+            }
+
+        }
+
+    `;
+
+
+    document.head.appendChild(
+        style
+    );
+
+}
+
+
+/* =========================================================
+   MAINTENANCE ICON
+   ========================================================= */
+
+function maintenanceIcon() {
+
+    return `
+
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+
+            <path
+                d="M14.7 6.3
+                   a5 5 0 0 0-6.4 6.4
+                   L3 18
+                   a2 2 0 0 0 3 3
+                   l5.3-5.3
+                   a5 5 0 0 0 6.4-6.4
+                   l-3 3
+                   -3-3
+                   3-3z"
+            />
+
+        </svg>
+
+    `;
+
+}
+
+
+/* =========================================================
+   REMOVE POPUP
+   ========================================================= */
+
+function removeScheduledPopup() {
+
+    const popup =
+        document.getElementById(
+            "esMaintenanceOverlay"
+        );
+
+
+    if (popup) {
+
+        popup.remove();
+
+    }
+
+}
+
+
+/* =========================================================
+   SHOW SCHEDULED POPUP
+   ========================================================= */
+
+function showScheduledPopup(
+    startDate,
+    endDate,
+    message,
+    maintenanceId
+) {
+
+    if (scheduledPopupShown) {
+
+        return;
+
+    }
+
+
+    /*
+     * Do not show again if this exact
+     * maintenance schedule was already
+     * dismissed.
+     */
+
+    if (
+        wasPopupDismissed(
+            maintenanceId
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    scheduledPopupShown = true;
+
+
+    addMaintenanceStyles();
+
+
+    removeScheduledPopup();
+
+
+    const overlay =
+        document.createElement(
+            "div"
+        );
+
+
+    overlay.id =
+        "esMaintenanceOverlay";
+
+
+    overlay.className =
+        "es-maintenance-overlay";
+
+
+    overlay.innerHTML = `
+
+        <div
+            class="es-maintenance-popup"
+        >
+
+
+            <button
+                class="es-maintenance-close"
+                id="esMaintenanceClose"
+                aria-label="Close"
+            >
+                ×
+            </button>
+
+
+            <div
+                class="es-maintenance-icon"
+            >
+
+                ${maintenanceIcon()}
+
+            </div>
+
+
+            <div
+                class="es-maintenance-label"
+            >
+                Scheduled Maintenance
+            </div>
+
+
+            <h2
+                class="es-maintenance-title"
+            >
+                A quick heads-up
+            </h2>
+
+
+            <p
+                class="es-maintenance-message"
+            >
+                ${escapeHtml(message)}
+            </p>
+
+
+            <div
+                class="es-maintenance-dates"
+            >
+
+
+                <div
+                    class="es-maintenance-date"
+                >
+
+                    <div
+                        class="es-maintenance-date-label"
+                    >
+                        Maintenance Starts
+                    </div>
+
+
+                    <div
+                        class="es-maintenance-date-value"
+                    >
+                        ${formatDateTime(startDate)}
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="es-maintenance-date"
+                >
+
+                    <div
+                        class="es-maintenance-date-label"
+                    >
+                        Expected Resume
+                    </div>
+
+
+                    <div
+                        class="es-maintenance-date-value"
+                    >
+                        ${formatDateTime(endDate)}
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <button
+                class="es-maintenance-button"
+                id="esMaintenanceGotIt"
+            >
+                Got it
+            </button>
+
+
+            <div
+                class="es-maintenance-brand"
+            >
+                EventSphere
+            </div>
+
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(
+        overlay
+    );
+
+
+    function dismiss() {
+
+        /*
+         * Save THIS maintenance schedule.
+         * A different schedule will automatically
+         * create a different ID.
+         */
+
+        savePopupDismissed(
+            maintenanceId
+        );
+
+
+        removeScheduledPopup();
+
+    }
+
+
+    document
+        .getElementById(
+            "esMaintenanceClose"
+        )
+        ?.addEventListener(
+            "click",
+            dismiss
+        );
+
+
+    document
+        .getElementById(
+            "esMaintenanceGotIt"
+        )
+        ?.addEventListener(
+            "click",
+            dismiss
+        );
+
+}
+
+
+/* =========================================================
+   SHOW FULL MAINTENANCE PAGE
+   ========================================================= */
+
+function showMaintenancePage(
+    endDate,
+    message
+) {
+
+    if (
+        document.body.dataset
+            .maintenanceActive === "true"
+    ) {
+
+        return;
+
+    }
+
+
+    document.body.dataset
+        .maintenanceActive = "true";
+
+
+    removeScheduledPopup();
+
+
+    if (maintenanceTimer) {
+
+        clearInterval(
+            maintenanceTimer
+        );
+
+        maintenanceTimer = null;
+
+    }
+
+
+    addMaintenanceStyles();
+
+
+    const resumeText =
+        endDate
+            ? formatDateTime(endDate)
+            : "As soon as possible";
+
+
+    document.documentElement.innerHTML = `
+
+        <head>
+
+            <meta
+                charset="UTF-8"
+            >
+
+            <meta
+                name="viewport"
+                content="width=device-width, initial-scale=1.0"
+            >
+
+            <title>
+                EventSphere - Maintenance
+            </title>
+
+        </head>
+
+
+        <body>
+
+            <div
+                class="es-full-maintenance"
+            >
+
+                <div
+                    class="es-full-maintenance-card"
+                >
+
+
+                    <div
+                        class="es-full-icon"
+                    >
+
+                        ${maintenanceIcon()}
+
+                    </div>
+
+
+                    <div
+                        class="es-full-label"
+                    >
+                        EventSphere Service
+                    </div>
+
+
+                    <h1
+                        class="es-full-title"
+                    >
+                        We'll be back soon.
+                    </h1>
+
+
+                    <p
+                        class="es-full-message"
+                    >
+                        ${escapeHtml(message)}
+                    </p>
+
+
+                    <div
+                        class="es-resume-label"
+                    >
+                        Expected to Resume
+                    </div>
+
+
+                    <div
+                        class="es-resume-time"
+                    >
+                        ${escapeHtml(resumeText)}
+                    </div>
+
+
+                    ${
+                        endDate
+                            ? `
+
+                                <div
+                                    class="es-countdown-label"
+                                >
+                                    Service resumes in
+                                </div>
+
+
+                                <div
+                                    id="esCountdown"
+                                    class="es-countdown"
+                                >
+                                    00:00:00
+                                </div>
+
+                              `
+                            : ""
+                    }
+
+
+                    <div
+                        class="es-full-footer"
+                    >
+                        Thank you for your patience.
+                        <br>
+                        EventSphere
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </body>
+
+    `;
+
+
+    if (endDate) {
+
+        startCountdown(
+            endDate
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   COUNTDOWN
+   ========================================================= */
+
+function startCountdown(
+    endDate
+) {
+
+    if (countdownTimer) {
+
+        clearInterval(
+            countdownTimer
+        );
+
+    }
+
+
+    function updateCountdown() {
+
+        const now =
+            new Date();
+
+
+        const difference =
+            endDate.getTime()
+            - now.getTime();
+
+
+        const countdown =
+            document.getElementById(
+                "esCountdown"
+            );
+
+
+        if (!countdown) {
+
+            return;
+
+        }
+
+
+        if (difference <= 0) {
+
+            countdown.textContent =
+                "00:00:00";
+
+
+            clearInterval(
+                countdownTimer
+            );
+
+
+            setTimeout(
+                () => {
+
+                    window.location.reload();
+
+                },
+                1000
+            );
+
+
+            return;
+
+        }
+
+
+        const totalSeconds =
+            Math.floor(
+                difference / 1000
+            );
+
+
+        const hours =
+            Math.floor(
+                totalSeconds / 3600
+            );
+
+
+        const minutes =
+            Math.floor(
+                (totalSeconds % 3600) / 60
+            );
+
+
+        const seconds =
+            totalSeconds % 60;
+
+
+        countdown.textContent =
+            `${String(hours).padStart(2, "0")}:` +
+            `${String(minutes).padStart(2, "0")}:` +
+            `${String(seconds).padStart(2, "0")}`;
+
+    }
+
+
+    updateCountdown();
+
+
+    countdownTimer =
+        setInterval(
+            updateCountdown,
+            1000
+        );
+
+}
+
+
+/* =========================================================
+   CHECK MAINTENANCE
+   ========================================================= */
 
 async function checkMaintenance() {
 
@@ -48,86 +1575,102 @@ async function checkMaintenance() {
             snapshot.data();
 
 
-        if (
-            data.enabled !== true
-        ) {
+        if (data.enabled !== true) {
+
+            removeScheduledPopup();
 
             return;
 
         }
+
+
+        const message =
+            data.message ||
+            "EventSphere is currently undergoing scheduled maintenance. Please check back soon.";
+
+
+        const startDate =
+            getDate(
+                data.startTime
+            );
+
+
+        const endDate =
+            getDate(
+                data.endTime
+            );
+
+
+        /*
+         * Create a unique ID for this
+         * particular maintenance schedule.
+         */
+
+        const maintenanceId =
+            createMaintenanceId(
+                startDate,
+                endDate,
+                message
+            );
 
 
         const now =
             new Date();
 
 
-        let startTime = null;
-
-        let endTime = null;
-
-
-        /* ================= START TIME ================= */
-
-        if (data.startTime) {
-
-            startTime =
-                new Date(
-                    data.startTime
-                );
-
-        }
-
-
-        /* ================= END TIME ================= */
-
-        if (data.endTime) {
-
-            endTime =
-                new Date(
-                    data.endTime
-                );
-
-        }
-
-
-        /* ================= NOT STARTED ================= */
+        /* =============================================
+           BEFORE MAINTENANCE
+           ============================================= */
 
         if (
-            startTime &&
-            now < startTime
+            startDate &&
+            now < startDate
         ) {
+
+            showScheduledPopup(
+                startDate,
+                endDate,
+                message,
+                maintenanceId
+            );
+
 
             return;
 
         }
 
 
-        /* ================= ALREADY ENDED ================= */
+        /* =============================================
+           MAINTENANCE ACTIVE
+           ============================================= */
 
         if (
-            endTime &&
-            now >= endTime
+            !endDate ||
+            now < endDate
         ) {
+
+            showMaintenancePage(
+                endDate,
+                message
+            );
+
 
             return;
 
         }
 
 
-        /* ================= SHOW PAGE ================= */
+        /* =============================================
+           MAINTENANCE FINISHED
+           ============================================= */
 
-        showMaintenancePage(
-            data,
-            startTime,
-            endTime
-        );
+        removeScheduledPopup();
 
     }
-
     catch (error) {
 
         console.error(
-            "Unable to check maintenance status:",
+            "Maintenance check failed:",
             error
         );
 
@@ -137,2003 +1680,47 @@ async function checkMaintenance() {
 
 
 /* =========================================================
-   SHOW PREMIUM MAINTENANCE PAGE
-========================================================= */
+   START SYSTEM
+   ========================================================= */
 
-function showMaintenancePage(
-    data,
-    startTime,
-    endTime
-) {
+async function startMaintenanceSystem() {
 
+    await checkMaintenance();
 
-    const message =
-        data.message ||
-        "EventSphere is temporarily unavailable while we complete scheduled maintenance.";
 
-
-    document.documentElement.innerHTML = `
-
-        <head>
-
-            <meta charset="UTF-8">
-
-            <meta
-                name="viewport"
-                content="width=device-width, initial-scale=1.0"
-            >
-
-            <title>
-                EventSphere - Service Maintenance
-            </title>
-
-        </head>
-
-
-        <body>
-
-
-            <div class="es-maintenance">
-
-
-                <!-- =========================================
-                     BACKGROUND
-                ========================================== -->
-
-                <div class="es-background">
-
-                    <div class="es-orb es-orb-one"></div>
-
-                    <div class="es-orb es-orb-two"></div>
-
-                    <div class="es-orb es-orb-three"></div>
-
-                    <div class="es-noise"></div>
-
-                </div>
-
-
-
-                <!-- =========================================
-                     MAIN CONTAINER
-                ========================================== -->
-
-                <main class="es-container">
-
-
-                    <!-- =====================================
-                         BRAND
-                    ====================================== -->
-
-                    <div class="es-brand">
-
-                        <div class="es-logo">
-                            ES
-                        </div>
-
-                        <span>
-                            EventSphere
-                        </span>
-
-                    </div>
-
-
-
-                    <!-- =====================================
-                         MAIN CARD
-                    ====================================== -->
-
-                    <section class="es-card">
-
-
-                        <!-- =================================
-                             STATUS
-                        ================================== -->
-
-                        <div class="es-status">
-
-                            <span class="es-status-light"></span>
-
-                            <span>
-                                SERVICE MAINTENANCE
-                            </span>
-
-                        </div>
-
-
-
-                        <!-- =================================
-                             ICON
-                        ================================== -->
-
-                        <div class="es-icon-area">
-
-                            <div class="es-icon-ring">
-
-                                <div class="es-icon">
-
-                                    <svg
-                                        viewBox="0 0 64 64"
-                                        aria-hidden="true"
-                                    >
-
-                                        <path
-                                            d="M38.6 10.2a16.8 16.8 0 0 0-8.2 15.1L13.1 42.6a6.1 6.1 0 1 0 8.6 8.6l17.3-17.3a16.8 16.8 0 0 0 15.1-8.2l-8.8 2.2-7.6-7.6 2.2-8.1-1.3-2z"
-                                        />
-
-                                        <path
-                                            d="m11 53 6-6"
-                                        />
-
-                                    </svg>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-
-                        <!-- =================================
-                             HEADING
-                        ================================== -->
-
-                        <div class="es-heading">
-
-                            <h1>
-                                We'll be back soon.
-                            </h1>
-
-
-                            <p class="es-message">
-                                ${escapeHtml(message)}
-                            </p>
-
-
-                            <p class="es-subtext">
-
-                                Our team is working behind the scenes
-                                to make EventSphere better, faster,
-                                and more reliable.
-
-                            </p>
-
-                        </div>
-
-
-
-                        <!-- =================================
-                             RETURN TIME
-                        ================================== -->
-
-                        ${
-                            endTime
-                            ?
-
-                            `
-
-                            <div class="es-return">
-
-                                <div class="es-return-left">
-
-                                    <div class="es-return-icon">
-
-                                        <svg
-                                            viewBox="0 0 24 24"
-                                            aria-hidden="true"
-                                        >
-
-                                            <circle
-                                                cx="12"
-                                                cy="12"
-                                                r="9"
-                                            ></circle>
-
-                                            <path
-                                                d="M12 7v5l3 2"
-                                            ></path>
-
-                                        </svg>
-
-                                    </div>
-
-
-                                    <div>
-
-                                        <span class="es-return-label">
-                                            EXPECTED TO RESUME
-                                        </span>
-
-                                        <strong id="esResumeTime">
-                                            ${formatDate(endTime)}
-                                        </strong>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            `
-
-                            :
-
-                            ""
-                        }
-
-
-
-                        <!-- =================================
-                             COUNTDOWN
-                        ================================== -->
-
-                        ${
-                            endTime
-                            ?
-
-                            `
-
-                            <div class="es-countdown-wrapper">
-
-                                <div class="es-countdown-title">
-                                    Estimated time remaining
-                                </div>
-
-
-                                <div class="es-countdown">
-
-                                    <div class="es-countdown-item">
-
-                                        <strong id="esDays">
-                                            00
-                                        </strong>
-
-                                        <span>
-                                            DAYS
-                                        </span>
-
-                                    </div>
-
-
-                                    <div class="es-divider">
-                                        :
-                                    </div>
-
-
-                                    <div class="es-countdown-item">
-
-                                        <strong id="esHours">
-                                            00
-                                        </strong>
-
-                                        <span>
-                                            HOURS
-                                        </span>
-
-                                    </div>
-
-
-                                    <div class="es-divider">
-                                        :
-                                    </div>
-
-
-                                    <div class="es-countdown-item">
-
-                                        <strong id="esMinutes">
-                                            00
-                                        </strong>
-
-                                        <span>
-                                            MINUTES
-                                        </span>
-
-                                    </div>
-
-
-                                    <div class="es-divider">
-                                        :
-                                    </div>
-
-
-                                    <div class="es-countdown-item">
-
-                                        <strong id="esSeconds">
-                                            00
-                                        </strong>
-
-                                        <span>
-                                            SECONDS
-                                        </span>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            `
-
-                            :
-
-                            ""
-                        }
-
-
-
-                        <!-- =================================
-                             FOOTER MESSAGE
-                        ================================== -->
-
-                        <div class="es-footer">
-
-                            <span>
-                                Thank you for your patience.
-                            </span>
-
-                            <div class="es-footer-dot"></div>
-
-                            <span>
-                                EventSphere Team
-                            </span>
-
-                        </div>
-
-
-                    </section>
-
-
-
-                    <!-- =====================================
-                         BOTTOM BRAND
-                    ====================================== -->
-
-                    <div class="es-bottom">
-
-                        <span class="es-bottom-mark">
-                            ES
-                        </span>
-
-                        <span>
-                            EventSphere
-                        </span>
-
-                    </div>
-
-
-                </main>
-
-            </div>
-
-
-        </body>
-
-    `;
-
-
-    addPremiumStyles();
-
-
-    if (endTime) {
-
-        startCountdown(
-            endTime
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   COUNTDOWN
-========================================================= */
-
-function startCountdown(
-    endTime
-) {
-
-
-    function updateCountdown() {
-
-        const now =
-            new Date();
-
-
-        let difference =
-            endTime.getTime() -
-            now.getTime();
-
-
-        if (
-            difference <= 0
-        ) {
-
-            difference = 0;
-
-        }
-
-
-        const totalSeconds =
-            Math.floor(
-                difference / 1000
-            );
-
-
-        const days =
-            Math.floor(
-                totalSeconds / 86400
-            );
-
-
-        const hours =
-            Math.floor(
-                (
-                    totalSeconds % 86400
-                ) / 3600
-            );
-
-
-        const minutes =
-            Math.floor(
-                (
-                    totalSeconds % 3600
-                ) / 60
-            );
-
-
-        const seconds =
-            totalSeconds % 60;
-
-
-        setText(
-            "esDays",
-            pad(days)
-        );
-
-
-        setText(
-            "esHours",
-            pad(hours)
-        );
-
-
-        setText(
-            "esMinutes",
-            pad(minutes)
-        );
-
-
-        setText(
-            "esSeconds",
-            pad(seconds)
-        );
-
-
-        if (
-            difference <= 0
-        ) {
-
-            clearInterval(
-                timer
-            );
-
-
-            setTimeout(
-                () => {
-
-                    window.location.reload();
-
-                },
-                1200
-            );
-
-        }
-
-    }
-
-
-    updateCountdown();
-
-
-    const timer =
+    maintenanceTimer =
         setInterval(
-            updateCountdown,
-            1000
+            async () => {
+
+                await checkMaintenance();
+
+            },
+            CHECK_INTERVAL
         );
-
-}
-
-
-/* =========================================================
-   SET TEXT
-========================================================= */
-
-function setText(
-    id,
-    value
-) {
-
-    const element =
-        document.getElementById(
-            id
-        );
-
-
-    if (element) {
-
-        element.textContent =
-            value;
-
-    }
-
-}
-
-
-/* =========================================================
-   PAD NUMBER
-========================================================= */
-
-function pad(
-    value
-) {
-
-    return String(
-        value
-    ).padStart(
-        2,
-        "0"
-    );
-
-}
-
-
-/* =========================================================
-   DATE FORMAT
-========================================================= */
-
-function formatDate(
-    date
-) {
-
-    return date.toLocaleString(
-        "en-IN",
-        {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true
-        }
-    );
-
-}
-
-
-/* =========================================================
-   ESCAPE HTML
-========================================================= */
-
-function escapeHtml(
-    value
-) {
-
-    return String(value)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
-}
-
-
-/* =========================================================
-   PREMIUM STYLES
-========================================================= */
-
-function addPremiumStyles() {
-
-    const style =
-        document.createElement(
-            "style"
-        );
-
-
-    style.textContent = `
-
-        /* ================================================
-           RESET
-        ================================================= */
-
-        * {
-
-            box-sizing: border-box;
-
-        }
-
-
-        html,
-        body {
-
-            margin: 0;
-
-            padding: 0;
-
-            width: 100%;
-
-            min-height: 100%;
-
-        }
-
-
-        body {
-
-            font-family:
-                Inter,
-                ui-sans-serif,
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                Roboto,
-                Arial,
-                sans-serif;
-
-        }
-
-
-
-        /* ================================================
-           MAIN BACKGROUND
-        ================================================= */
-
-        .es-maintenance {
-
-            min-height: 100vh;
-
-            width: 100%;
-
-            position: relative;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            overflow: hidden;
-
-            background:
-                #07111f;
-
-            color: #ffffff;
-
-        }
-
-
-
-        /* ================================================
-           BACKGROUND
-        ================================================= */
-
-        .es-background {
-
-            position: absolute;
-
-            inset: 0;
-
-            overflow: hidden;
-
-            pointer-events: none;
-
-        }
-
-
-        .es-background::before {
-
-            content: "";
-
-            position: absolute;
-
-            inset: 0;
-
-            background:
-                radial-gradient(
-                    circle at 50% 45%,
-                    rgba(
-                        37,
-                        99,
-                        235,
-                        0.18
-                    ),
-                    transparent 38%
-                );
-
-        }
-
-
-        .es-background::after {
-
-            content: "";
-
-            position: absolute;
-
-            inset: 0;
-
-            background-image:
-                linear-gradient(
-                    rgba(
-                        255,
-                        255,
-                        255,
-                        0.025
-                    ) 1px,
-                    transparent 1px
-                ),
-                linear-gradient(
-                    90deg,
-                    rgba(
-                        255,
-                        255,
-                        255,
-                        0.025
-                    ) 1px,
-                    transparent 1px
-                );
-
-            background-size:
-                55px 55px;
-
-            mask-image:
-                linear-gradient(
-                    to bottom,
-                    transparent,
-                    black 20%,
-                    black 80%,
-                    transparent
-                );
-
-        }
-
-
-
-        /* ================================================
-           GLOW ORBS
-        ================================================= */
-
-        .es-orb {
-
-            position: absolute;
-
-            border-radius: 50%;
-
-            filter: blur(2px);
-
-            opacity: 0.55;
-
-        }
-
-
-        .es-orb-one {
-
-            width: 430px;
-
-            height: 430px;
-
-            top: -250px;
-
-            left: -120px;
-
-            background:
-                radial-gradient(
-                    circle,
-                    rgba(
-                        37,
-                        99,
-                        235,
-                        0.34
-                    ),
-                    transparent 68%
-                );
-
-            animation:
-                esOrbOne 12s ease-in-out infinite;
-
-        }
-
-
-        .es-orb-two {
-
-            width: 500px;
-
-            height: 500px;
-
-            right: -220px;
-
-            bottom: -280px;
-
-            background:
-                radial-gradient(
-                    circle,
-                    rgba(
-                        124,
-                        58,
-                        237,
-                        0.28
-                    ),
-                    transparent 68%
-                );
-
-            animation:
-                esOrbTwo 15s ease-in-out infinite;
-
-        }
-
-
-        .es-orb-three {
-
-            width: 240px;
-
-            height: 240px;
-
-            left: 48%;
-
-            top: -130px;
-
-            background:
-                radial-gradient(
-                    circle,
-                    rgba(
-                        14,
-                        165,
-                        233,
-                        0.13
-                    ),
-                    transparent 70%
-                );
-
-        }
-
-
-
-        @keyframes esOrbOne {
-
-            0%,
-            100% {
-
-                transform:
-                    translate(
-                        0,
-                        0
-                    );
-
-            }
-
-            50% {
-
-                transform:
-                    translate(
-                        40px,
-                        35px
-                    );
-
-            }
-
-        }
-
-
-        @keyframes esOrbTwo {
-
-            0%,
-            100% {
-
-                transform:
-                    translate(
-                        0,
-                        0
-                    );
-
-            }
-
-            50% {
-
-                transform:
-                    translate(
-                        -35px,
-                        -30px
-                    );
-
-            }
-
-        }
-
-
-
-        /* ================================================
-           NOISE
-        ================================================= */
-
-        .es-noise {
-
-            position: absolute;
-
-            inset: 0;
-
-            opacity: 0.035;
-
-            background-image:
-                url(
-                    "data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E"
-                );
-
-        }
-
-
-
-        /* ================================================
-           CONTAINER
-        ================================================= */
-
-        .es-container {
-
-            width: min(
-                760px,
-                calc(100% - 32px)
-            );
-
-            position: relative;
-
-            z-index: 5;
-
-            display: flex;
-
-            flex-direction: column;
-
-            align-items: center;
-
-            padding:
-                36px 0;
-
-        }
-
-
-
-        /* ================================================
-           BRAND
-        ================================================= */
-
-        .es-brand {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 11px;
-
-            margin-bottom: 22px;
-
-            font-size: 17px;
-
-            font-weight: 700;
-
-            letter-spacing:
-                -0.2px;
-
-            color:
-                rgba(
-                    255,
-                    255,
-                    255,
-                    0.95
-                );
-
-        }
-
-
-        .es-logo {
-
-            width: 36px;
-
-            height: 36px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            border-radius: 11px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #2563eb,
-                    #7c3aed
-                );
-
-            box-shadow:
-                0 8px 24px
-                rgba(
-                    37,
-                    99,
-                    235,
-                    0.35
-                );
-
-            font-size: 11px;
-
-            font-weight: 800;
-
-            letter-spacing:
-                0.3px;
-
-        }
-
-
-
-        /* ================================================
-           CARD
-        ================================================= */
-
-        .es-card {
-
-            width: 100%;
-
-            padding:
-                52px 58px 38px;
-
-            border-radius: 30px;
-
-            text-align: center;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(
-                        255,
-                        255,
-                        255,
-                        0.98
-                    ),
-                    rgba(
-                        248,
-                        250,
-                        255,
-                        0.96
-                    )
-                );
-
-            border:
-                1px solid
-                rgba(
-                    255,
-                    255,
-                    255,
-                    0.75
-                );
-
-            box-shadow:
-                0 40px 100px
-                rgba(
-                    0,
-                    0,
-                    0,
-                    0.34
-                );
-
-            color: #111827;
-
-            animation:
-                esCardIn
-                0.65s
-                cubic-bezier(
-                    0.22,
-                    1,
-                    0.36,
-                    1
-                );
-
-        }
-
-
-
-        @keyframes esCardIn {
-
-            from {
-
-                opacity: 0;
-
-                transform:
-                    translateY(22px)
-                    scale(0.98);
-
-            }
-
-            to {
-
-                opacity: 1;
-
-                transform:
-                    translateY(0)
-                    scale(1);
-
-            }
-
-        }
-
-
-
-        /* ================================================
-           STATUS
-        ================================================= */
-
-        .es-status {
-
-            display: inline-flex;
-
-            align-items: center;
-
-            gap: 8px;
-
-            padding:
-                7px 12px;
-
-            border-radius: 50px;
-
-            background:
-                #f8fafc;
-
-            border:
-                1px solid
-                #e5e7eb;
-
-            color:
-                #64748b;
-
-            font-size: 10px;
-
-            font-weight: 800;
-
-            letter-spacing:
-                1.2px;
-
-        }
-
-
-        .es-status-light {
-
-            width: 7px;
-
-            height: 7px;
-
-            border-radius: 50%;
-
-            background:
-                #f59e0b;
-
-            box-shadow:
-                0 0 0 4px
-                rgba(
-                    245,
-                    158,
-                    11,
-                    0.10
-                );
-
-            animation:
-                esStatusPulse
-                1.8s
-                ease-in-out
-                infinite;
-
-        }
-
-
-        @keyframes esStatusPulse {
-
-            0%,
-            100% {
-
-                opacity: 1;
-
-            }
-
-            50% {
-
-                opacity: 0.35;
-
-            }
-
-        }
-
-
-
-        /* ================================================
-           ICON
-        ================================================= */
-
-        .es-icon-area {
-
-            display: flex;
-
-            justify-content: center;
-
-            margin:
-                30px 0 25px;
-
-        }
-
-
-        .es-icon-ring {
-
-            width: 104px;
-
-            height: 104px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            border-radius: 50%;
-
-            background:
-                #eef4ff;
-
-            border:
-                1px solid
-                #dbe7ff;
-
-            position: relative;
-
-        }
-
-
-        .es-icon-ring::before {
-
-            content: "";
-
-            position: absolute;
-
-            inset: -9px;
-
-            border-radius: 50%;
-
-            border:
-                1px solid
-                rgba(
-                    96,
-                    165,
-                    250,
-                    0.20
-                );
-
-        }
-
-
-        .es-icon {
-
-            width: 76px;
-
-            height: 76px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            border-radius: 23px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    #2563eb,
-                    #4f46e5
-                );
-
-            box-shadow:
-                0 16px 30px
-                rgba(
-                    37,
-                    99,
-                    235,
-                    0.24
-                );
-
-            animation:
-                esIconFloat
-                3.5s
-                ease-in-out
-                infinite;
-
-        }
-
-
-        .es-icon svg {
-
-            width: 39px;
-
-            height: 39px;
-
-            fill: none;
-
-            stroke:
-                white;
-
-            stroke-width: 2.7;
-
-            stroke-linecap:
-                round;
-
-            stroke-linejoin:
-                round;
-
-        }
-
-
-        @keyframes esIconFloat {
-
-            0%,
-            100% {
-
-                transform:
-                    translateY(0);
-
-            }
-
-            50% {
-
-                transform:
-                    translateY(-4px);
-
-            }
-
-        }
-
-
-
-        /* ================================================
-           HEADING
-        ================================================= */
-
-        .es-heading h1 {
-
-            margin:
-                0 0 15px;
-
-            font-size:
-                clamp(
-                    34px,
-                    6vw,
-                    52px
-                );
-
-            line-height:
-                1.05;
-
-            letter-spacing:
-                -2px;
-
-            color:
-                #0f172a;
-
-        }
-
-
-        .es-message {
-
-            max-width: 580px;
-
-            margin:
-                0 auto 12px;
-
-            color:
-                #334155;
-
-            font-size: 17px;
-
-            line-height:
-                1.65;
-
-            font-weight: 600;
-
-        }
-
-
-        .es-subtext {
-
-            max-width: 540px;
-
-            margin:
-                0 auto;
-
-            color:
-                #94a3b8;
-
-            font-size: 13px;
-
-            line-height:
-                1.7;
-
-        }
-
-
-
-        /* ================================================
-           RETURN TIME
-        ================================================= */
-
-        .es-return {
-
-            margin-top: 30px;
-
-            padding:
-                16px 18px;
-
-            display: flex;
-
-            align-items: center;
-
-            text-align: left;
-
-            border-radius: 17px;
-
-            background:
-                #f8faff;
-
-            border:
-                1px solid
-                #e4eaff;
-
-        }
-
-
-        .es-return-left {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 13px;
-
-            width: 100%;
-
-        }
-
-
-        .es-return-icon {
-
-            width: 43px;
-
-            height: 43px;
-
-            flex-shrink: 0;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            border-radius: 12px;
-
-            background:
-                #eaf2ff;
-
-        }
-
-
-        .es-return-icon svg {
-
-            width: 21px;
-
-            height: 21px;
-
-            fill: none;
-
-            stroke:
-                #2563eb;
-
-            stroke-width: 1.8;
-
-            stroke-linecap:
-                round;
-
-            stroke-linejoin:
-                round;
-
-        }
-
-
-        .es-return-label {
-
-            display: block;
-
-            margin-bottom: 4px;
-
-            color:
-                #94a3b8;
-
-            font-size: 9px;
-
-            font-weight: 800;
-
-            letter-spacing:
-                1px;
-
-        }
-
-
-        .es-return strong {
-
-            color:
-                #1e3a8a;
-
-            font-size: 15px;
-
-            font-weight: 700;
-
-        }
-
-
-
-        /* ================================================
-           COUNTDOWN
-        ================================================= */
-
-        .es-countdown-wrapper {
-
-            margin-top: 29px;
-
-        }
-
-
-        .es-countdown-title {
-
-            margin-bottom: 13px;
-
-            color:
-                #94a3b8;
-
-            font-size: 11px;
-
-            font-weight: 600;
-
-        }
-
-
-        .es-countdown {
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            gap: 7px;
-
-        }
-
-
-        .es-countdown-item {
-
-            width: 84px;
-
-            padding:
-                14px 8px 12px;
-
-            border-radius: 15px;
-
-            background:
-                #0f172a;
-
-            box-shadow:
-                0 9px 22px
-                rgba(
-                    15,
-                    23,
-                    42,
-                    0.14
-                );
-
-        }
-
-
-        .es-countdown-item strong {
-
-            display: block;
-
-            color:
-                #ffffff;
-
-            font-size: 26px;
-
-            line-height: 1;
-
-            letter-spacing:
-                -0.8px;
-
-            font-variant-numeric:
-                tabular-nums;
-
-        }
-
-
-        .es-countdown-item span {
-
-            display: block;
-
-            margin-top: 7px;
-
-            color:
-                #64748b;
-
-            font-size: 8px;
-
-            font-weight: 800;
-
-            letter-spacing:
-                0.8px;
-
-        }
-
-
-        .es-divider {
-
-            color:
-                #cbd5e1;
-
-            font-size: 18px;
-
-            font-weight: 800;
-
-            margin-top: -12px;
-
-        }
-
-
-
-        /* ================================================
-           FOOTER
-        ================================================= */
-
-        .es-footer {
-
-            margin-top: 30px;
-
-            padding-top: 21px;
-
-            border-top:
-                1px solid
-                #edf0f5;
-
-            display: flex;
-
-            justify-content: center;
-
-            align-items: center;
-
-            gap: 9px;
-
-            color:
-                #94a3b8;
-
-            font-size: 11px;
-
-        }
-
-
-        .es-footer-dot {
-
-            width: 3px;
-
-            height: 3px;
-
-            border-radius: 50%;
-
-            background:
-                #cbd5e1;
-
-        }
-
-
-
-        /* ================================================
-           BOTTOM BRAND
-        ================================================= */
-
-        .es-bottom {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 7px;
-
-            margin-top: 20px;
-
-            color:
-                rgba(
-                    255,
-                    255,
-                    255,
-                    0.42
-                );
-
-            font-size: 11px;
-
-            font-weight: 600;
-
-        }
-
-
-        .es-bottom-mark {
-
-            display: inline-flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            width: 21px;
-
-            height: 21px;
-
-            border-radius: 7px;
-
-            background:
-                rgba(
-                    255,
-                    255,
-                    255,
-                    0.08
-                );
-
-            font-size: 7px;
-
-            font-weight: 800;
-
-        }
-
-
-
-        /* ================================================
-           MOBILE
-        ================================================= */
-
-        @media (
-            max-width: 600px
-        ) {
-
-            .es-container {
-
-                width:
-                    calc(100% - 24px);
-
-                padding:
-                    22px 0;
-
-            }
-
-
-            .es-card {
-
-                padding:
-                    34px 20px 27px;
-
-                border-radius:
-                    23px;
-
-            }
-
-
-            .es-brand {
-
-                margin-bottom:
-                    17px;
-
-            }
-
-
-            .es-icon-area {
-
-                margin:
-                    25px 0 22px;
-
-            }
-
-
-            .es-icon-ring {
-
-                width: 88px;
-
-                height: 88px;
-
-            }
-
-
-            .es-icon {
-
-                width: 65px;
-
-                height: 65px;
-
-                border-radius: 19px;
-
-            }
-
-
-            .es-icon svg {
-
-                width: 33px;
-
-                height: 33px;
-
-            }
-
-
-            .es-heading h1 {
-
-                font-size: 34px;
-
-                letter-spacing:
-                    -1.4px;
-
-            }
-
-
-            .es-message {
-
-                font-size: 15px;
-
-            }
-
-
-            .es-subtext {
-
-                font-size: 12px;
-
-            }
-
-
-            .es-return {
-
-                margin-top:
-                    24px;
-
-            }
-
-
-            .es-countdown {
-
-                gap: 4px;
-
-            }
-
-
-            .es-countdown-item {
-
-                width: 65px;
-
-                padding:
-                    12px 5px 10px;
-
-                border-radius:
-                    12px;
-
-            }
-
-
-            .es-countdown-item strong {
-
-                font-size: 20px;
-
-            }
-
-
-            .es-countdown-item span {
-
-                font-size: 7px;
-
-            }
-
-
-            .es-divider {
-
-                font-size: 15px;
-
-            }
-
-
-            .es-footer {
-
-                flex-direction:
-                    column;
-
-                gap: 5px;
-
-            }
-
-
-            .es-footer-dot {
-
-                display: none;
-
-            }
-
-        }
-
-
-
-        /* ================================================
-           VERY SMALL DEVICES
-        ================================================= */
-
-        @media (
-            max-width: 380px
-        ) {
-
-            .es-card {
-
-                padding:
-                    30px 15px 24px;
-
-            }
-
-
-            .es-heading h1 {
-
-                font-size: 30px;
-
-            }
-
-
-            .es-countdown-item {
-
-                width: 58px;
-
-            }
-
-
-            .es-countdown-item strong {
-
-                font-size: 18px;
-
-            }
-
-        }
-
-    `;
-
-
-    document.head.appendChild(
-        style
-    );
 
 }
 
 
 /* =========================================================
    START
-========================================================= */
+   ========================================================= */
 
-checkMaintenance();
+if (
+    document.readyState ===
+    "loading"
+) {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        startMaintenanceSystem,
+        {
+            once: true
+        }
+    );
+
+}
+else {
+
+    startMaintenanceSystem();
+
+}

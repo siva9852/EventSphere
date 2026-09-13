@@ -5,13 +5,19 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>Admin Dashboard - EventSphere</title>
+    <title>
+        Admin Dashboard - EventSphere
+    </title>
 
-    <link rel="stylesheet"
-          href="css/style.css">
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
 
 </head>
 
@@ -22,7 +28,9 @@
 <div class="dashboard">
 
 
-    <!-- ================= SIDEBAR ================= -->
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
 
     <div class="sidebar">
 
@@ -68,7 +76,9 @@
             </li>
 
 
-            <!-- ================= COUPONS ================= -->
+            <!-- =================================================
+                 COUPONS
+                 ================================================= -->
 
             <li>
                 <a href="#coupons">
@@ -77,7 +87,9 @@
             </li>
 
 
-            <!-- ================= MAINTENANCE ================= -->
+            <!-- =================================================
+                 SERVICE MAINTENANCE
+                 ================================================= -->
 
             <li>
                 <a href="#maintenance">
@@ -86,14 +98,16 @@
             </li>
 
 
-            <!-- ================= LOGOUT ================= -->
+            <!-- =================================================
+                 LOGOUT
+                 ================================================= -->
 
             <li>
-                <a href="#"
-                   onclick="logout()">
-
+                <a
+                    href="#"
+                    onclick="logout()"
+                >
                     🚪 Logout
-
                 </a>
             </li>
 
@@ -103,7 +117,9 @@
 
 
 
-    <!-- ================= DASHBOARD CONTENT ================= -->
+    <!-- =====================================================
+         DASHBOARD CONTENT
+         ===================================================== -->
 
     <div class="dashboard-content">
 
@@ -124,12 +140,12 @@
 
 
 
-        <!-- ================= STATISTICS ================= -->
+        <!-- =================================================
+             STATISTICS CARDS
+             ================================================= -->
 
         <div class="cards">
 
-
-            <!-- TOTAL CUSTOMERS -->
 
             <div class="card">
 
@@ -144,8 +160,6 @@
             </div>
 
 
-            <!-- TOTAL BOOKINGS -->
-
             <div class="card">
 
                 <h3>
@@ -158,8 +172,6 @@
 
             </div>
 
-
-            <!-- ACTIVE BOOKINGS -->
 
             <div class="card">
 
@@ -174,8 +186,6 @@
             </div>
 
 
-            <!-- COMPLETED BOOKINGS -->
-
             <div class="card">
 
                 <h3>
@@ -188,8 +198,6 @@
 
             </div>
 
-
-            <!-- TOTAL EVENTS -->
 
             <div class="card">
 
@@ -210,11 +218,12 @@
 
         <!-- =====================================================
              DISCOUNTS & COUPONS
-        ====================================================== -->
+             ===================================================== -->
 
-        <section id="coupons"
-                 class="card">
-
+        <section
+            id="coupons"
+            class="card"
+        >
 
             <h2>
                 🎟️ Discounts & Coupons
@@ -226,15 +235,13 @@
             </p>
 
 
-
             <form id="couponForm">
 
-
-                <!-- COUPON CODE -->
 
                 <label for="couponCode">
                     Coupon Code
                 </label>
+
 
                 <input
                     type="text"
@@ -245,11 +252,10 @@
 
 
 
-                <!-- DISCOUNT TYPE -->
-
                 <label for="discountType">
                     Discount Type
                 </label>
+
 
                 <select
                     id="discountType"
@@ -260,6 +266,7 @@
                         Percentage (%)
                     </option>
 
+
                     <option value="fixed">
                         Fixed Amount (₹)
                     </option>
@@ -268,11 +275,10 @@
 
 
 
-                <!-- DISCOUNT VALUE -->
-
                 <label for="discountValue">
                     Discount Value
                 </label>
+
 
                 <input
                     type="number"
@@ -284,11 +290,10 @@
 
 
 
-                <!-- MINIMUM AMOUNT -->
-
                 <label for="minimumAmount">
                     Minimum Booking Amount
                 </label>
+
 
                 <input
                     type="number"
@@ -300,11 +305,10 @@
 
 
 
-                <!-- MAXIMUM DISCOUNT -->
-
                 <label for="maximumDiscount">
                     Maximum Discount
                 </label>
+
 
                 <input
                     type="number"
@@ -315,11 +319,10 @@
 
 
 
-                <!-- EXPIRY -->
-
                 <label for="couponExpiry">
                     Expiry Date
                 </label>
+
 
                 <input
                     type="date"
@@ -329,11 +332,10 @@
 
 
 
-                <!-- USAGE LIMIT -->
-
                 <label for="usageLimit">
                     Usage Limit
                 </label>
+
 
                 <input
                     type="number"
@@ -345,7 +347,8 @@
                 >
 
 
-                <br><br>
+                <br>
+                <br>
 
 
                 <button type="submit">
@@ -355,22 +358,26 @@
 
             </form>
 
-
         </section>
 
 
 
         <!-- =====================================================
              SERVICE MAINTENANCE
-        ====================================================== -->
+             ===================================================== -->
 
-        <section id="maintenance"
-                 class="card maintenance-section">
+        <section
+            id="maintenance"
+            class="card"
+        >
 
 
-            <!-- HEADER -->
+            <!-- =================================================
+                 MAINTENANCE HEADER
+                 ================================================= -->
 
             <div class="maintenance-header">
+
 
                 <div>
 
@@ -385,34 +392,58 @@
 
                 </div>
 
+
+                <div
+                    id="maintenanceStatusBadge"
+                    class="maintenance-badge online"
+                >
+
+                    🟢 Service Online
+
+                </div>
+
+
             </div>
 
 
 
-            <!-- MAINTENANCE FORM -->
+            <!-- =================================================
+                 MAINTENANCE FORM
+                 ================================================= -->
 
-            <form id="maintenanceForm"
-                  class="maintenance-form">
+            <form id="maintenanceForm">
 
 
-                <!-- ================= SERVICE STATUS ================= -->
+                <!-- SERVICE STATUS -->
 
-                <div class="maintenance-field">
+                <div
+                    class="maintenance-field full-width"
+                >
 
-                    <label for="maintenanceEnabled">
+                    <label
+                        for="maintenanceEnabled"
+                    >
+
                         Service Status
+
                     </label>
 
 
-                    <select id="maintenanceEnabled">
+                    <select
+                        id="maintenanceEnabled"
+                    >
 
                         <option value="false">
+
                             🟢 Service Online
+
                         </option>
 
 
                         <option value="true">
+
                             🔴 Enable Maintenance
+
                         </option>
 
                     </select>
@@ -421,12 +452,18 @@
 
 
 
-                <!-- ================= MAINTENANCE MESSAGE ================= -->
+                <!-- MAINTENANCE MESSAGE -->
 
-                <div class="maintenance-field">
+                <div
+                    class="maintenance-field full-width"
+                >
 
-                    <label for="maintenanceMessage">
+                    <label
+                        for="maintenanceMessage"
+                    >
+
                         Maintenance Message
+
                     </label>
 
 
@@ -440,12 +477,18 @@
 
 
 
-                <!-- ================= START TIME ================= -->
+                <!-- MAINTENANCE START -->
 
-                <div class="maintenance-field">
+                <div
+                    class="maintenance-field"
+                >
 
-                    <label for="maintenanceStart">
+                    <label
+                        for="maintenanceStart"
+                    >
+
                         Maintenance Start
+
                     </label>
 
 
@@ -458,12 +501,18 @@
 
 
 
-                <!-- ================= END TIME ================= -->
+                <!-- MAINTENANCE END -->
 
-                <div class="maintenance-field">
+                <div
+                    class="maintenance-field"
+                >
 
-                    <label for="maintenanceEnd">
+                    <label
+                        for="maintenanceEnd"
+                    >
+
                         Maintenance End
+
                     </label>
 
 
@@ -476,12 +525,19 @@
 
 
 
-                <!-- ================= BUTTONS ================= -->
+                <!-- =================================================
+                     ACTION BUTTONS
+                     ================================================= -->
 
-                <div class="maintenance-buttons">
+                <div
+                    class="maintenance-actions full-width"
+                >
 
 
-                    <button type="submit">
+                    <button
+                        type="submit"
+                        class="maintenance-save-btn"
+                    >
 
                         🛠️ Save Maintenance Settings
 
@@ -492,7 +548,7 @@
                     <button
                         type="button"
                         id="disableMaintenanceBtn"
-                        class="disable-maintenance-button"
+                        class="maintenance-disable-btn"
                     >
 
                         🟢 Disable Maintenance
@@ -507,10 +563,14 @@
 
 
 
-            <!-- ================= CURRENT STATUS ================= -->
+            <!-- =================================================
+                 CURRENT STATUS
+                 ================================================= -->
 
-            <div id="maintenanceStatus"
-                 class="maintenance-status">
+            <div
+                id="maintenanceStatus"
+                class="maintenance-status-box"
+            >
 
                 Loading maintenance status...
 
@@ -527,93 +587,97 @@
 
 
 <!-- =========================================================
-     ADMIN AUTH + BACK BUTTON PROTECTION
-========================================================== -->
+     ADMIN AUTH + BACK PROTECTION
+     ========================================================= -->
 
 <script type="module">
 
-import { auth }
-    from "./js/firebase-config.js";
+
+import {
+    auth
+}
+from "./js/firebase-config.js";
 
 
 import {
     signOut
-} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+}
+from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 
 
 
-/* =========================================================
-   AUTHENTICATION CHECK
-========================================================= */
-
-auth.onAuthStateChanged(async (user) => {
+auth.onAuthStateChanged(
+    async (user) => {
 
 
-    const otpVerified =
-        sessionStorage.getItem(
-            "adminOtpVerified"
-        );
+        const otpVerified =
+            sessionStorage.getItem(
+                "adminOtpVerified"
+            );
 
 
 
-    /*
-     * Admin must have:
-     *
-     * 1. Firebase login
-     * 2. Successful OTP verification
-     */
-
-    if (
-        !user ||
-        otpVerified !== "true"
-    ) {
+        /*
+         * Admin must have:
+         *
+         * 1. Firebase login
+         * 2. Successful OTP verification
+         */
 
 
-        sessionStorage.removeItem(
-            "adminOtpVerified"
-        );
+        if (
+            !user ||
+            otpVerified !== "true"
+        ) {
 
 
+            sessionStorage.removeItem(
+                "adminOtpVerified"
+            );
 
-        if (user) {
 
-            await signOut(auth);
+            if (user) {
+
+                await signOut(
+                    auth
+                );
+
+            }
+
+
+            window.location.replace(
+                "admin-login.html"
+            );
+
+
+            return;
 
         }
 
 
 
-        window.location.replace(
-            "admin-login.html"
+        /*
+         * Keep dashboard in browser history
+         * so Back does not leave the dashboard.
+         */
+
+        history.pushState(
+            {
+                adminDashboard: true
+            },
+            "",
+            window.location.href
         );
 
 
-        return;
-
     }
+);
 
 
 
-    /*
-     * Keep dashboard in browser history
-     * so Back does not leave the dashboard.
-     */
-
-    history.pushState(
-        {
-            adminDashboard: true
-        },
-        "",
-        window.location.href
-    );
-
-});
-
-
-
-/* =========================================================
-   BACK BUTTON
-========================================================= */
+// ======================================================
+// BACK BUTTON
+// ======================================================
 
 window.addEventListener(
     "popstate",
@@ -624,7 +688,6 @@ window.addEventListener(
             sessionStorage.getItem(
                 "adminOtpVerified"
             );
-
 
 
         if (
@@ -646,17 +709,19 @@ window.addEventListener(
     }
 );
 
+
 </script>
 
 
 
 <!-- =========================================================
      ADMIN JAVASCRIPT
-========================================================== -->
+     ========================================================= -->
 
-<script type="module"
-        src="js/admin.js">
-</script>
+<script
+    type="module"
+    src="js/admin.js"
+></script>
 
 
 </body>
