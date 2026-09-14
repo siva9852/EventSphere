@@ -1314,118 +1314,105 @@ function showMaintenancePage(
             : "As soon as possible";
 
 
-    document.documentElement.innerHTML = `
+    /*
+     * IMPORTANT:
+     * Do NOT replace the complete <html> element.
+     *
+     * The previous version replaced document.documentElement
+     * and removed the stylesheet that was already added.
+     *
+     * We only replace the body instead.
+     */
 
-        <head>
+    document.body.innerHTML = `
 
-            <meta
-                charset="UTF-8"
-            >
-
-            <meta
-                name="viewport"
-                content="width=device-width, initial-scale=1.0"
-            >
-
-            <title>
-                EventSphere - Maintenance
-            </title>
-
-        </head>
-
-
-        <body>
+        <div
+            class="es-full-maintenance"
+        >
 
             <div
-                class="es-full-maintenance"
+                class="es-full-maintenance-card"
             >
 
                 <div
-                    class="es-full-maintenance-card"
+                    class="es-full-icon"
                 >
 
-
-                    <div
-                        class="es-full-icon"
-                    >
-
-                        ${maintenanceIcon()}
-
-                    </div>
-
-
-                    <div
-                        class="es-full-label"
-                    >
-                        EventSphere Service
-                    </div>
-
-
-                    <h1
-                        class="es-full-title"
-                    >
-                        We'll be back soon.
-                    </h1>
-
-
-                    <p
-                        class="es-full-message"
-                    >
-                        ${escapeHtml(message)}
-                    </p>
-
-
-                    <div
-                        class="es-resume-label"
-                    >
-                        Expected to Resume
-                    </div>
-
-
-                    <div
-                        class="es-resume-time"
-                    >
-                        ${escapeHtml(resumeText)}
-                    </div>
-
-
-                    ${
-                        endDate
-                            ? `
-
-                                <div
-                                    class="es-countdown-label"
-                                >
-                                    Service resumes in
-                                </div>
-
-
-                                <div
-                                    id="esCountdown"
-                                    class="es-countdown"
-                                >
-                                    00:00:00
-                                </div>
-
-                              `
-                            : ""
-                    }
-
-
-                    <div
-                        class="es-full-footer"
-                    >
-                        Thank you for your patience.
-                        <br>
-                        EventSphere
-                    </div>
-
+                    ${maintenanceIcon()}
 
                 </div>
 
+
+                <div
+                    class="es-full-label"
+                >
+                    EventSphere Service
+                </div>
+
+
+                <h1
+                    class="es-full-title"
+                >
+                    We'll be back soon.
+                </h1>
+
+
+                <p
+                    class="es-full-message"
+                >
+                    ${escapeHtml(message)}
+                </p>
+
+
+                <div
+                    class="es-resume-label"
+                >
+                    Expected to Resume
+                </div>
+
+
+                <div
+                    class="es-resume-time"
+                >
+                    ${escapeHtml(resumeText)}
+                </div>
+
+
+                ${
+                    endDate
+                        ? `
+
+                            <div
+                                class="es-countdown-label"
+                            >
+                                Service resumes in
+                            </div>
+
+
+                            <div
+                                id="esCountdown"
+                                class="es-countdown"
+                            >
+                                00:00:00
+                            </div>
+
+                          `
+                        : ""
+                }
+
+
+                <div
+                    class="es-full-footer"
+                >
+                    Thank you for your patience.
+                    <br>
+                    EventSphere
+                </div>
+
+
             </div>
 
-        </body>
+        </div>
 
     `;
 
