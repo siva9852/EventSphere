@@ -5,16 +5,1180 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>Add Event - EventSphere</title>
+    <title>
+        Add Event - EventSphere
+    </title>
 
-    <link rel="stylesheet"
-          href="css/style.css">
+    <!-- FONT AWESOME -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
 
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background: #f5f7fb;
+
+            color: #172554;
+        }
+
+
+        /* =====================================================
+           MAIN LAYOUT
+        ===================================================== */
+
+        .admin-layout {
+            min-height: 100vh;
+
+            display: flex;
+        }
+
+
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
+
+        .admin-sidebar {
+
+            width: 230px;
+
+            min-height: 100vh;
+
+            position: fixed;
+
+            left: 0;
+            top: 0;
+
+            background: #10245b;
+
+            color: white;
+
+            padding: 20px 12px;
+
+            z-index: 100;
+        }
+
+
+        /* BRAND */
+
+        .admin-brand {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            padding: 0 8px 20px;
+
+            border-bottom:
+                1px solid
+                rgba(255,255,255,0.12);
+
+            margin-bottom: 22px;
+        }
+
+
+        .brand-icon {
+
+            width: 46px;
+            height: 46px;
+
+            border-radius: 13px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            background: #2563eb;
+
+            font-size: 22px;
+        }
+
+
+        .brand-text h2 {
+
+            font-size: 20px;
+
+            color: white;
+
+            margin-bottom: 3px;
+        }
+
+
+        .brand-text span {
+
+            font-size: 11px;
+
+            color: #b9c6e5;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.7px;
+        }
+
+
+        /* NAVIGATION */
+
+        .admin-nav {
+
+            list-style: none;
+        }
+
+
+        .admin-nav li {
+
+            margin-bottom: 7px;
+        }
+
+
+        .admin-nav a {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 14px;
+
+            padding: 12px 13px;
+
+            border-radius: 10px;
+
+            text-decoration: none;
+
+            color: #dce5ff;
+
+            font-size: 14px;
+
+            transition: 0.2s;
+        }
+
+
+        .admin-nav a i {
+
+            width: 20px;
+
+            text-align: center;
+
+            font-size: 16px;
+        }
+
+
+        .admin-nav a:hover {
+
+            background:
+                rgba(255,255,255,0.08);
+
+            color: white;
+        }
+
+
+        .admin-nav li.active a {
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #2563eb,
+                    #6366f1
+                );
+
+            color: white;
+
+            font-weight: 600;
+        }
+
+
+        /* MANAGEMENT */
+
+        .nav-section-title {
+
+            color: #9fb0d6;
+
+            font-size: 11px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.8px;
+
+            margin:
+
+                24px 8px 10px;
+        }
+
+
+        /* =====================================================
+           MAIN CONTENT
+        ===================================================== */
+
+        .admin-main {
+
+            width:
+                calc(100% - 230px);
+
+            margin-left: 230px;
+
+            min-height: 100vh;
+
+            background: #f7f9fd;
+        }
+
+
+        /* =====================================================
+           TOP BAR
+        ===================================================== */
+
+        .topbar {
+
+            height: 68px;
+
+            background: white;
+
+            border-bottom:
+                1px solid #e4e9f2;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding:
+                0 28px;
+        }
+
+
+        .search-box {
+
+            width: 410px;
+
+            height: 42px;
+
+            border:
+                1px solid #dce3ef;
+
+            border-radius: 10px;
+
+            background: #fbfcff;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            padding: 0 13px;
+
+            color: #2563eb;
+        }
+
+
+        .search-box input {
+
+            width: 100%;
+
+            border: none;
+
+            outline: none;
+
+            background: transparent;
+
+            font-size: 13px;
+
+            color: #172554;
+        }
+
+
+        .search-box input::placeholder {
+
+            color: #8794ad;
+        }
+
+
+        .topbar-right {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 14px;
+        }
+
+
+        .top-icon {
+
+            width: 40px;
+            height: 40px;
+
+            border:
+                1px solid #e0e6f0;
+
+            border-radius: 10px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            color: #2563eb;
+
+            background: white;
+
+            cursor: pointer;
+        }
+
+
+        .admin-account {
+
+            height: 42px;
+
+            padding:
+                0 14px;
+
+            border:
+                1px solid #e0e6f0;
+
+            border-radius: 10px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+            background: white;
+
+            color: #172554;
+
+            font-size: 13px;
+
+            font-weight: 600;
+        }
+
+
+        .admin-avatar {
+
+            width: 30px;
+            height: 30px;
+
+            border-radius: 50%;
+
+            background: #eef2ff;
+
+            color: #4f46e5;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            font-weight: 700;
+        }
+
+
+        /* =====================================================
+           PAGE CONTENT
+        ===================================================== */
+
+        .page-content {
+
+            padding:
+                22px 24px 40px;
+        }
+
+
+        /* BREADCRUMB */
+
+        .breadcrumb {
+
+            font-size: 13px;
+
+            color: #71809e;
+
+            margin-bottom: 18px;
+        }
+
+
+        .breadcrumb span {
+
+            color: #172554;
+
+            font-weight: 600;
+        }
+
+
+        /* =====================================================
+           PAGE HEADER
+        ===================================================== */
+
+        .page-header {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            margin-bottom: 22px;
+        }
+
+
+        .page-title {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 16px;
+        }
+
+
+        .page-title-icon {
+
+            width: 64px;
+            height: 64px;
+
+            border-radius: 18px;
+
+            background: #eef3ff;
+
+            color: #2563eb;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            font-size: 28px;
+        }
+
+
+        .page-title h1 {
+
+            font-size: 29px;
+
+            color: #10204b;
+
+            margin-bottom: 5px;
+        }
+
+
+        .page-title p {
+
+            color: #71809e;
+
+            font-size: 14px;
+        }
+
+
+        .back-btn {
+
+            text-decoration: none;
+
+            border:
+                1px solid #dce5f5;
+
+            background: #f8faff;
+
+            color: #2563eb;
+
+            padding:
+                11px 17px;
+
+            border-radius: 9px;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+        }
+
+
+        .back-btn:hover {
+
+            background: #eef4ff;
+        }
+
+
+        /* =====================================================
+           FORM LAYOUT
+        ===================================================== */
+
+        .event-form-layout {
+
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 2fr)
+                minmax(300px, 1fr);
+
+            gap: 16px;
+
+            align-items: start;
+        }
+
+
+        .form-card {
+
+            background: white;
+
+            border:
+                1px solid #e7ebf3;
+
+            border-radius: 16px;
+
+            padding: 20px;
+
+            box-shadow:
+                0 5px 18px
+                rgba(24, 45, 90, 0.05);
+        }
+
+
+        /* =====================================================
+           SECTION HEADER
+        ===================================================== */
+
+        .section-header {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            margin-bottom: 18px;
+        }
+
+
+        .section-icon {
+
+            width: 42px;
+            height: 42px;
+
+            border-radius: 12px;
+
+            background: #eef4ff;
+
+            color: #2563eb;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            font-size: 17px;
+        }
+
+
+        .section-header h2 {
+
+            font-size: 16px;
+
+            color: #15244d;
+
+            margin-bottom: 3px;
+        }
+
+
+        .section-header p {
+
+            font-size: 12px;
+
+            color: #71809e;
+        }
+
+
+        /* =====================================================
+           FORM GRID
+        ===================================================== */
+
+        .form-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap:
+                15px 18px;
+        }
+
+
+        .form-group {
+
+            min-width: 0;
+        }
+
+
+        .form-group.full {
+
+            grid-column:
+                1 / -1;
+        }
+
+
+        .form-group label {
+
+            display: block;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            color: #172554;
+
+            margin-bottom: 7px;
+        }
+
+
+        .required {
+
+            color: #ef4444;
+        }
+
+
+        .input-wrap {
+
+            position: relative;
+        }
+
+
+        .input-wrap i {
+
+            position: absolute;
+
+            left: 13px;
+
+            top: 50%;
+
+            transform:
+                translateY(-50%);
+
+            color: #8190ac;
+
+            font-size: 14px;
+
+            pointer-events: none;
+        }
+
+
+        .input-wrap input,
+        .input-wrap select,
+        .input-wrap textarea {
+
+            width: 100%;
+
+            border:
+                1px solid #d7dfed;
+
+            border-radius: 9px;
+
+            outline: none;
+
+            background: white;
+
+            color: #172554;
+
+            font-size: 13px;
+
+            transition: 0.2s;
+        }
+
+
+        .input-wrap input,
+        .input-wrap select {
+
+            height: 43px;
+
+            padding:
+                0 13px 0 40px;
+        }
+
+
+        .input-wrap textarea {
+
+            min-height: 105px;
+
+            resize: vertical;
+
+            padding:
+                12px 13px 12px 40px;
+        }
+
+
+        .input-wrap input:focus,
+        .input-wrap select:focus,
+        .input-wrap textarea:focus {
+
+            border-color: #2563eb;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(37,99,235,0.08);
+        }
+
+
+        .input-wrap input::placeholder,
+        .input-wrap textarea::placeholder {
+
+            color: #94a1b8;
+        }
+
+
+        /* =====================================================
+           CHARACTER COUNT
+        ===================================================== */
+
+        .description-footer {
+
+            display: flex;
+
+            justify-content: flex-end;
+
+            color: #8794ad;
+
+            font-size: 11px;
+
+            margin-top: 5px;
+        }
+
+
+        /* =====================================================
+           ADDITIONAL INFORMATION
+        ===================================================== */
+
+        .additional-section {
+
+            border-top:
+                1px solid #e8edf5;
+
+            margin-top: 20px;
+
+            padding-top: 18px;
+        }
+
+
+        /* =====================================================
+           IMAGE UPLOAD
+        ===================================================== */
+
+        .upload-box {
+
+            border:
+                2px dashed #bfd1f5;
+
+            background: #f9fbff;
+
+            border-radius: 12px;
+
+            min-height: 160px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            text-align: center;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
+            padding: 18px;
+        }
+
+
+        .upload-box:hover {
+
+            background: #f3f7ff;
+
+            border-color: #2563eb;
+        }
+
+
+        .upload-content i {
+
+            font-size: 38px;
+
+            color: #2563eb;
+
+            margin-bottom: 10px;
+        }
+
+
+        .upload-content strong {
+
+            display: block;
+
+            color: #2563eb;
+
+            font-size: 14px;
+
+            margin-bottom: 5px;
+        }
+
+
+        .upload-content span {
+
+            display: block;
+
+            color: #7b89a4;
+
+            font-size: 12px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .upload-content small {
+
+            color: #7b89a4;
+
+            font-size: 11px;
+        }
+
+
+        #imageFile {
+
+            display: none;
+        }
+
+
+        /* =====================================================
+           IMAGE PREVIEW
+        ===================================================== */
+
+        .preview-box {
+
+            margin-top: 15px;
+
+            padding: 10px;
+
+            border:
+                1px solid #e3e9f3;
+
+            border-radius: 12px;
+
+            background: white;
+        }
+
+
+        .preview-title {
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            color: #172554;
+
+            margin-bottom: 9px;
+        }
+
+
+        .image-preview {
+
+            height: 170px;
+
+            border-radius: 9px;
+
+            background: #f4f6fa;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            overflow: hidden;
+
+            text-align: center;
+        }
+
+
+        .image-preview i {
+
+            font-size: 35px;
+
+            color: #9aa6bb;
+
+            margin-bottom: 7px;
+        }
+
+
+        .image-preview p {
+
+            font-size: 12px;
+
+            color: #7c8aa3;
+        }
+
+
+        .image-preview img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+
+            display: none;
+        }
+
+
+        /* =====================================================
+           EVENT SETTINGS
+        ===================================================== */
+
+        .settings-card {
+
+            margin-top: 15px;
+        }
+
+
+        .setting-item {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            margin-bottom: 14px;
+
+            font-size: 13px;
+
+            color: #34415f;
+        }
+
+
+        .setting-item:last-child {
+
+            margin-bottom: 0;
+        }
+
+
+        .setting-item input {
+
+            width: 18px;
+            height: 18px;
+
+            accent-color: #2563eb;
+        }
+
+
+        /* =====================================================
+           BUTTONS
+        ===================================================== */
+
+        .form-actions {
+
+            display: flex;
+
+            justify-content: flex-end;
+
+            gap: 10px;
+
+            margin-top: 17px;
+        }
+
+
+        .cancel-btn {
+
+            height: 44px;
+
+            padding:
+                0 20px;
+
+            border:
+                1px solid #dce4f0;
+
+            background: #f8fafc;
+
+            color: #2563eb;
+
+            border-radius: 9px;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+        }
+
+
+        .submit-btn {
+
+            height: 44px;
+
+            padding:
+                0 23px;
+
+            border: none;
+
+            background: #2563eb;
+
+            color: white;
+
+            border-radius: 9px;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+        }
+
+
+        .submit-btn:hover {
+
+            background: #1d4ed8;
+        }
+
+
+        .cancel-btn:hover {
+
+            background: #eef4ff;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 1100px) {
+
+            .event-form-layout {
+
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+
+                grid-template-columns:
+                    repeat(2, minmax(0,1fr));
+            }
+
+        }
+
+
+        @media (max-width: 800px) {
+
+            .admin-sidebar {
+
+                width: 200px;
+            }
+
+            .admin-main {
+
+                width:
+                    calc(100% - 200px);
+
+                margin-left: 200px;
+            }
+
+            .search-box {
+
+                width: 280px;
+            }
+
+        }
+
+
+        @media (max-width: 650px) {
+
+            .admin-sidebar {
+
+                position: relative;
+
+                width: 100%;
+
+                min-height: auto;
+            }
+
+            .admin-layout {
+
+                display: block;
+            }
+
+            .admin-main {
+
+                width: 100%;
+
+                margin-left: 0;
+            }
+
+            .topbar {
+
+                padding: 0 15px;
+            }
+
+            .search-box {
+
+                display: none;
+            }
+
+            .page-content {
+
+                padding: 18px 14px 30px;
+            }
+
+            .page-header {
+
+                align-items: flex-start;
+
+                flex-direction: column;
+
+                gap: 15px;
+            }
+
+            .back-btn {
+
+                align-self: flex-start;
+            }
+
+            .form-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full {
+
+                grid-column: auto;
+            }
+
+        }
+
+    </style>
 
 </head>
 
@@ -22,24 +1186,52 @@
 <body>
 
 
-<div class="dashboard">
+<div class="admin-layout">
 
 
-    <!-- ================= SIDEBAR ================= -->
+    <!-- =====================================================
+         SIDEBAR
+    ===================================================== -->
 
-    <div class="sidebar">
-
-        <h2>
-            EventSphere
-        </h2>
+    <aside class="admin-sidebar">
 
 
-        <ul>
+        <div class="admin-brand">
+
+            <div class="brand-icon">
+
+                <i class="fa-solid fa-calendar-plus"></i>
+
+            </div>
+
+            <div class="brand-text">
+
+                <h2>
+                    EventSphere
+                </h2>
+
+                <span>
+                    Admin Panel
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <ul class="admin-nav">
+
 
             <li>
 
                 <a href="admin-dashboard.html">
-                    🏠 Dashboard
+
+                    <i class="fa-solid fa-house"></i>
+
+                    <span>
+                        Dashboard
+                    </span>
+
                 </a>
 
             </li>
@@ -48,7 +1240,13 @@
             <li class="active">
 
                 <a href="add-event.html">
-                    ➕ Add Event
+
+                    <i class="fa-solid fa-plus"></i>
+
+                    <span>
+                        Add Event
+                    </span>
+
                 </a>
 
             </li>
@@ -57,7 +1255,13 @@
             <li>
 
                 <a href="view-events.html">
-                    🎉 View Events
+
+                    <i class="fa-solid fa-calendar-days"></i>
+
+                    <span>
+                        View Events
+                    </span>
+
                 </a>
 
             </li>
@@ -66,7 +1270,13 @@
             <li>
 
                 <a href="admin-bookings.html">
-                    📅 Bookings
+
+                    <i class="fa-solid fa-ticket"></i>
+
+                    <span>
+                        Bookings
+                    </span>
+
                 </a>
 
             </li>
@@ -75,7 +1285,33 @@
             <li>
 
                 <a href="admin-customers.html">
-                    👥 Customers
+
+                    <i class="fa-solid fa-users"></i>
+
+                    <span>
+                        Customers
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <div class="nav-section-title">
+                Management
+            </div>
+
+
+            <li>
+
+                <a href="admin-dashboard.html#coupons">
+
+                    <i class="fa-solid fa-ticket-simple"></i>
+
+                    <span>
+                        Discounts & Coupons
+                    </span>
+
                 </a>
 
             </li>
@@ -83,48 +1319,73 @@
 
             <li>
 
-                <a href="#"
-                   onclick="logout()">
+                <a href="admin-dashboard.html#maintenance">
 
-                    🚪 Logout
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+
+                    <span>
+                        Service Maintenance
+                    </span>
 
                 </a>
 
             </li>
 
+
         </ul>
 
-    </div>
+    </aside>
 
 
 
-    <!-- ================= MAIN CONTENT ================= -->
+    <!-- =====================================================
+         MAIN
+    ===================================================== -->
 
-    <div class="dashboard-content add-event-page">
-
-
-        <!-- ================= PAGE HEADING ================= -->
-
-        <div class="page-heading">
+    <main class="admin-main">
 
 
-            <div class="heading-icon">
+        <!-- TOP BAR -->
 
-                <i class="fa-solid fa-calendar-plus"></i>
+        <div class="topbar">
+
+
+            <div class="search-box">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="text"
+                    placeholder="Search anything..."
+                >
 
             </div>
 
 
-            <div>
-
-                <h1>
-                    Add New Event
-                </h1>
+            <div class="topbar-right">
 
 
-                <p>
-                    Fill in the details below to create a new event.
-                </p>
+                <div class="top-icon">
+
+                    <i class="fa-regular fa-bell"></i>
+
+                </div>
+
+
+                <div class="admin-account">
+
+                    <div class="admin-avatar">
+                        A
+                    </div>
+
+                    <span>
+                        Admin
+                    </span>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
 
             </div>
 
@@ -132,39 +1393,108 @@
 
 
 
-        <!-- ================= EVENT FORM ================= -->
+        <!-- PAGE CONTENT -->
 
-        <div class="event-form-card">
-
-
-            <form id="eventForm">
+        <div class="page-content">
 
 
-                <div class="event-form-row">
+            <!-- BREADCRUMB -->
+
+            <div class="breadcrumb">
+
+                EventSphere
+
+                <span>
+                    &nbsp; / &nbsp; Add Event
+                </span>
+
+            </div>
 
 
-                    <!-- ================= EVENT NAME ================= -->
 
-                    <div class="event-field">
+            <!-- PAGE HEADER -->
 
-                        <label>
-
-                            Event Name
-                            <span>*</span>
-
-                        </label>
+            <div class="page-header">
 
 
-                        <div class="input-box">
-
-                            <i class="fa-solid fa-tag"></i>
+                <div class="page-title">
 
 
-                            <input
-                                type="text"
-                                id="eventName"
-                                placeholder="Enter event name"
-                                required>
+                    <div class="page-title-icon">
+
+                        <i class="fa-solid fa-calendar-plus"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <h1>
+                            Add New Event
+                        </h1>
+
+                        <p>
+                            Fill in the details below to create a new event.
+                        </p>
+
+                    </div>
+
+
+                </div>
+
+
+                <a
+                    href="admin-dashboard.html"
+                    class="back-btn"
+                >
+
+                    <i class="fa-solid fa-arrow-left"></i>
+
+                    Back to Dashboard
+
+                </a>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 EVENT FORM
+            ================================================= -->
+
+            <form
+                id="eventForm"
+                class="event-form-layout"
+            >
+
+
+                <!-- =================================================
+                     LEFT COLUMN
+                ================================================= -->
+
+                <div class="form-card">
+
+
+                    <!-- EVENT DETAILS -->
+
+                    <div class="section-header">
+
+                        <div class="section-icon">
+
+                            <i class="fa-solid fa-tags"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Event Details
+                            </h2>
+
+                            <p>
+                                Enter the essential information about your event.
+                            </p>
 
                         </div>
 
@@ -172,87 +1502,334 @@
 
 
 
-                    <!-- ================= CATEGORY ================= -->
-
-                    <div class="event-field">
-
-                        <label>
-
-                            Category
-                            <span>*</span>
-
-                        </label>
+                    <div class="form-grid">
 
 
-                        <div class="input-box">
+                        <!-- EVENT NAME -->
 
-                            <i class="fa-solid fa-list"></i>
+                        <div class="form-group">
+
+                            <label for="eventName">
+
+                                Event Name
+
+                                <span class="required">
+                                    *
+                                </span>
+
+                            </label>
 
 
-                            <input
-                                type="text"
-                                id="category"
-                                placeholder="Enter category"
-                                required>
+                            <div class="input-wrap">
+
+                                <i class="fa-solid fa-tag"></i>
+
+                                <input
+                                    type="text"
+                                    id="eventName"
+                                    name="eventName"
+                                    placeholder="Enter event name"
+                                    required
+                                >
+
+                            </div>
 
                         </div>
+
+
+
+                        <!-- CATEGORY -->
+
+                        <div class="form-group">
+
+                            <label for="category">
+
+                                Category
+
+                                <span class="required">
+                                    *
+                                </span>
+
+                            </label>
+
+
+                            <div class="input-wrap">
+
+                                <i class="fa-solid fa-list"></i>
+
+                                <select
+                                    id="category"
+                                    name="category"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Select category
+                                    </option>
+
+                                    <option value="Wedding">
+                                        Wedding
+                                    </option>
+
+                                    <option value="Birthday">
+                                        Birthday
+                                    </option>
+
+                                    <option value="Corporate">
+                                        Corporate
+                                    </option>
+
+                                    <option value="Anniversary">
+                                        Anniversary
+                                    </option>
+
+                                    <option value="Concert">
+                                        Concert
+                                    </option>
+
+                                    <option value="Conference">
+                                        Conference
+                                    </option>
+
+                                    <option value="Other">
+                                        Other
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- PRICE -->
+
+                        <div class="form-group">
+
+                            <label for="price">
+
+                                Price (₹)
+
+                                <span class="required">
+                                    *
+                                </span>
+
+                            </label>
+
+
+                            <div class="input-wrap">
+
+                                <i class="fa-solid fa-indian-rupee-sign"></i>
+
+                                <input
+                                    type="number"
+                                    id="price"
+                                    name="price"
+                                    min="0"
+                                    step="0.01"
+                                    placeholder="Enter price"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- DATE -->
+
+                        <div class="form-group">
+
+                            <label for="eventDate">
+
+                                Date & Time
+
+                                <span class="required">
+                                    *
+                                </span>
+
+                            </label>
+
+
+                            <div class="input-wrap">
+
+                                <i class="fa-regular fa-calendar"></i>
+
+                                <input
+                                    type="datetime-local"
+                                    id="eventDate"
+                                    name="eventDate"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- LOCATION -->
+
+                        <div class="form-group full">
+
+                            <label for="location">
+
+                                Venue / Location
+
+                                <span class="required">
+                                    *
+                                </span>
+
+                            </label>
+
+
+                            <div class="input-wrap">
+
+                                <i class="fa-solid fa-location-dot"></i>
+
+                                <input
+                                    type="text"
+                                    id="location"
+                                    name="location"
+                                    placeholder="Enter venue or location"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- DESCRIPTION -->
+
+                        <div class="form-group full">
+
+                            <label for="description">
+
+                                Short Description
+
+                                <span class="required">
+                                    *
+                                </span>
+
+                            </label>
+
+
+                            <div class="input-wrap">
+
+                                <i class="fa-solid fa-file-lines"></i>
+
+                                <textarea
+                                    id="description"
+                                    name="description"
+                                    maxlength="500"
+                                    placeholder="Enter a brief description about the event..."
+                                    required
+                                ></textarea>
+
+                            </div>
+
+
+                            <div class="description-footer">
+
+                                <span id="descriptionCount">
+                                    0/500
+                                </span>
+
+                            </div>
+
+                        </div>
+
 
                     </div>
 
 
 
-                    <!-- ================= PRICE ================= -->
+                    <!-- ADDITIONAL INFORMATION -->
 
-                    <div class="event-field">
-
-                        <label>
-
-                            Price
-                            <span>*</span>
-
-                        </label>
+                    <div class="additional-section">
 
 
-                        <div class="input-box">
+                        <div class="section-header">
 
-                            <i class="fa-solid fa-indian-rupee-sign"></i>
+                            <div class="section-icon">
 
+                                <i class="fa-solid fa-circle-info"></i>
 
-                            <input
-                                type="number"
-                                id="price"
-                                placeholder="Enter price"
-                                min="0"
-                                required>
+                            </div>
+
+                            <div>
+
+                                <h2>
+                                    Additional Information
+                                </h2>
+
+                                <p>
+                                    Provide more details to help customers understand your event.
+                                </p>
+
+                            </div>
 
                         </div>
 
-                    </div>
+
+
+                        <div class="form-grid">
+
+
+                            <!-- ORGANIZER -->
+
+                            <div class="form-group">
+
+                                <label for="organizer">
+                                    Organizer
+                                </label>
+
+
+                                <div class="input-wrap">
+
+                                    <i class="fa-solid fa-user"></i>
+
+                                    <input
+                                        type="text"
+                                        id="organizer"
+                                        name="organizer"
+                                        placeholder="Enter organizer name"
+                                    >
+
+                                </div>
+
+                            </div>
 
 
 
-                    <!-- ================= IMAGE PATH ================= -->
+                            <!-- CONTACT EMAIL -->
 
-                    <div class="event-field">
+                            <div class="form-group">
 
-                        <label>
-
-                            Image Path
-                            <span>*</span>
-
-                        </label>
+                                <label for="contactEmail">
+                                    Contact Email
+                                </label>
 
 
-                        <div class="input-box">
+                                <div class="input-wrap">
 
-                            <i class="fa-solid fa-image"></i>
+                                    <i class="fa-solid fa-envelope"></i>
 
+                                    <input
+                                        type="email"
+                                        id="contactEmail"
+                                        name="contactEmail"
+                                        placeholder="Enter contact email"
+                                    >
 
-                            <input
-                                type="text"
-                                id="imageUrl"
-                                placeholder="images/anniversary.jpg"
-                                required>
+                                </div>
+
+                            </div>
+
 
                         </div>
 
@@ -263,67 +1840,211 @@
 
 
 
-                <!-- ================= IMAGE HELP ================= -->
+                <!-- =================================================
+                     RIGHT COLUMN
+                ================================================= -->
 
-                <p style="
-                    margin-top: 10px;
-                    color: #64748b;
-                    font-size: 14px;
-                ">
-
-                    Example:
-                    <strong>images/anniversary.jpg</strong>
-
-                </p>
+                <div>
 
 
+                    <!-- EVENT IMAGE -->
 
-                <!-- ================= DESCRIPTION ================= -->
-
-                <div class="event-field description-field">
-
-
-                    <label>
-
-                        Description
-                        <span>*</span>
-
-                    </label>
+                    <div class="form-card">
 
 
-                    <div class="textarea-box">
+                        <div class="section-header">
 
-                        <i class="fa-solid fa-file-lines"></i>
+                            <div class="section-icon">
+
+                                <i class="fa-regular fa-image"></i>
+
+                            </div>
+
+                            <div>
+
+                                <h2>
+                                    Event Image
+                                </h2>
+
+                                <p>
+                                    Add an image for your event.
+                                </p>
+
+                            </div>
+
+                        </div>
 
 
-                        <textarea
-                            id="description"
-                            placeholder="Enter event description..."
-                            required></textarea>
+
+                        <!-- IMAGE URL -->
+
+                        <div class="form-group">
+
+                            <label for="imageUrl">
+
+                                Image URL
+
+                                <span class="required">
+                                    *
+                                </span>
+
+                            </label>
+
+
+                            <div class="input-wrap">
+
+                                <i class="fa-solid fa-link"></i>
+
+                                <input
+                                    type="text"
+                                    id="imageUrl"
+                                    name="imageUrl"
+                                    placeholder="images/anniversary.jpg"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div
+                            class="upload-box"
+                            style="margin-top:12px;"
+                            onclick="document.getElementById('imageFile').click()"
+                        >
+
+                            <div class="upload-content">
+
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                                <strong>
+                                    Select image for preview
+                                </strong>
+
+                                <span>
+                                    Click to choose an image
+                                </span>
+
+                                <small>
+                                    PNG, JPG or JPEG
+                                </small>
+
+                            </div>
+
+                        </div>
+
+
+                        <input
+                            type="file"
+                            id="imageFile"
+                            accept="image/png,image/jpeg,image/jpg"
+                        >
+
+
+
+                        <!-- PREVIEW -->
+
+                        <div class="preview-box">
+
+                            <div class="preview-title">
+                                Image Preview
+                            </div>
+
+
+                            <div class="image-preview">
+
+
+                                <div
+                                    id="previewPlaceholder"
+                                >
+
+                                    <i
+                                        class="fa-regular fa-image"
+                                    ></i>
+
+                                    <p>
+                                        No image selected
+                                    </p>
+
+                                </div>
+
+
+                                <img
+                                    id="imagePreview"
+                                    alt="Event preview"
+                                >
+
+
+                            </div>
+
+                        </div>
+
 
                     </div>
 
-                </div>
+
+
+                    <!-- EVENT SETTINGS -->
+
+                    <div class="form-card settings-card">
+
+
+                        <div class="section-header">
+
+                            <div class="section-icon">
+
+                                <i class="fa-solid fa-gear"></i>
+
+                            </div>
+
+                            <div>
+
+                                <h2>
+                                    Event Settings
+                                </h2>
+
+                                <p>
+                                    Configure event visibility.
+                                </p>
+
+                            </div>
+
+                        </div>
 
 
 
-                <!-- ================= BUTTON ================= -->
+                        <label class="setting-item">
 
-                <div class="event-button-container">
+                            <input
+                                type="checkbox"
+                                id="visible"
+                                checked
+                            >
+
+                            <span>
+                                Make this event visible to customers
+                            </span>
+
+                        </label>
 
 
-                    <button
-                        type="submit"
-                        class="add-event-button">
+                        <label class="setting-item">
+
+                            <input
+                                type="checkbox"
+                                id="featured"
+                            >
+
+                            <span>
+                                Feature this event on homepage
+                            </span>
+
+                        </label>
 
 
-                        <i class="fa-solid fa-plus"></i>
-
-
-                        Add Event
-
-
-                    </button>
+                    </div>
 
 
                 </div>
@@ -332,21 +2053,439 @@
             </form>
 
 
+
+            <!-- =================================================
+                 ACTION BUTTONS
+            ================================================= -->
+
+            <div class="form-actions">
+
+
+                <button
+                    type="button"
+                    class="cancel-btn"
+                    onclick="window.location.href='admin-dashboard.html'"
+                >
+
+                    <i class="fa-solid fa-xmark"></i>
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="submit"
+                    form="eventForm"
+                    class="submit-btn"
+                >
+
+                    <i class="fa-solid fa-plus"></i>
+
+                    Add Event
+
+                </button>
+
+
+            </div>
+
+
         </div>
 
-
-    </div>
-
+    </main>
 
 </div>
 
 
 
-<!-- ================= ADMIN EVENTS JS ================= -->
+<!-- =====================================================
+     FIREBASE / EXISTING ADMIN JS
+===================================================== -->
 
-<script type="module"
-        src="js/admin-events.js">
+<script type="module">
+
+    import {
+        auth,
+        db
+    }
+    from "./js/firebase-config.js";
+
+
+    import {
+        doc,
+        setDoc
+    }
+    from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+
+    /* =====================================================
+       DESCRIPTION COUNTER
+    ===================================================== */
+
+    const description =
+        document.getElementById(
+            "description"
+        );
+
+    const descriptionCount =
+        document.getElementById(
+            "descriptionCount"
+        );
+
+
+    description.addEventListener(
+        "input",
+        function () {
+
+            descriptionCount.textContent =
+                this.value.length +
+                "/500";
+
+        }
+    );
+
+
+
+    /* =====================================================
+       IMAGE PREVIEW
+    ===================================================== */
+
+    const imageFile =
+        document.getElementById(
+            "imageFile"
+        );
+
+    const imagePreview =
+        document.getElementById(
+            "imagePreview"
+        );
+
+    const previewPlaceholder =
+        document.getElementById(
+            "previewPlaceholder"
+        );
+
+
+    imageFile.addEventListener(
+        "change",
+        function () {
+
+            const file =
+                this.files[0];
+
+            if (!file) {
+                return;
+            }
+
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                function (event) {
+
+                    imagePreview.src =
+                        event.target.result;
+
+                    imagePreview.style.display =
+                        "block";
+
+                    previewPlaceholder.style.display =
+                        "none";
+
+                };
+
+
+            reader.readAsDataURL(
+                file
+            );
+
+        }
+    );
+
+
+
+    /* =====================================================
+       IMAGE URL PREVIEW
+    ===================================================== */
+
+    const imageUrl =
+        document.getElementById(
+            "imageUrl"
+        );
+
+
+    imageUrl.addEventListener(
+        "input",
+        function () {
+
+            const url =
+                this.value.trim();
+
+
+            if (!url) {
+
+                imagePreview.style.display =
+                    "none";
+
+                previewPlaceholder.style.display =
+                    "block";
+
+                return;
+
+            }
+
+
+            imagePreview.src =
+                url;
+
+
+            imagePreview.onload =
+                function () {
+
+                    imagePreview.style.display =
+                        "block";
+
+                    previewPlaceholder.style.display =
+                        "none";
+
+                };
+
+
+            imagePreview.onerror =
+                function () {
+
+                    imagePreview.style.display =
+                        "none";
+
+                    previewPlaceholder.style.display =
+                        "block";
+
+                };
+
+        }
+    );
+
+
+
+    /* =====================================================
+       ADD EVENT
+    ===================================================== */
+
+    const eventForm =
+        document.getElementById(
+            "eventForm"
+        );
+
+
+    eventForm.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            const user =
+                auth.currentUser;
+
+
+            if (!user) {
+
+                alert(
+                    "Admin login session expired. Please login again."
+                );
+
+                window.location.href =
+                    "admin-login.html";
+
+                return;
+
+            }
+
+
+            const eventName =
+                document.getElementById(
+                    "eventName"
+                ).value.trim();
+
+
+            const category =
+                document.getElementById(
+                    "category"
+                ).value;
+
+
+            const price =
+                Number(
+                    document.getElementById(
+                        "price"
+                    ).value
+                );
+
+
+            const eventDate =
+                document.getElementById(
+                    "eventDate"
+                ).value;
+
+
+            const location =
+                document.getElementById(
+                    "location"
+                ).value.trim();
+
+
+            const descriptionValue =
+                document.getElementById(
+                    "description"
+                ).value.trim();
+
+
+            const imageUrlValue =
+                document.getElementById(
+                    "imageUrl"
+                ).value.trim();
+
+
+            const organizer =
+                document.getElementById(
+                    "organizer"
+                ).value.trim();
+
+
+            const contactEmail =
+                document.getElementById(
+                    "contactEmail"
+                ).value.trim();
+
+
+            const visible =
+                document.getElementById(
+                    "visible"
+                ).checked;
+
+
+            const featured =
+                document.getElementById(
+                    "featured"
+                ).checked;
+
+
+            if (
+                !eventName ||
+                !category ||
+                !price ||
+                !eventDate ||
+                !location ||
+                !descriptionValue ||
+                !imageUrlValue
+            ) {
+
+                alert(
+                    "Please fill all required fields."
+                );
+
+                return;
+
+            }
+
+
+            try {
+
+
+                const eventRef =
+                    doc(
+                        db,
+                        "events",
+                        crypto.randomUUID()
+                    );
+
+
+                await setDoc(
+                    eventRef,
+                    {
+
+                        eventName:
+                            eventName,
+
+                        category:
+                            category,
+
+                        price:
+                            price,
+
+                        eventDate:
+                            eventDate,
+
+                        location:
+                            location,
+
+                        description:
+                            descriptionValue,
+
+                        imageUrl:
+                            imageUrlValue,
+
+                        organizer:
+                            organizer,
+
+                        contactEmail:
+                            contactEmail,
+
+                        visible:
+                            visible,
+
+                        featured:
+                            featured,
+
+                        createdBy:
+                            user.uid,
+
+                        createdAt:
+                            new Date().toISOString()
+
+                    }
+                );
+
+
+                alert(
+                    "Event added successfully! 🎉"
+                );
+
+
+                window.location.href =
+                    "view-events.html";
+
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Add Event Error:",
+                    error
+                );
+
+
+                alert(
+                    error.message ||
+                    "Unable to add event."
+                );
+
+            }
+
+        }
+    );
+
 </script>
+
+
+<!-- EXISTING ADMIN AUTH / INACTIVITY -->
+
+<script
+    type="module"
+    src="js/admin.js"
+></script>
 
 
 </body>

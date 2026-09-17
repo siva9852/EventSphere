@@ -5,120 +5,818 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Bookings - EventSphere</title>
 
-    <link rel="stylesheet"
-          href="css/style.css">
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
 
     <style>
 
-        /* ================= PAYMENT FILTER ================= */
-
-        .payment-filter-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 15px 0;
-            flex-wrap: wrap;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .payment-filter-label {
-            font-weight: 700;
-            color: #334155;
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f7fc;
+            color: #162a5a;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 237px;
+            height: 100vh;
+            background: #102b63;
+            color: white;
+            padding: 15px 18px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding-bottom: 17px;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .brand-icon {
+            width: 49px;
+            height: 49px;
+            border-radius: 13px;
+            background: #1769ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .brand h2 {
+            font-size: 20px;
+            color: white;
+            margin-bottom: 3px;
+        }
+
+        .brand p {
+            font-size: 11px;
+            color: #b9c8e8;
+            letter-spacing: .5px;
+        }
+
+        .nav {
+            list-style: none;
+            margin-top: 23px;
+        }
+
+        .nav li {
+            margin-bottom: 5px;
+        }
+
+        .nav a {
+            height: 47px;
+            padding: 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: #edf3ff;
+            text-decoration: none;
+            border-radius: 10px;
             font-size: 14px;
         }
 
-        .payment-filter-btn {
-            border: 1px solid #d5dce8;
-            background: #ffffff;
-            color: #475569;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
+        .nav a i {
+            width: 20px;
+            text-align: center;
+            font-size: 17px;
+        }
+
+        .nav a:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .nav .active a {
+            background: linear-gradient(
+                90deg,
+                #2874ff,
+                #7770f5
+            );
             font-weight: 600;
+        }
+
+        .management {
+            margin: 22px 4px 9px;
+            color: #b8c7e6;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .6px;
+        }
+
+        .admin-bottom {
+            position: absolute;
+            left: 18px;
+            right: 18px;
+            bottom: 23px;
+            border-top: 1px solid rgba(255,255,255,.12);
+            padding-top: 22px;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .admin-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(
+                135deg,
+                #8b5cf6,
+                #5b5ff0
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .admin-bottom strong {
+            display: block;
             font-size: 13px;
         }
 
-        .payment-filter-btn:hover {
-            background: #f1f5f9;
+        .admin-bottom span {
+            display: block;
+            margin-top: 4px;
+            font-size: 10px;
+            color: #b7c6e4;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 237px;
+            min-height: 100vh;
+        }
+
+        /* ================= TOPBAR ================= */
+
+        .topbar {
+            height: 70px;
+            background: white;
+            border-bottom: 1px solid #e0e7f1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+        }
+
+        .top-search {
+            width: 380px;
+            height: 43px;
+            border: 1px solid #e0e6f0;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 0 14px;
+            background: #fbfcff;
+        }
+
+        .top-search i {
+            color: #1262ec;
+        }
+
+        .top-search input {
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 100%;
+            font-size: 12px;
+        }
+
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .notification-btn {
+            width: 43px;
+            height: 43px;
+            border-radius: 11px;
+            border: 1px solid #e2e8f1;
+            background: white;
+            color: #1763ed;
+            font-size: 18px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-number {
+            position: absolute;
+            top: -5px;
+            right: -4px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ef3340;
+            color: white;
+            font-size: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .account-btn {
+            height: 43px;
+            padding: 0 14px;
+            border-radius: 11px;
+            border: 1px solid #e1e7f0;
+            background: white;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            cursor: pointer;
+            color: #14285a;
+            font-weight: 600;
+        }
+
+        .account-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #6655e9;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ================= CONTENT ================= */
+
+        .content {
+            padding: 22px 24px 35px;
+        }
+
+        .breadcrumb {
+            color: #8290aa;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .breadcrumb strong {
+            color: #34456c;
+        }
+
+        .heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .heading-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .heading-icon {
+            width: 62px;
+            height: 62px;
+            border-radius: 15px;
+            background: #eaf2ff;
+            color: #1766ee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+        }
+
+        .heading h1 {
+            color: #122d69;
+            font-size: 27px;
+            margin-bottom: 5px;
+        }
+
+        .heading p {
+            color: #7787a7;
+            font-size: 13px;
+        }
+
+        .heading-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .date-btn,
+        .export-btn {
+            height: 44px;
+            border-radius: 9px;
+            padding: 0 16px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .date-btn {
+            background: white;
+            border: 1px solid #dce5f1;
+            color: #1b326c;
+        }
+
+        .export-btn {
+            background: #1765ed;
+            border: none;
+            color: white;
+        }
+
+        /* ================= STAT CARDS ================= */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 13px;
+            margin-bottom: 19px;
+        }
+
+        .stat-card {
+            min-height: 108px;
+            background: white;
+            border: 1px solid #dce5f0;
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .stat-card.pending {
+            border-color: #f5dfad;
+            background: #fffdf7;
+        }
+
+        .stat-card.approved {
+            border-color: #cdeee0;
+            background: #fbfffd;
+        }
+
+        .stat-card.rejected {
+            border-color: #f2d4d9;
+            background: #fffafb;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: #e9f1ff;
+            color: #1766ed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            flex-shrink: 0;
+        }
+
+        .pending .stat-icon {
+            background: #fff1ce;
+            color: #df9000;
+        }
+
+        .approved .stat-icon {
+            background: #dcf7e9;
+            color: #16a365;
+        }
+
+        .rejected .stat-icon {
+            background: #ffe0e4;
+            color: #ed3542;
+        }
+
+        .stat-title {
+            font-size: 11px;
+            color: #20376e;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #183b82;
+        }
+
+        .stat-sub {
+            color: #7c8ba7;
+            font-size: 10px;
+            margin-top: 3px;
+        }
+
+        /* ================= BOOKING PANEL ================= */
+
+        .booking-panel {
+            background: white;
+            border: 1px solid #dfe6f0;
+            border-radius: 11px;
+            padding: 12px;
+            box-shadow: 0 4px 14px rgba(31,55,100,.04);
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .filter-btn {
+            height: 42px;
+            padding: 0 18px;
+            border: none;
+            border-radius: 10px;
+            background: #f0f4fa;
+            color: #405274;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .filter-btn.active-filter {
+            background: #1465ed;
+            color: white;
+        }
+
+        .filter-btn span {
+            margin-left: 5px;
+            font-weight: 700;
+        }
+
+        .payment-title {
+            margin-left: auto;
+            font-size: 12px;
+            font-weight: 700;
+            color: #243765;
+        }
+
+        .payment-filter-btn {
+            height: 42px;
+            padding: 0 16px;
+            border: none;
+            border-radius: 10px;
+            background: #f0f4fa;
+            color: #405274;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
         }
 
         .payment-filter-btn.active-payment-filter {
-            background: #172554;
-            color: #ffffff;
-            border-color: #172554;
+            background: #1465ed;
+            color: white;
         }
 
-        /* ================= PAYMENT BOX ================= */
+        .booking-search {
+            height: 42px;
+            width: 285px;
+            border: 1px solid #dce4ef;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 0 12px;
+            margin-left: 3px;
+        }
+
+        .booking-search i {
+            color: #1265ed;
+        }
+
+        .booking-search input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 11px;
+        }
+
+        /* ================= BOOKINGS ================= */
+
+        #bookingsContainer {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .booking-card {
+            border: 1px solid #e6ebf2;
+            border-radius: 9px;
+            padding: 14px;
+            background: white;
+            position: relative;
+        }
+
+        .booking-card:hover {
+            border-color: #cbd9ee;
+            box-shadow: 0 3px 12px rgba(25,65,130,.06);
+        }
+
+        .booking-card h2 {
+            color: #15429a;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .booking-status {
+            position: absolute;
+            right: 15px;
+            top: 13px;
+            padding: 6px 11px;
+            border-radius: 15px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .status-approved {
+            background: #ddf7e8;
+            color: #07924c;
+        }
+
+        .status-pending {
+            background: #fff0c9;
+            color: #c17a00;
+        }
+
+        .status-rejected {
+            background: #ffe0e3;
+            color: #e22d39;
+        }
+
+        .booking-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            border-top: 1px solid #edf0f5;
+            border-bottom: 1px solid #edf0f5;
+            padding: 12px 0 3px;
+        }
+
+        .booking-column {
+            padding: 0 14px;
+            border-right: 1px solid #edf0f5;
+        }
+
+        .booking-column:first-child {
+            padding-left: 0;
+        }
+
+        .booking-column:last-child {
+            border-right: none;
+        }
+
+        .booking-info {
+            display: flex;
+            gap: 6px;
+            align-items: flex-start;
+            font-size: 10px;
+            margin-bottom: 10px;
+            color: #63728e;
+            line-height: 1.5;
+        }
+
+        .booking-info strong {
+            color: #203665;
+            white-space: nowrap;
+        }
+
+        .booking-info span {
+            word-break: break-word;
+        }
+
+        /* ================= PAYMENT ================= */
 
         .payment-details-box {
-            margin-top: 20px;
-            padding: 16px;
-            border-radius: 12px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+            margin-top: 12px;
+            background: #f8faff;
+            border: 1px solid #dce6f2;
+            border-radius: 9px;
+            padding: 12px;
         }
 
         .payment-details-title {
-            font-size: 16px;
-            font-weight: 800;
-            color: #172554;
-            margin-bottom: 12px;
+            color: #1b3978;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 10px;
         }
 
         .payment-details-grid {
             display: grid;
-            grid-template-columns:
-                repeat(2, minmax(0, 1fr));
-            gap: 10px 25px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
         }
 
         .payment-info {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
+            min-height: 53px;
+            padding: 9px;
+            background: white;
+            border: 1px solid #dce5f0;
+            border-radius: 7px;
         }
 
         .payment-info strong {
-            font-size: 12px;
-            color: #64748b;
+            display: block;
+            color: #71809b;
+            font-size: 9px;
+            margin-bottom: 6px;
         }
 
         .payment-info span {
-            font-size: 13px;
-            color: #172554;
+            color: #203c79;
+            font-size: 10px;
             word-break: break-word;
         }
 
-        /* ================= PAYMENT STATUS ================= */
-
         .payment-status {
-            display: inline-flex;
-            align-items: center;
-            width: fit-content;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 800;
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-weight: 700;
         }
 
         .payment-paid {
-            background: #dcfce7;
-            color: #166534;
+            background: #dcf8e8;
+            color: #078f4a !important;
         }
 
         .payment-unpaid {
-            background: #fee2e2;
-            color: #991b1b;
+            background: #ffe1e3;
+            color: #e22c3a !important;
         }
 
-        @media (max-width: 700px) {
+        /* ================= ACTIONS ================= */
+
+        .booking-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .approve-btn,
+        .reject-btn {
+            border: none;
+            border-radius: 7px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .approve-btn {
+            background: #16a34a;
+            color: white;
+        }
+
+        .reject-btn {
+            background: #ef4444;
+            color: white;
+        }
+
+        .approve-btn:hover {
+            background: #12813b;
+        }
+
+        .reject-btn:hover {
+            background: #d92f3b;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 1150px) {
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .payment-details-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .booking-search {
+                width: 220px;
+            }
+
+        }
+
+        @media (max-width: 850px) {
+
+            .sidebar {
+                width: 200px;
+            }
+
+            .main {
+                margin-left: 200px;
+            }
+
+            .top-search {
+                width: 280px;
+            }
+
+            .toolbar {
+                flex-wrap: wrap;
+            }
+
+            .payment-title {
+                margin-left: 0;
+            }
+
+            .booking-search {
+                width: 100%;
+            }
+
+            .booking-details {
+                grid-template-columns: 1fr;
+            }
+
+            .booking-column {
+                border-right: none;
+                border-bottom: 1px solid #edf0f5;
+                padding: 10px 0;
+            }
+
+            .booking-column:last-child {
+                border-bottom: none;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .admin-bottom {
+                position: static;
+                margin-top: 25px;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .top-search {
+                display: none;
+            }
+
+            .content {
+                padding: 16px 12px;
+            }
+
+            .heading {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .heading-actions {
+                width: 100%;
+            }
+
+            .date-btn,
+            .export-btn {
+                flex: 1;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
 
             .payment-details-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-btn,
+            .payment-filter-btn {
+                width: 100%;
+            }
+
+            .payment-title {
+                margin-top: 5px;
             }
 
         }
@@ -130,251 +828,1032 @@
 
 <body>
 
-<div class="dashboard">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-calendar-days"></i>
+            </div>
+
+            <div>
+                <h2>EventSphere</h2>
+                <p>ADMIN PANEL</p>
+            </div>
+
+        </div>
 
 
-    <!-- SIDEBAR -->
-
-    <div class="sidebar">
-
-        <h2>EventSphere</h2>
-
-        <ul>
+        <ul class="nav">
 
             <li>
-
                 <a href="admin-dashboard.html">
-                    🏠 Dashboard
+                    <i class="fa-solid fa-house"></i>
+                    Dashboard
                 </a>
-
             </li>
 
-
             <li>
-
                 <a href="add-event.html">
-                    ➕ Add Event
+                    <i class="fa-solid fa-plus"></i>
+                    Add Event
                 </a>
-
             </li>
 
-
             <li>
-
                 <a href="view-events.html">
-                    🎉 View Events
+                    <i class="fa-solid fa-calendar-days"></i>
+                    View Events
                 </a>
-
             </li>
 
-
-            <li>
-
-                <a href="admin-bookings.html"
-                   class="active-menu">
-
-                    📅 Bookings
-
+            <li class="active">
+                <a href="admin-bookings.html">
+                    <i class="fa-solid fa-ticket"></i>
+                    Bookings
                 </a>
-
             </li>
 
-
             <li>
-
                 <a href="admin-customers.html">
-                    👥 Customers
+                    <i class="fa-solid fa-users"></i>
+                    Customers
                 </a>
-
             </li>
 
+            <div class="management">
+                MANAGEMENT
+            </div>
 
             <li>
-
-                <a href="#"
-                   onclick="logout()">
-
-                    🚪 Logout
-
+                <a href="admin-dashboard.html#coupons">
+                    <i class="fa-solid fa-tag"></i>
+                    Discounts & Coupons
                 </a>
+            </li>
 
+            <li>
+                <a href="admin-dashboard.html#maintenance">
+                    <i class="fa-solid fa-wrench"></i>
+                    Service Maintenance
+                </a>
             </li>
 
         </ul>
 
-    </div>
 
+        <div class="admin-bottom">
 
-    <!-- MAIN CONTENT -->
+            <div class="admin-avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
 
-    <div class="dashboard-content bookings-page">
-
-
-        <h1>
-            Customer Bookings
-        </h1>
-
-
-        <!-- STATUS FILTERS -->
-
-        <div class="booking-filters">
-
-
-            <button
-                class="filter-btn active-filter"
-                onclick="filterBookings('All')">
-
-                <span>
-                    All
-                </span>
-
-                <span
-                    class="count-badge all-count"
-                    id="allCount">
-
-                    0
-
-                </span>
-
-            </button>
-
-
-            <button
-                class="filter-btn"
-                onclick="filterBookings('Pending')">
-
-                <span>
-                    Pending
-                </span>
-
-                <span
-                    class="count-badge pending-count"
-                    id="pendingCount">
-
-                    0
-
-                </span>
-
-            </button>
-
-
-            <button
-                class="filter-btn"
-                onclick="filterBookings('Approved')">
-
-                <span>
-                    Approved
-                </span>
-
-                <span
-                    class="count-badge approved-count"
-                    id="approvedCount">
-
-                    0
-
-                </span>
-
-            </button>
-
-
-            <button
-                class="filter-btn"
-                onclick="filterBookings('Rejected')">
-
-                <span>
-                    Rejected
-                </span>
-
-                <span
-                    class="count-badge rejected-count"
-                    id="rejectedCount">
-
-                    0
-
-                </span>
-
-            </button>
-
+            <div>
+                <strong>Administrator</strong>
+                <span>EventSphere Admin</span>
+            </div>
 
         </div>
 
-
-        <!-- PAYMENT FILTER -->
-
-        <div class="payment-filter-section">
-
-            <span class="payment-filter-label">
-                Payment:
-            </span>
+    </aside>
 
 
-            <button
-                class="payment-filter-btn active-payment-filter"
-                onclick="filterPaymentBookings('All')">
 
-                All
+    <!-- ================= MAIN ================= -->
 
-            </button>
+    <main class="main">
 
 
-            <button
-                class="payment-filter-btn"
-                onclick="filterPaymentBookings('Paid')">
+        <!-- ================= TOPBAR ================= -->
 
-                Paid
+        <header class="topbar">
 
-            </button>
+            <div class="top-search">
 
+                <i class="fa-solid fa-magnifying-glass"></i>
 
-            <button
-                class="payment-filter-btn"
-                onclick="filterPaymentBookings('Unpaid')">
+                <input
+                    type="text"
+                    placeholder="Search bookings, customers, events..."
+                >
 
-                Unpaid
-
-            </button>
-
-        </div>
+            </div>
 
 
-        <!-- SEARCH -->
+            <div class="top-right">
 
-        <div class="booking-search">
+                <button
+                    class="notification-btn"
+                    type="button"
+                >
 
-            <span>
-                🔍
-            </span>
+                    <i class="fa-regular fa-bell"></i>
 
+                    <span class="notification-number">
+                        5
+                    </span>
 
-            <input
-                type="text"
-                id="bookingSearch"
-                placeholder="Search customer, email or event..."
-            >
-
-        </div>
+                </button>
 
 
-        <!-- BOOKINGS -->
+                <button
+                    class="account-btn"
+                    type="button"
+                >
 
-        <div id="bookingsContainer">
+                    <div class="account-avatar">
+                        A
+                    </div>
 
-            <p>
-                Loading bookings...
-            </p>
+                    Admin
 
-        </div>
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </button>
+
+            </div>
+
+        </header>
 
 
-    </div>
 
-</div>
+        <!-- ================= CONTENT ================= -->
+
+        <section class="content">
 
 
-<script type="module"
-        src="js/admin-bookings.js">
+            <div class="breadcrumb">
+
+                Dashboard
+
+                <strong>
+                    &nbsp;›&nbsp; Bookings
+                </strong>
+
+            </div>
+
+
+
+            <!-- ================= HEADING ================= -->
+
+            <div class="heading">
+
+
+                <div class="heading-left">
+
+                    <div class="heading-icon">
+
+                        <i class="fa-solid fa-ticket"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <h1>
+                            Customer Bookings
+                        </h1>
+
+                        <p>
+                            Manage and track all event bookings in one place.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="heading-actions">
+
+                    <button
+                        class="date-btn"
+                        type="button"
+                    >
+
+                        <i class="fa-regular fa-calendar"></i>
+
+                        &nbsp;
+
+                        01 Sep 2026 - 30 Sep 2026
+
+                        &nbsp;
+
+                        <i class="fa-solid fa-chevron-down"></i>
+
+                    </button>
+
+
+                    <button
+                        class="export-btn"
+                        type="button"
+                    >
+
+                        <i class="fa-solid fa-download"></i>
+
+                        &nbsp;
+
+                        Export
+
+                    </button>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- ================= STATS ================= -->
+
+            <div class="stats">
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+
+                        <i class="fa-solid fa-users"></i>
+
+                    </div>
+
+                    <div>
+
+                        <div class="stat-title">
+                            Total Bookings
+                        </div>
+
+                        <div
+                            class="stat-number"
+                            id="allCount"
+                        >
+                            0
+                        </div>
+
+                        <div class="stat-sub">
+                            All customer bookings
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="stat-card pending">
+
+                    <div class="stat-icon">
+
+                        <i class="fa-solid fa-clock"></i>
+
+                    </div>
+
+                    <div>
+
+                        <div class="stat-title">
+                            Pending
+                        </div>
+
+                        <div
+                            class="stat-number"
+                            id="pendingCount"
+                        >
+                            0
+                        </div>
+
+                        <div class="stat-sub">
+                            Awaiting confirmation
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="stat-card approved">
+
+                    <div class="stat-icon">
+
+                        <i class="fa-solid fa-check"></i>
+
+                    </div>
+
+                    <div>
+
+                        <div class="stat-title">
+                            Approved
+                        </div>
+
+                        <div
+                            class="stat-number"
+                            id="approvedCount"
+                        >
+                            0
+                        </div>
+
+                        <div class="stat-sub">
+                            Confirmed bookings
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="stat-card rejected">
+
+                    <div class="stat-icon">
+
+                        <i class="fa-solid fa-xmark"></i>
+
+                    </div>
+
+                    <div>
+
+                        <div class="stat-title">
+                            Rejected
+                        </div>
+
+                        <div
+                            class="stat-number"
+                            id="rejectedCount"
+                        >
+                            0
+                        </div>
+
+                        <div class="stat-sub">
+                            Cancelled bookings
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- ================= BOOKING PANEL ================= -->
+
+            <div class="booking-panel">
+
+
+                <div class="toolbar">
+
+
+                    <button
+                        type="button"
+                        class="filter-btn active-filter"
+                        onclick="filterBookings('All')"
+                    >
+
+                        All
+
+                        <span>
+                            (<span id="allCountTop">0</span>)
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="filter-btn"
+                        onclick="filterBookings('Pending')"
+                    >
+
+                        Pending
+
+                        <span>
+                            (<span id="pendingCountTop">0</span>)
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="filter-btn"
+                        onclick="filterBookings('Approved')"
+                    >
+
+                        Approved
+
+                        <span>
+                            (<span id="approvedCountTop">0</span>)
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="filter-btn"
+                        onclick="filterBookings('Rejected')"
+                    >
+
+                        Rejected
+
+                        <span>
+                            (<span id="rejectedCountTop">0</span>)
+                        </span>
+
+                    </button>
+
+
+                    <span class="payment-title">
+                        Payment:
+                    </span>
+
+
+                    <button
+                        type="button"
+                        class="payment-filter-btn active-payment-filter"
+                        onclick="filterPaymentBookings('All')"
+                    >
+                        All
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="payment-filter-btn"
+                        onclick="filterPaymentBookings('Paid')"
+                    >
+                        Paid
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="payment-filter-btn"
+                        onclick="filterPaymentBookings('Unpaid')"
+                    >
+                        Unpaid
+                    </button>
+
+
+                    <div class="booking-search">
+
+                        <i class="fa-solid fa-magnifying-glass"></i>
+
+                        <input
+                            type="text"
+                            id="bookingSearch"
+                            placeholder="Search customer, event or email..."
+                        >
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- EXISTING JS LOADS BOOKINGS HERE -->
+
+                <div id="bookingsContainer">
+
+                    <p style="
+                        text-align:center;
+                        padding:30px;
+                        color:#7b89a3;
+                        font-size:13px;
+                    ">
+                        Loading bookings...
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+
+
+    <!-- ================= COUNT SYNC ================= -->
+
+    <script>
+
+        /*
+            These top filter counts mirror the main
+            statistics automatically.
+        */
+
+        function syncTopCounts() {
+
+            const mainAll =
+                document.getElementById("allCount");
+
+            const mainPending =
+                document.getElementById("pendingCount");
+
+            const mainApproved =
+                document.getElementById("approvedCount");
+
+            const mainRejected =
+                document.getElementById("rejectedCount");
+
+
+            const topAll =
+                document.getElementById("allCountTop");
+
+            const topPending =
+                document.getElementById("pendingCountTop");
+
+            const topApproved =
+                document.getElementById("approvedCountTop");
+
+            const topRejected =
+                document.getElementById("rejectedCountTop");
+
+
+            if (mainAll && topAll) {
+                topAll.textContent =
+                    mainAll.textContent;
+            }
+
+            if (mainPending && topPending) {
+                topPending.textContent =
+                    mainPending.textContent;
+            }
+
+            if (mainApproved && topApproved) {
+                topApproved.textContent =
+                    mainApproved.textContent;
+            }
+
+            if (mainRejected && topRejected) {
+                topRejected.textContent =
+                    mainRejected.textContent;
+            }
+
+        }
+
+
+        setInterval(
+            syncTopCounts,
+            300
+        );
+
+    </script>
+
+
+
+    <!-- ================= ADMIN AUTH ================= -->
+
+    <script type="module">
+
+        import {
+            auth
+        } from "./js/firebase-config.js";
+
+
+        import {
+            signOut
+        } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+
+
+        auth.onAuthStateChanged(
+            async function(user) {
+
+                const otpVerified =
+                    sessionStorage.getItem(
+                        "adminOtpVerified"
+                    );
+
+
+                if (
+                    !user ||
+                    otpVerified !== "true"
+                ) {
+
+                    sessionStorage.removeItem(
+                        "adminOtpVerified"
+                    );
+
+
+                    if (user) {
+
+                        await signOut(
+                            auth
+                        );
+
+                    }
+
+
+                    window.location.replace(
+                        "admin-login.html"
+                    );
+
+                }
+
+            }
+        );
+
+    </script>
+
+
+
+    <!-- ================= EXISTING JS ================= -->
+
+    <script
+        type="module"
+        src="js/admin-bookings.js"
+
+        
+    ></script>
+<!-- ================= TOP RIGHT BUTTONS ================= -->
+
+<script type="module">
+
+import {
+    auth
+} from "./js/firebase-config.js";
+
+import {
+    signOut
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const notificationBtn =
+        document.querySelector(".notification-btn");
+
+    const accountBtn =
+        document.querySelector(".account-btn");
+
+
+    /* ================= NOTIFICATION ================= */
+
+    if (notificationBtn) {
+
+        notificationBtn.addEventListener(
+            "click",
+            function (event) {
+
+                event.stopPropagation();
+
+                let oldBox =
+                    document.getElementById(
+                        "adminNotificationBox"
+                    );
+
+                if (oldBox) {
+                    oldBox.remove();
+                    return;
+                }
+
+
+                const box =
+                    document.createElement("div");
+
+                box.id =
+                    "adminNotificationBox";
+
+                box.style.position = "fixed";
+                box.style.top = "78px";
+                box.style.right = "25px";
+                box.style.width = "300px";
+                box.style.background = "#ffffff";
+                box.style.border = "1px solid #e1e7f0";
+                box.style.borderRadius = "12px";
+                box.style.boxShadow =
+                    "0 10px 30px rgba(20,40,90,0.15)";
+                box.style.zIndex = "99999";
+                box.style.overflow = "hidden";
+
+
+                box.innerHTML = `
+
+                    <div style="
+                        padding:15px;
+                        border-bottom:1px solid #edf0f5;
+                        font-weight:700;
+                        color:#14285a;
+                    ">
+                        Notifications
+                    </div>
+
+
+                    <div style="
+                        padding:14px;
+                        border-bottom:1px solid #edf0f5;
+                        font-size:13px;
+                        color:#34456c;
+                    ">
+                        <strong>New Booking</strong>
+                        <br>
+                        <span style="
+                            color:#8290aa;
+                            font-size:11px;
+                        ">
+                            A new booking has been received.
+                        </span>
+                    </div>
+
+
+                    <div style="
+                        padding:14px;
+                        border-bottom:1px solid #edf0f5;
+                        font-size:13px;
+                        color:#34456c;
+                    ">
+                        <strong>Booking Update</strong>
+                        <br>
+                        <span style="
+                            color:#8290aa;
+                            font-size:11px;
+                        ">
+                            Booking information was updated.
+                        </span>
+                    </div>
+
+
+                    <div style="
+                        padding:14px;
+                        font-size:13px;
+                        color:#34456c;
+                    ">
+                        <strong>System</strong>
+                        <br>
+                        <span style="
+                            color:#8290aa;
+                            font-size:11px;
+                        ">
+                            EventSphere is running normally.
+                        </span>
+                    </div>
+
+                `;
+
+                document.body.appendChild(box);
+
+            }
+        );
+
+    }
+
+
+    /* ================= ADMIN ACCOUNT ================= */
+
+    if (accountBtn) {
+
+        accountBtn.addEventListener(
+            "click",
+            function (event) {
+
+                event.stopPropagation();
+
+                let oldBox =
+                    document.getElementById(
+                        "adminAccountBox"
+                    );
+
+                if (oldBox) {
+                    oldBox.remove();
+                    return;
+                }
+
+
+                const box =
+                    document.createElement("div");
+
+                box.id =
+                    "adminAccountBox";
+
+                box.style.position = "fixed";
+                box.style.top = "78px";
+                box.style.right = "25px";
+                box.style.width = "240px";
+                box.style.background = "#ffffff";
+                box.style.border = "1px solid #e1e7f0";
+                box.style.borderRadius = "12px";
+                box.style.boxShadow =
+                    "0 10px 30px rgba(20,40,90,0.15)";
+                box.style.zIndex = "99999";
+                box.style.overflow = "hidden";
+
+
+                box.innerHTML = `
+
+                    <div style="
+                        padding:16px;
+                        border-bottom:1px solid #edf0f5;
+                    ">
+
+                        <div style="
+                            font-weight:700;
+                            color:#14285a;
+                        ">
+                            Administrator
+                        </div>
+
+                        <div style="
+                            margin-top:4px;
+                            font-size:11px;
+                            color:#8290aa;
+                        ">
+                            EventSphere Admin
+                        </div>
+
+                    </div>
+
+
+                    <a href="admin-dashboard.html"
+                       style="
+                        display:block;
+                        padding:13px 16px;
+                        text-decoration:none;
+                        color:#34456c;
+                        font-size:13px;
+                        border-bottom:1px solid #edf0f5;
+                       ">
+                        <i class="fa-solid fa-house"></i>
+                        &nbsp; Dashboard
+                    </a>
+
+
+                    <a href="admin-customers.html"
+                       style="
+                        display:block;
+                        padding:13px 16px;
+                        text-decoration:none;
+                        color:#34456c;
+                        font-size:13px;
+                        border-bottom:1px solid #edf0f5;
+                       ">
+                        <i class="fa-solid fa-users"></i>
+                        &nbsp; Customers
+                    </a>
+
+
+                    <a href="admin-bookings.html"
+                       style="
+                        display:block;
+                        padding:13px 16px;
+                        text-decoration:none;
+                        color:#34456c;
+                        font-size:13px;
+                        border-bottom:1px solid #edf0f5;
+                       ">
+                        <i class="fa-solid fa-ticket"></i>
+                        &nbsp; Bookings
+                    </a>
+
+
+                    <button
+                        id="adminPopupLogout"
+                        type="button"
+                        style="
+                            width:100%;
+                            border:none;
+                            background:white;
+                            text-align:left;
+                            padding:13px 16px;
+                            color:#e22d39;
+                            font-size:13px;
+                            cursor:pointer;
+                        "
+                    >
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        &nbsp; Logout
+                    </button>
+
+                `;
+
+
+                document.body.appendChild(box);
+
+
+                const logoutBtn =
+                    document.getElementById(
+                        "adminPopupLogout"
+                    );
+
+
+                if (logoutBtn) {
+
+                    logoutBtn.addEventListener(
+                        "click",
+                        async function () {
+
+                            try {
+
+                                sessionStorage.removeItem(
+                                    "adminOtpVerified"
+                                );
+
+                                await signOut(auth);
+
+                                window.location.replace(
+                                    "admin-login.html"
+                                );
+
+                            } catch (error) {
+
+                                console.error(
+                                    "Logout error:",
+                                    error
+                                );
+
+                                alert(
+                                    "Logout failed. Please try again."
+                                );
+
+                            }
+
+                        }
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* ================= CLOSE WHEN CLICKING OUTSIDE ================= */
+
+    document.addEventListener(
+        "click",
+        function () {
+
+            const notificationBox =
+                document.getElementById(
+                    "adminNotificationBox"
+                );
+
+            const accountBox =
+                document.getElementById(
+                    "adminAccountBox"
+                );
+
+
+            if (notificationBox) {
+                notificationBox.remove();
+            }
+
+            if (accountBox) {
+                accountBox.remove();
+            }
+
+        }
+    );
+
+
+    /* ================= PREVENT POPUP CLICK CLOSING ================= */
+
+    document.addEventListener(
+        "click",
+        function (event) {
+
+            const notificationBox =
+                document.getElementById(
+                    "adminNotificationBox"
+                );
+
+            const accountBox =
+                document.getElementById(
+                    "adminAccountBox"
+                );
+
+
+            if (
+                notificationBox &&
+                notificationBox.contains(event.target)
+            ) {
+                event.stopPropagation();
+            }
+
+
+            if (
+                accountBox &&
+                accountBox.contains(event.target)
+            ) {
+                event.stopPropagation();
+            }
+
+        },
+        true
+    );
+
+});
+
 </script>
 
+</body>
 
 </body>
 

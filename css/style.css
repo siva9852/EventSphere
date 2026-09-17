@@ -11580,3 +11580,1420 @@ footer {
     }
 
 }
+
+/* =========================================
+   ADMIN DASHBOARD - TOP RIGHT POPUPS
+   Add only this part to style.css
+========================================= */
+
+.topbar-popup-container {
+    position: relative;
+}
+
+
+/* Notification Popup */
+
+.notification-popup {
+    position: absolute;
+    top: 48px;
+    right: -5px;
+    width: 320px;
+    background: #ffffff;
+    border: 1px solid #e3e8f1;
+    border-radius: 12px;
+    box-shadow: 0 12px 35px rgba(20, 35, 70, 0.15);
+    z-index: 2000;
+    display: none;
+    overflow: hidden;
+}
+
+.notification-popup.show {
+    display: block;
+}
+
+.popup-header {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.popup-header strong {
+    display: block;
+    font-size: 13px;
+    color: #17233d;
+}
+
+.popup-header span {
+    display: block;
+    margin-top: 3px;
+    font-size: 9px;
+    color: #8995a8;
+}
+
+.popup-header button {
+    border: none;
+    background: transparent;
+    color: #3268e8;
+    font-size: 9px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.notification-item {
+    display: flex;
+    gap: 10px;
+    padding: 13px 15px;
+    border-bottom: 1px solid #f0f2f6;
+}
+
+.notification-item:hover {
+    background: #f8faff;
+}
+
+.notification-icon {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.notification-icon.blue {
+    background: #eaf1ff;
+    color: #2563eb;
+}
+
+.notification-icon.green {
+    background: #e7f8ef;
+    color: #0ca763;
+}
+
+.notification-icon.orange {
+    background: #fff0df;
+    color: #f28a17;
+}
+
+.notification-item strong {
+    display: block;
+    font-size: 10px;
+    color: #1c2942;
+}
+
+.notification-item p {
+    margin-top: 3px;
+    font-size: 8px;
+    line-height: 1.4;
+    color: #7d899d;
+}
+
+.notification-item small {
+    display: block;
+    margin-top: 4px;
+    font-size: 7px;
+    color: #a0aabb;
+}
+
+.no-notifications {
+    display: none;
+    text-align: center;
+    padding: 25px;
+    font-size: 10px;
+    color: #8995a8;
+}
+
+
+/* Admin Profile Popup */
+
+.admin-popup {
+    position: absolute;
+    top: 48px;
+    right: 0;
+    width: 235px;
+    background: #ffffff;
+    border: 1px solid #e3e8f1;
+    border-radius: 12px;
+    box-shadow: 0 12px 35px rgba(20, 35, 70, 0.15);
+    z-index: 2000;
+    display: none;
+    overflow: hidden;
+    padding: 7px;
+}
+
+.admin-popup.show {
+    display: block;
+}
+
+.admin-popup-profile {
+    padding: 11px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.large-avatar {
+    width: 39px;
+    height: 39px;
+    border-radius: 50%;
+    background: #2563eb;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.admin-popup-profile strong {
+    display: block;
+    font-size: 11px;
+    color: #17233d;
+}
+
+.admin-popup-profile span {
+    display: block;
+    margin-top: 3px;
+    font-size: 8px;
+    color: #8995a8;
+}
+
+.popup-divider {
+    height: 1px;
+    background: #edf0f5;
+    margin: 5px 0;
+}
+
+.admin-popup a,
+.admin-popup button {
+    width: 100%;
+    height: 36px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    background: transparent;
+    border-radius: 7px;
+    color: #44536d;
+    font-size: 10px;
+    text-decoration: none;
+    cursor: pointer;
+    text-align: left;
+}
+
+.admin-popup a:hover {
+    background: #f3f6fc;
+    color: #2563eb;
+}
+
+.admin-popup a i,
+.admin-popup button i {
+    width: 17px;
+    text-align: center;
+}
+
+.popup-logout {
+    color: #df3d55 !important;
+}
+
+.popup-logout:hover {
+    background: #fff1f3 !important;
+}
+
+
+/* Top buttons */
+
+.notification-btn,
+.admin-account {
+    cursor: pointer;
+}
+
+
+/* Mobile */
+
+@media (max-width: 650px) {
+
+    .notification-popup {
+        right: -70px;
+        width: 290px;
+    }
+
+    .admin-popup {
+        right: -10px;
+        width: 220px;
+    }
+
+}
+
+/* =========================================================
+   ADMIN BOOKINGS - CLEAN TABLE DESIGN
+========================================================= */
+
+.booking-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    background: #ffffff;
+    border-radius: 14px;
+}
+
+.booking-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1050px;
+}
+
+.booking-table thead {
+    background: #f5f8fc;
+}
+
+.booking-table th {
+    padding: 15px 12px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    color: #17336f;
+    border-bottom: 1px solid #e5ebf4;
+    white-space: nowrap;
+}
+
+.booking-table td {
+    padding: 13px 12px;
+    border-bottom: 1px solid #edf1f6;
+    vertical-align: middle;
+    font-size: 13px;
+    color: #334155;
+}
+
+.booking-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.booking-table tbody tr:hover {
+    background: #f8fbff;
+}
+
+.booking-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* NUMBER */
+
+.booking-number {
+    font-weight: 700;
+    color: #64748b;
+    width: 35px;
+}
+
+
+/* EVENT */
+
+.booking-event {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 190px;
+}
+
+.booking-event img {
+    width: 52px;
+    height: 52px;
+    border-radius: 9px;
+    object-fit: cover;
+    border: 1px solid #e5eaf2;
+}
+
+.booking-event div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.booking-event strong {
+    color: #12306d;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.booking-event span {
+    color: #7b8ba8;
+    font-size: 11px;
+}
+
+
+/* CUSTOMER */
+
+.booking-customer {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 175px;
+}
+
+.booking-customer strong {
+    color: #172554;
+    font-size: 13px;
+}
+
+.booking-customer span {
+    color: #71809b;
+    font-size: 11px;
+}
+
+
+/* DATE */
+
+.booking-date {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 105px;
+}
+
+.booking-date strong {
+    color: #243b70;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.booking-date strong i {
+    color: #2563eb;
+    margin-right: 4px;
+}
+
+.booking-date span {
+    color: #7a89a4;
+    font-size: 11px;
+    padding-left: 17px;
+}
+
+
+/* SEATS */
+
+.booking-seats {
+    font-weight: 700;
+    color: #172554 !important;
+    text-align: center;
+}
+
+
+/* AMOUNT */
+
+.booking-amount {
+    font-weight: 700;
+    color: #173b82 !important;
+    white-space: nowrap;
+}
+
+
+/* PAYMENT BADGES */
+
+.payment-badge,
+.booking-status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.payment-paid {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.payment-partial {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.payment-unpaid {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+
+/* BOOKING STATUS */
+
+.booking-approved {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.booking-pending {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.booking-rejected {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+
+/* ACTION BUTTONS */
+
+.booking-action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+}
+
+.booking-view-btn,
+.booking-menu-btn,
+.booking-approve-small,
+.booking-reject-small {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid #dce5f2;
+    background: #ffffff;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.booking-view-btn {
+    color: #2563eb;
+}
+
+.booking-menu-btn {
+    color: #475569;
+}
+
+.booking-approve-small {
+    color: #16a34a;
+}
+
+.booking-reject-small {
+    color: #dc2626;
+}
+
+.booking-view-btn:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+}
+
+.booking-menu-btn:hover {
+    background: #f8fafc;
+}
+
+.booking-approve-small:hover {
+    background: #f0fdf4;
+    border-color: #86efac;
+}
+
+.booking-reject-small:hover {
+    background: #fef2f2;
+    border-color: #fca5a5;
+}
+
+
+/* EMPTY */
+
+.booking-empty {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.booking-empty-icon {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 15px;
+    border-radius: 14px;
+    background: #eff6ff;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 23px;
+}
+
+.booking-empty h3 {
+    margin: 0 0 7px;
+    color: #172554;
+    font-size: 18px;
+}
+
+.booking-empty p {
+    margin: 0;
+    color: #71809b;
+    font-size: 13px;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 900px) {
+
+    .booking-table-wrapper {
+        overflow-x: auto;
+    }
+
+}
+
+/* =====================================================
+   ADMIN BOOKING DETAILS MODAL
+===================================================== */
+
+.admin-booking-modal-overlay,
+.admin-reject-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(15, 23, 42, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(3px);
+}
+
+
+.admin-booking-modal {
+    width: 100%;
+    max-width: 850px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
+}
+
+
+.admin-booking-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 25px;
+    border-bottom: 1px solid #e7edf5;
+}
+
+
+.admin-booking-modal-header span {
+    font-size: 11px;
+    font-weight: 700;
+    color: #2563eb;
+    letter-spacing: 0.5px;
+}
+
+
+.admin-booking-modal-header h2 {
+    margin: 5px 0 0;
+    font-size: 22px;
+    color: #172554;
+}
+
+
+.admin-modal-close {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 9px;
+    background: #f1f5f9;
+    color: #475569;
+    cursor: pointer;
+}
+
+
+.admin-booking-modal-body {
+    padding: 22px 25px;
+}
+
+
+.admin-detail-section {
+    margin-bottom: 22px;
+}
+
+
+.admin-detail-section h3 {
+    margin: 0 0 14px;
+    color: #172554;
+    font-size: 15px;
+}
+
+
+.admin-detail-section h3 i {
+    color: #2563eb;
+    margin-right: 7px;
+}
+
+
+.admin-detail-grid,
+.admin-payment-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+
+.admin-detail-grid > div,
+.admin-payment-grid > div {
+    padding: 14px;
+    border: 1px solid #e3eaf3;
+    border-radius: 10px;
+    background: #f8fafc;
+}
+
+
+.admin-detail-grid label,
+.admin-payment-grid label {
+    display: block;
+    margin-bottom: 5px;
+    color: #71809b;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+.admin-detail-grid strong,
+.admin-payment-grid strong {
+    color: #172554;
+    font-size: 13px;
+    word-break: break-word;
+}
+
+
+.paid-value {
+    color: #16a34a !important;
+}
+
+
+.due-value {
+    color: #dc2626 !important;
+}
+
+
+.admin-requirements {
+    margin: 0;
+    padding: 14px;
+    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px solid #e3eaf3;
+    color: #475569;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+
+.admin-booking-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 15px 25px;
+    border-top: 1px solid #e7edf5;
+}
+
+
+.admin-modal-close.secondary {
+    width: auto;
+    padding: 0 18px;
+    background: #2563eb;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+
+/* =====================================================
+   REJECT MODAL
+===================================================== */
+
+.admin-reject-modal {
+    width: 100%;
+    max-width: 430px;
+    padding: 25px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
+}
+
+
+.reject-icon {
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #fee2e2;
+    color: #dc2626;
+    font-size: 19px;
+    margin-bottom: 14px;
+}
+
+
+.admin-reject-modal h2 {
+    margin: 0 0 7px;
+    color: #172554;
+    font-size: 21px;
+}
+
+
+.admin-reject-modal p {
+    margin: 0 0 18px;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+
+.admin-reject-modal label {
+    display: block;
+    margin-bottom: 7px;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+.admin-reject-modal label span {
+    color: #dc2626;
+}
+
+
+.admin-reject-modal textarea {
+    width: 100%;
+    min-height: 105px;
+    padding: 11px;
+    box-sizing: border-box;
+    resize: vertical;
+    border: 1px solid #d8e0eb;
+    border-radius: 9px;
+    outline: none;
+    font-family: inherit;
+    font-size: 13px;
+}
+
+
+.admin-reject-modal textarea:focus {
+    border-color: #2563eb;
+}
+
+
+.reject-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 9px;
+    margin-top: 18px;
+}
+
+
+.reject-modal-actions button {
+    height: 38px;
+    padding: 0 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+#closeAdminReject {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+
+#confirmAdminReject {
+    background: #dc2626;
+    color: #ffffff;
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 650px) {
+
+    .admin-booking-modal-overlay,
+    .admin-reject-overlay {
+        padding: 10px;
+    }
+
+
+    .admin-detail-grid,
+    .admin-payment-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .admin-booking-modal-header,
+    .admin-booking-modal-body {
+        padding: 18px;
+    }
+
+
+    .admin-booking-modal-header h2 {
+        font-size: 18px;
+    }
+
+}
+
+/* =========================================================
+   ADMIN TOP RIGHT BUTTONS
+========================================================= */
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+}
+
+
+/* Notification button */
+
+.topbar-icon-btn {
+    width: 44px;
+    height: 44px;
+
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+
+    border-radius: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+
+    color: #2563eb;
+
+    cursor: pointer;
+
+    font-size: 18px;
+
+    transition: 0.2s ease;
+}
+
+.topbar-icon-btn:hover {
+    background: #f1f5ff;
+    border-color: #c7d7fe;
+}
+
+
+/* Notification red number */
+
+.notification-badge {
+    position: absolute;
+
+    top: -4px;
+    right: -4px;
+
+    min-width: 18px;
+    height: 18px;
+
+    padding: 0 5px;
+
+    border-radius: 20px;
+
+    background: #ef4444;
+    color: white;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 2px solid white;
+}
+
+
+/* Admin button */
+
+.admin-profile-btn {
+    height: 44px;
+
+    padding: 5px 12px 5px 6px;
+
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+
+    border-radius: 12px;
+
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    cursor: pointer;
+
+    color: #172554;
+
+    font-weight: 700;
+
+    transition: 0.2s ease;
+}
+
+.admin-profile-btn:hover {
+    background: #f8fafc;
+    border-color: #c7d7fe;
+}
+
+
+.admin-avatar-small {
+    width: 32px;
+    height: 32px;
+
+    border-radius: 50%;
+
+    background: #6957e8;
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-weight: 700;
+}
+
+
+.admin-profile-btn i {
+    font-size: 11px;
+    margin-left: 4px;
+}
+
+
+/* =========================================================
+   POPUPS
+========================================================= */
+
+.admin-floating-popup {
+    position: fixed;
+
+    top: 76px;
+    right: 25px;
+
+    width: 330px;
+
+    background: white;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 15px 40px rgba(15, 23, 42, 0.16);
+
+    z-index: 99999;
+
+    display: none;
+
+    overflow: hidden;
+}
+
+.admin-floating-popup.show {
+    display: block;
+}
+
+
+/* Popup header */
+
+.admin-popup-header {
+    padding: 15px 18px;
+
+    border-bottom: 1px solid #eef2f7;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.admin-popup-header strong {
+    color: #172554;
+    font-size: 15px;
+}
+
+.admin-popup-close {
+    border: none;
+    background: transparent;
+
+    color: #64748b;
+
+    font-size: 18px;
+
+    cursor: pointer;
+}
+
+
+/* Notification item */
+
+.admin-notification-item {
+    padding: 14px 18px;
+
+    display: flex;
+    gap: 12px;
+
+    border-bottom: 1px solid #f1f5f9;
+
+    cursor: pointer;
+}
+
+.admin-notification-item:hover {
+    background: #f8fafc;
+}
+
+.admin-notification-icon {
+    width: 34px;
+    height: 34px;
+
+    flex-shrink: 0;
+
+    border-radius: 9px;
+
+    background: #eff6ff;
+
+    color: #2563eb;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-notification-text strong {
+    display: block;
+
+    font-size: 13px;
+
+    color: #172554;
+
+    margin-bottom: 3px;
+}
+
+.admin-notification-text span {
+    display: block;
+
+    font-size: 11px;
+
+    color: #64748b;
+}
+
+
+/* Admin profile popup */
+
+.admin-profile-popup {
+    padding: 18px;
+}
+
+
+.admin-profile-popup-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding-bottom: 15px;
+
+    border-bottom: 1px solid #eef2f7;
+}
+
+
+.admin-large-avatar {
+    width: 45px;
+    height: 45px;
+
+    border-radius: 50%;
+
+    background: #6957e8;
+
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 18px;
+    font-weight: 700;
+}
+
+
+.admin-profile-popup-header strong {
+    display: block;
+
+    color: #172554;
+
+    font-size: 14px;
+}
+
+.admin-profile-popup-header span {
+    display: block;
+
+    color: #64748b;
+
+    font-size: 11px;
+
+    margin-top: 3px;
+}
+
+
+/* Popup links */
+
+.admin-popup-link {
+    width: 100%;
+
+    padding: 12px 4px;
+
+    border: none;
+    background: transparent;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    color: #334155;
+
+    font-size: 13px;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    text-align: left;
+}
+
+.admin-popup-link:hover {
+    color: #2563eb;
+    background: #f8fafc;
+}
+
+
+.admin-popup-link i {
+    width: 18px;
+
+    text-align: center;
+}
+
+
+.admin-popup-logout {
+    color: #dc2626;
+}
+
+
+/* Mobile */
+
+@media (max-width: 600px) {
+
+    .admin-profile-name {
+        display: none;
+    }
+
+    .admin-profile-btn {
+        padding-right: 7px;
+    }
+
+    .admin-floating-popup {
+        right: 12px;
+        width: calc(100% - 24px);
+        max-width: 330px;
+    }
+}
+
+/* =========================================
+   ADMIN TOP RIGHT POPUPS
+========================================= */
+
+.top-right {
+    position: relative;
+}
+
+
+/* COMMON POPUP */
+
+.admin-top-popup {
+    position: absolute;
+    top: 54px;
+    right: 0;
+    background: white;
+    border: 1px solid #dfe5ee;
+    border-radius: 10px;
+    box-shadow: 0 12px 30px rgba(20, 45, 90, 0.15);
+    display: none;
+    z-index: 9999;
+}
+
+.admin-top-popup.show {
+    display: block;
+}
+
+
+/* NOTIFICATION */
+
+.notification-popup-box {
+    width: 310px;
+    overflow: hidden;
+}
+
+.popup-title {
+    height: 48px;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.popup-title strong {
+    font-size: 13px;
+    color: #1d315f;
+}
+
+.popup-title button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: #7b879c;
+    font-size: 14px;
+}
+
+
+.popup-notification {
+    display: flex;
+    gap: 10px;
+    padding: 13px 15px;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.popup-notification-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.popup-notification-icon.blue {
+    background: #eaf2ff;
+    color: #1765ed;
+}
+
+.popup-notification-icon.green {
+    background: #e3f8ec;
+    color: #15945a;
+}
+
+.popup-notification-icon.orange {
+    background: #fff2d9;
+    color: #d88b00;
+}
+
+.popup-notification strong {
+    display: block;
+    font-size: 11px;
+    color: #243866;
+    margin-bottom: 3px;
+}
+
+.popup-notification p {
+    margin: 0;
+    font-size: 10px;
+    color: #7b89a3;
+    line-height: 1.4;
+}
+
+
+.popup-footer {
+    padding: 10px 15px;
+    text-align: center;
+}
+
+.popup-footer button {
+    border: none;
+    background: transparent;
+    color: #1765ed;
+    cursor: pointer;
+    font-size: 10px;
+}
+
+
+/* ACCOUNT POPUP */
+
+.account-popup-box {
+    width: 235px;
+    overflow: hidden;
+}
+
+.account-popup-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+}
+
+.account-popup-avatar {
+    width: 39px;
+    height: 39px;
+    border-radius: 50%;
+    background: #6655e9;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.account-popup-header strong {
+    display: block;
+    font-size: 12px;
+    color: #1d315f;
+}
+
+.account-popup-header span {
+    display: block;
+    margin-top: 3px;
+    font-size: 10px;
+    color: #7b89a3;
+}
+
+
+.popup-divider {
+    height: 1px;
+    background: #edf0f5;
+}
+
+
+.account-popup-box a,
+.account-popup-box button {
+    width: 100%;
+    height: 40px;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    background: white;
+    text-decoration: none;
+    color: #34456c;
+    font-size: 11px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.account-popup-box a:hover,
+.account-popup-box button:hover {
+    background: #f5f7fb;
+}
+
+.account-popup-box a i,
+.account-popup-box button i {
+    width: 16px;
+    text-align: center;
+}
+
+.logout-popup-button {
+    color: #e23845 !important;
+}

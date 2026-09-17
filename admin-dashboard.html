@@ -5,149 +5,113 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Admin Dashboard - EventSphere</title>
 
-    <link rel="stylesheet"
-          href="css/style.css">
-
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
 
     <style>
 
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
-
 
         body {
             font-family:
                 Inter,
-                -apple-system,
-                BlinkMacSystemFont,
                 "Segoe UI",
+                Arial,
                 sans-serif;
 
             background: #f5f7fb;
+            color: #14213d;
+        }
 
-            color: #172033;
+        a {
+            text-decoration: none;
+        }
 
-            overflow-x: hidden;
+        button,
+        input,
+        select,
+        textarea {
+            font-family: inherit;
         }
 
 
-        /* =====================================================
-           MAIN LAYOUT
-        ===================================================== */
+        /* =========================
+           LAYOUT
+        ========================= */
 
         .admin-layout {
             min-height: 100vh;
-
             display: flex;
         }
 
 
-        /* =====================================================
+        /* =========================
            SIDEBAR
-        ===================================================== */
+        ========================= */
 
         .admin-sidebar {
-            width: 260px;
-
-            min-height: 100vh;
-
-            position: fixed;
-
-            left: 0;
-            top: 0;
-
-            background:
-                linear-gradient(
-                    180deg,
-                    #101b46 0%,
-                    #182a67 55%,
-                    #223b82 100%
-                );
-
+            width: 225px;
+            min-width: 225px;
+            background: #10245a;
             color: white;
 
-            padding: 24px 16px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
 
             z-index: 1000;
 
-            box-shadow:
-                8px 0 30px rgba(
-                    16,
-                    27,
-                    70,
-                    0.12
-                );
+            display: flex;
+            flex-direction: column;
         }
 
 
-        .admin-brand {
+        .sidebar-brand {
+            height: 82px;
+            padding: 18px 20px;
+
             display: flex;
-
             align-items: center;
-
-            gap: 12px;
-
-            padding: 8px 12px 28px;
+            gap: 11px;
 
             border-bottom:
-                1px solid
-                rgba(
-                    255,
-                    255,
-                    255,
-                    0.12
-                );
+                1px solid rgba(255,255,255,0.10);
         }
 
 
         .brand-icon {
-            width: 44px;
-            height: 44px;
+            width: 38px;
+            height: 38px;
 
-            border-radius: 13px;
+            border-radius: 10px;
+
+            background: #3b82f6;
 
             display: flex;
-
             align-items: center;
             justify-content: center;
 
-            background:
-                linear-gradient(
-                    135deg,
-                    #6c63ff,
-                    #8f7cff
-                );
-
-            font-size: 20px;
-
-            box-shadow:
-                0 8px 22px
-                rgba(
-                    108,
-                    99,
-                    255,
-                    0.35
-                );
+            font-size: 19px;
         }
 
 
         .brand-text h2 {
-            font-size: 19px;
-
-            font-weight: 800;
-
-            letter-spacing: -0.3px;
+            font-size: 17px;
+            font-weight: 700;
         }
 
 
@@ -156,267 +120,726 @@
 
             margin-top: 2px;
 
-            color:
-                rgba(
-                    255,
-                    255,
-                    255,
-                    0.55
-                );
+            font-size: 9px;
+            letter-spacing: 0.7px;
 
-            font-size: 11px;
-
+            color: #b9c7e7;
             font-weight: 600;
+        }
 
-            text-transform: uppercase;
+
+        .sidebar-menu {
+            padding: 18px 12px;
+            flex: 1;
+        }
+
+
+        .menu-label {
+            color: #91a4d0;
+
+            font-size: 9px;
+            font-weight: 700;
 
             letter-spacing: 1px;
+
+            padding:
+                14px 12px 8px;
+
+            text-transform: uppercase;
         }
 
 
-        /* =====================================================
-           SIDEBAR NAVIGATION
-        ===================================================== */
-
-        .admin-nav {
-            list-style: none;
-
-            margin-top: 28px;
-        }
-
-
-        .admin-nav li {
-            margin-bottom: 7px;
-        }
-
-
-        .admin-nav a {
+        .sidebar-menu a {
             display: flex;
-
             align-items: center;
 
-            gap: 13px;
+            gap: 12px;
 
-            padding: 13px 14px;
+            color: #dce5fa;
 
-            color:
-                rgba(
-                    255,
-                    255,
-                    255,
-                    0.72
-                );
+            padding: 10px 12px;
 
-            text-decoration: none;
+            margin-bottom: 3px;
 
-            border-radius: 12px;
+            border-radius: 8px;
 
-            font-size: 14px;
+            font-size: 12px;
+            font-weight: 500;
 
-            font-weight: 600;
-
-            transition:
-                all 0.25s ease;
+            transition: 0.2s ease;
         }
 
 
-        .admin-nav a i {
-            width: 20px;
+        .sidebar-menu a i {
+            width: 17px;
 
             text-align: center;
 
-            font-size: 15px;
+            font-size: 13px;
         }
 
 
-        .admin-nav a:hover {
-            color: white;
-
+        .sidebar-menu a:hover {
             background:
-                rgba(
-                    255,
-                    255,
-                    255,
-                    0.09
-                );
+                rgba(255,255,255,0.08);
 
-            transform:
-                translateX(3px);
+            color: white;
         }
 
 
-        .admin-nav .active a {
-            color: white;
+        .sidebar-menu a.active {
+            background: #5366f5;
 
-            background:
-                linear-gradient(
-                    135deg,
-                    #665df5,
-                    #8378ff
-                );
+            color: white;
 
             box-shadow:
-                0 8px 22px
-                rgba(
-                    102,
-                    93,
-                    245,
-                    0.28
-                );
+                0 5px 15px
+                rgba(83,102,245,0.25);
         }
 
 
-        .nav-section-title {
-            padding:
-                18px 14px
-                8px;
+        /* =========================
+           SIDEBAR PROFILE
+        ========================= */
 
-            color:
-                rgba(
-                    255,
-                    255,
-                    255,
-                    0.35
-                );
-
-            font-size: 10px;
-
-            font-weight: 800;
-
-            letter-spacing: 1.2px;
-
-            text-transform: uppercase;
-        }
-
-
-        /* =====================================================
-           SIDEBAR BOTTOM
-        ===================================================== */
-
-        .sidebar-bottom {
-            position: absolute;
-
-            left: 16px;
-            right: 16px;
-            bottom: 22px;
-
-            padding-top: 16px;
+        .sidebar-profile {
+            padding: 15px;
 
             border-top:
-                1px solid
-                rgba(
-                    255,
-                    255,
-                    255,
-                    0.1
-                );
+                1px solid rgba(255,255,255,0.10);
+
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
         }
 
 
-        .admin-profile-mini {
+        .profile-avatar {
+            width: 34px;
+            height: 34px;
+
+            border-radius: 50%;
+
+            background: #6d5dfc;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 14px;
+        }
+
+
+        .profile-info strong {
+            display: block;
+
+            font-size: 11px;
+
+            color: white;
+        }
+
+
+        .profile-info span {
+            display: block;
+
+            margin-top: 2px;
+
+            font-size: 9px;
+
+            color: #9fb0d3;
+        }
+
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .admin-main {
+            margin-left: 225px;
+
+            width:
+                calc(100% - 225px);
+
+            min-height: 100vh;
+        }
+
+
+        /* =========================
+           TOPBAR
+        ========================= */
+
+        .topbar {
+            height: 66px;
+
+            background: white;
+
+            border-bottom:
+                1px solid #e7ebf3;
+
             display: flex;
 
             align-items: center;
 
-            gap: 11px;
+            justify-content:
+                space-between;
 
-            padding: 10px;
+            padding:
+                0 30px;
         }
 
 
-        .admin-avatar {
-            width: 38px;
+        .search-box {
+            width: 405px;
             height: 38px;
 
+            border:
+                1px solid #e2e7f0;
+
+            border-radius: 9px;
+
+            display: flex;
+            align-items: center;
+
+            padding:
+                0 13px;
+
+            color: #3468e8;
+
+            background: #fbfcff;
+        }
+
+
+        .search-box i {
+            font-size: 14px;
+
+            margin-right: 10px;
+        }
+
+
+        .search-box input {
+            border: none;
+            outline: none;
+
+            background: transparent;
+
+            width: 100%;
+
+            font-size: 12px;
+
+            color: #263653;
+        }
+
+
+        .search-box input::placeholder {
+            color: #9aa6ba;
+        }
+
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+
+            gap: 18px;
+        }
+
+
+        /* =========================
+           NOTIFICATION BUTTON
+        ========================= */
+
+        .topbar-popup-container {
+            position: relative;
+        }
+
+
+        .notification-btn {
+            width: 36px;
+            height: 36px;
+
+            border:
+                1px solid #e4e8f0;
+
+            background: white;
+
             border-radius: 50%;
+
+            position: relative;
+
+            color: #233557;
+
+            cursor: pointer;
+        }
+
+
+        .notification-btn:hover {
+            background: #f5f8ff;
+        }
+
+
+        .notification-count {
+            position: absolute;
+
+            right: -2px;
+            top: -3px;
+
+            min-width: 15px;
+            height: 15px;
+
+            padding:
+                0 4px;
+
+            border-radius: 20px;
+
+            background: #e83e57;
+
+            color: white;
+
+            font-size: 8px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        /* =========================
+           ADMIN BUTTON
+        ========================= */
+
+        .admin-account {
+            height: 38px;
+
+            padding:
+                0 10px 0 5px;
+
+            border:
+                1px solid #e4e8f0;
+
+            background: white;
+
+            border-radius: 20px;
+
+            display: flex;
+            align-items: center;
+
+            gap: 8px;
+
+            color: #162650;
+
+            font-size: 12px;
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+
+        .admin-account:hover {
+            background: #f7f9fd;
+        }
+
+
+        .account-avatar {
+            width: 28px;
+            height: 28px;
+
+            border-radius: 50%;
+
+            background: #2563eb;
+
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 12px;
+        }
+
+
+        /* =========================
+           NOTIFICATION POPUP
+        ========================= */
+
+        .notification-popup {
+            position: absolute;
+
+            top: 48px;
+            right: -8px;
+
+            width: 320px;
+
+            background: white;
+
+            border:
+                1px solid #e3e8f1;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 15px 40px
+                rgba(20,35,70,0.15);
+
+            z-index: 2000;
+
+            display: none;
+
+            overflow: hidden;
+        }
+
+
+        .notification-popup.show {
+            display: block;
+        }
+
+
+        .popup-header {
+            padding: 14px 16px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content:
+                space-between;
+
+            border-bottom:
+                1px solid #edf0f5;
+        }
+
+
+        .popup-header strong {
+            display: block;
+
+            font-size: 13px;
+
+            color: #17233d;
+        }
+
+
+        .popup-header span {
+            display: block;
+
+            margin-top: 3px;
+
+            font-size: 9px;
+
+            color: #8995a8;
+        }
+
+
+        .popup-header button {
+            border: none;
+
+            background: transparent;
+
+            color: #3268e8;
+
+            font-size: 9px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+
+        .notification-item {
+            display: flex;
+
+            gap: 10px;
+
+            padding: 13px 15px;
+
+            border-bottom:
+                1px solid #f0f2f6;
+        }
+
+
+        .notification-item:hover {
+            background: #f8faff;
+        }
+
+
+        .notification-icon {
+            width: 32px;
+            height: 32px;
+
+            min-width: 32px;
+
+            border-radius: 8px;
 
             display: flex;
 
             align-items: center;
             justify-content: center;
 
-            background:
-                linear-gradient(
-                    135deg,
-                    #8a7cff,
-                    #6258e8
-                );
-
-            font-size: 15px;
+            font-size: 12px;
         }
 
 
-        .admin-profile-mini strong {
+        .notification-icon.blue {
+            background: #eaf1ff;
+            color: #2563eb;
+        }
+
+
+        .notification-icon.green {
+            background: #e7f8ef;
+            color: #0ca763;
+        }
+
+
+        .notification-icon.orange {
+            background: #fff0df;
+            color: #f28a17;
+        }
+
+
+        .notification-item strong {
             display: block;
 
-            color: white;
+            font-size: 10px;
 
-            font-size: 13px;
+            color: #1c2942;
         }
 
 
-        .admin-profile-mini span {
+        .notification-item p {
+            margin-top: 3px;
+
+            font-size: 8px;
+
+            line-height: 1.4;
+
+            color: #7d899d;
+        }
+
+
+        .notification-item small {
             display: block;
 
-            margin-top: 2px;
+            margin-top: 4px;
 
-            color:
-                rgba(
-                    255,
-                    255,
-                    255,
-                    0.48
-                );
+            font-size: 7px;
 
-            font-size: 11px;
+            color: #a0aabb;
         }
 
 
-        /* =====================================================
-           MAIN CONTENT
-        ===================================================== */
+        .no-notifications {
+            display: none;
 
-        .admin-main {
-            width: calc(100% - 260px);
+            text-align: center;
 
-            margin-left: 260px;
+            padding: 25px;
 
-            min-height: 100vh;
+            font-size: 10px;
 
-            padding: 28px 34px 50px;
+            color: #8995a8;
         }
 
 
-        /* =====================================================
-           TOPBAR
-        ===================================================== */
+        /* =========================
+           ADMIN POPUP
+        ========================= */
 
-        .admin-topbar {
+        .admin-popup {
+            position: absolute;
+
+            top: 48px;
+            right: 0;
+
+            width: 235px;
+
+            background: white;
+
+            border:
+                1px solid #e3e8f1;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 15px 40px
+                rgba(20,35,70,0.15);
+
+            z-index: 2000;
+
+            display: none;
+
+            overflow: hidden;
+
+            padding: 7px;
+        }
+
+
+        .admin-popup.show {
+            display: block;
+        }
+
+
+        .admin-popup-profile {
+            padding: 11px;
+
             display: flex;
-
-            justify-content: space-between;
 
             align-items: center;
 
-            margin-bottom: 30px;
+            gap: 10px;
         }
 
 
-        .breadcrumb {
-            color: #7b8499;
+        .large-avatar {
+            width: 39px;
+            height: 39px;
 
-            font-size: 13px;
+            border-radius: 50%;
 
-            font-weight: 600;
+            background: #2563eb;
+
+            color: white;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            font-size: 14px;
+
+            font-weight: 700;
         }
 
 
-        .breadcrumb span {
-            color: #172033;
+        .admin-popup-profile strong {
+            display: block;
+
+            font-size: 11px;
+
+            color: #17233d;
         }
 
 
-        .topbar-right {
+        .admin-popup-profile span {
+            display: block;
+
+            margin-top: 3px;
+
+            font-size: 8px;
+
+            color: #8995a8;
+        }
+
+
+        .popup-divider {
+            height: 1px;
+
+            background: #edf0f5;
+
+            margin: 5px 0;
+        }
+
+
+        .admin-popup a,
+        .admin-popup button {
+            width: 100%;
+            height: 36px;
+
+            padding: 0 10px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            border: none;
+
+            background: transparent;
+
+            border-radius: 7px;
+
+            color: #44536d;
+
+            font-size: 10px;
+
+            text-decoration: none;
+
+            cursor: pointer;
+
+            text-align: left;
+        }
+
+
+        .admin-popup a:hover {
+            background: #f3f6fc;
+
+            color: #2563eb;
+        }
+
+
+        .admin-popup a i,
+        .admin-popup button i {
+            width: 17px;
+
+            text-align: center;
+        }
+
+
+        .popup-logout {
+            color: #df3d55 !important;
+        }
+
+
+        .popup-logout:hover {
+            background: #fff1f3 !important;
+        }
+
+
+        /* =========================
+           CONTENT
+        ========================= */
+
+        .content {
+            padding:
+                25px 28px 30px;
+        }
+
+
+        .welcome-row {
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            margin-bottom: 20px;
+        }
+
+
+        .welcome-title {
+            font-size: 26px;
+
+            font-weight: 750;
+
+            color: #101d38;
+        }
+
+
+        .welcome-title span {
+            color: #2563eb;
+        }
+
+
+        .welcome-text {
+            margin-top: 5px;
+
+            font-size: 12px;
+
+            color: #71809a;
+        }
+
+
+        .status-area {
             display: flex;
 
             align-items: center;
@@ -425,146 +848,82 @@
         }
 
 
-        .top-icon {
-            width: 42px;
-            height: 42px;
-
-            border-radius: 12px;
-
-            background: white;
-
-            border: 1px solid #e8ebf2;
-
-            display: flex;
-
-            align-items: center;
-            justify-content: center;
-
-            color: #69738a;
-
-            box-shadow:
-                0 4px 14px
-                rgba(
-                    30,
-                    40,
-                    70,
-                    0.04
-                );
-        }
-
-
-        .online-status {
+        .system-status {
             display: flex;
 
             align-items: center;
 
             gap: 7px;
 
-            padding: 9px 13px;
+            background: #effaf4;
 
-            border-radius: 20px;
+            color: #159447;
 
-            background: #ecfdf3;
+            border:
+                1px solid #d7f1e1;
 
-            color: #15803d;
+            border-radius: 9px;
 
-            font-size: 12px;
+            padding:
+                9px 13px;
+
+            font-size: 10px;
 
             font-weight: 700;
         }
 
 
-        .online-dot {
+        .status-dot {
             width: 7px;
             height: 7px;
 
             border-radius: 50%;
 
-            background: #22c55e;
-
-            box-shadow:
-                0 0 0 4px
-                rgba(
-                    34,
-                    197,
-                    94,
-                    0.12
-                );
+            background: #16b364;
         }
 
 
-        /* =====================================================
-           WELCOME SECTION
-        ===================================================== */
-
-        .welcome-section {
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: flex-end;
-
-            margin-bottom: 25px;
-        }
-
-
-        .welcome-section h1 {
-            font-size: 30px;
-
-            line-height: 1.2;
-
-            font-weight: 800;
-
-            letter-spacing: -1px;
-
-            color: #141b2d;
-        }
-
-
-        .welcome-section p {
-            margin-top: 8px;
-
-            color: #7a8498;
-
-            font-size: 14px;
-        }
-
-
-        .admin-date {
-            padding: 10px 15px;
-
+        .date-box {
             background: white;
 
             border:
-                1px solid
-                #e8ebf2;
+                1px solid #e4e8f0;
 
-            border-radius: 12px;
+            border-radius: 9px;
 
-            color: #69738a;
+            padding:
+                8px 13px;
 
-            font-size: 12px;
+            display: flex;
 
-            font-weight: 600;
+            align-items: center;
+
+            gap: 8px;
+
+            color: #64728a;
+
+            font-size: 10px;
         }
 
 
-        /* =====================================================
+        .date-box i {
+            color: #274a9a;
+        }
+
+
+        /* =========================
            STATISTICS
-        ===================================================== */
+        ========================= */
 
         .stats-grid {
             display: grid;
 
             grid-template-columns:
-                repeat(
-                    5,
-                    minmax(0, 1fr)
-                );
+                repeat(4, 1fr);
 
             gap: 16px;
 
-            margin-bottom: 28px;
+            margin-bottom: 18px;
         }
 
 
@@ -572,52 +931,35 @@
             background: white;
 
             border:
-                1px solid
-                #e9ecf3;
+                1px solid #e3e8f1;
 
-            border-radius: 18px;
+            border-radius: 11px;
 
-            padding: 20px;
+            min-height: 135px;
+
+            padding: 17px;
 
             position: relative;
 
             overflow: hidden;
-
-            transition:
-                transform 0.25s ease,
-                box-shadow 0.25s ease;
-        }
-
-
-        .stat-card:hover {
-            transform:
-                translateY(-4px);
-
-            box-shadow:
-                0 14px 35px
-                rgba(
-                    35,
-                    48,
-                    90,
-                    0.08
-                );
         }
 
 
         .stat-top {
             display: flex;
 
-            justify-content: space-between;
-
             align-items: flex-start;
+
+            justify-content:
+                space-between;
         }
 
 
         .stat-icon {
-            width: 43px;
-            height: 43px;
+            width: 42px;
+            height: 42px;
 
-            border-radius: 13px;
+            border-radius: 11px;
 
             display: flex;
 
@@ -628,292 +970,292 @@
         }
 
 
-        .icon-purple {
-            background: #f0edff;
-            color: #6658e8;
-        }
-
-
         .icon-blue {
-            background: #e9f3ff;
-            color: #2878e8;
+            background: #e8f1ff;
+            color: #2563eb;
         }
 
 
         .icon-green {
-            background: #eafbf2;
-            color: #16a05d;
+            background: #e5f8ef;
+            color: #12a263;
         }
 
 
         .icon-orange {
-            background: #fff4e6;
-            color: #e88917;
+            background: #fff1df;
+            color: #f28a17;
         }
 
 
         .icon-pink {
-            background: #fff0f6;
-            color: #dc4b8d;
+            background: #ffe8f1;
+            color: #e93d78;
         }
 
 
-        .stat-label {
-            margin-top: 18px;
+        .stat-arrow {
+            width: 28px;
+            height: 28px;
 
-            color: #7d879a;
-
-            font-size: 12px;
-
-            font-weight: 600;
-        }
-
-
-        .stat-number {
-            margin-top: 5px;
-
-            color: #182033;
-
-            font-size: 26px;
-
-            font-weight: 800;
-
-            letter-spacing: -0.5px;
-        }
-
-
-        .stat-card::after {
-            content: "";
-
-            position: absolute;
-
-            width: 80px;
-            height: 80px;
-
-            right: -35px;
-            bottom: -35px;
+            border:
+                1px solid #e4e9f1;
 
             border-radius: 50%;
 
-            background:
-                rgba(
-                    102,
-                    93,
-                    245,
-                    0.035
-                );
-        }
-
-
-        /* =====================================================
-           SECTION CARD
-        ===================================================== */
-
-        .admin-card {
-            background: white;
-
-            border:
-                1px solid
-                #e8ebf2;
-
-            border-radius: 20px;
-
-            padding: 24px;
-
-            margin-bottom: 24px;
-
-            box-shadow:
-                0 5px 20px
-                rgba(
-                    30,
-                    40,
-                    70,
-                    0.035
-                );
-        }
-
-
-        .card-heading {
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            gap: 15px;
-
-            margin-bottom: 6px;
-        }
-
-
-        .card-heading-left {
-            display: flex;
-
-            align-items: center;
-
-            gap: 12px;
-        }
-
-
-        .section-icon {
-            width: 42px;
-            height: 42px;
-
-            border-radius: 12px;
-
             display: flex;
 
             align-items: center;
             justify-content: center;
 
-            background: #f0edff;
-
-            color: #6658e8;
-        }
-
-
-        .card-heading h2 {
-            color: #1a2236;
-
-            font-size: 18px;
-
-            font-weight: 800;
-        }
-
-
-        .card-description {
-            margin:
-                0 0 22px
-                54px;
-
-            color: #8992a5;
-
-            font-size: 13px;
-
-            line-height: 1.6;
-        }
-
-
-        /* =====================================================
-           QUICK ACTIONS
-        ===================================================== */
-
-        .quick-actions {
-            display: grid;
-
-            grid-template-columns:
-                repeat(
-                    3,
-                    1fr
-                );
-
-            gap: 14px;
-
-            margin-bottom: 24px;
-        }
-
-
-        .quick-action {
-            text-decoration: none;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #f7f6ff,
-                    #ffffff
-                );
-
-            border:
-                1px solid
-                #e9e7ff;
-
-            border-radius: 15px;
-
-            padding: 17px;
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 13px;
-
-            transition:
-                all 0.25s ease;
-        }
-
-
-        .quick-action:hover {
-            transform:
-                translateY(-2px);
-
-            border-color:
-                #d8d3ff;
-
-            box-shadow:
-                0 10px 25px
-                rgba(
-                    102,
-                    93,
-                    245,
-                    0.08
-                );
-        }
-
-
-        .quick-action-icon {
-            width: 40px;
-            height: 40px;
-
-            border-radius: 11px;
-
-            display: flex;
-
-            align-items: center;
-            justify-content: center;
-
-            background: #ece9ff;
-
-            color: #6658e8;
-        }
-
-
-        .quick-action strong {
-            display: block;
-
-            color: #252d40;
-
-            font-size: 13px;
-        }
-
-
-        .quick-action span {
-            display: block;
-
-            margin-top: 3px;
-
-            color: #8b94a6;
+            color: #405473;
 
             font-size: 11px;
         }
 
 
-        /* =====================================================
-           FORMS
-        ===================================================== */
+        .stat-card h3 {
+            margin-top: 11px;
 
-        .form-grid {
+            font-size: 10px;
+
+            color: #738099;
+
+            font-weight: 600;
+        }
+
+
+        .stat-value {
+            margin-top: 3px;
+
+            font-size: 24px;
+
+            font-weight: 750;
+
+            color: #12203b;
+        }
+
+
+        .stat-bottom {
+            margin-top: 6px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 5px;
+
+            font-size: 9px;
+        }
+
+
+        .stat-up {
+            color: #0ca763;
+
+            font-weight: 700;
+        }
+
+
+        .stat-small {
+            color: #8793a8;
+        }
+
+
+        /* =========================
+           PANELS
+        ========================= */
+
+        .panel {
+            background: white;
+
+            border:
+                1px solid #e3e8f1;
+
+            border-radius: 11px;
+
+            margin-bottom: 18px;
+
+            padding: 18px;
+        }
+
+
+        .panel-header {
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 10px;
+
+            margin-bottom: 15px;
+        }
+
+
+        .panel-icon {
+            width: 36px;
+            height: 36px;
+
+            border-radius: 10px;
+
+            background: #eaf1ff;
+
+            color: #3268e8;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            font-size: 14px;
+
+            flex-shrink: 0;
+        }
+
+
+        .panel-header h2 {
+            font-size: 14px;
+
+            color: #15223d;
+        }
+
+
+        .panel-header p {
+            margin-top: 3px;
+
+            font-size: 9px;
+
+            color: #8995a9;
+        }
+
+
+        /* =========================
+           QUICK ACTIONS
+        ========================= */
+
+        .quick-actions {
             display: grid;
 
             grid-template-columns:
-                repeat(
-                    2,
-                    minmax(
-                        0,
-                        1fr
-                    )
-                );
+                repeat(3, 1fr);
+
+            gap: 12px;
+        }
+
+
+        .quick-action {
+            height: 67px;
+
+            border:
+                1px solid #e2e7f4;
+
+            background: #fcfdff;
+
+            border-radius: 9px;
+
+            padding: 12px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+        }
+
+
+        .quick-action:hover {
+            border-color: #8ca8ef;
+
+            transform:
+                translateY(-1px);
+        }
+
+
+        .quick-action-icon {
+            width: 32px;
+            height: 32px;
+
+            border-radius: 8px;
+
+            background: #efefff;
+
+            color: #6059e9;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            font-size: 13px;
+        }
+
+
+        .quick-action-text {
+            flex: 1;
+        }
+
+
+        .quick-action-text strong {
+            display: block;
+
+            font-size: 10px;
+
+            color: #162440;
+        }
+
+
+        .quick-action-text span {
+            display: block;
+
+            margin-top: 3px;
+
+            font-size: 8px;
+
+            color: #8995a9;
+        }
+
+
+        .quick-action > i {
+            color: #405b86;
+
+            font-size: 10px;
+        }
+
+
+        /* =========================
+           BOTTOM GRID
+        ========================= */
+
+        .bottom-grid {
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
 
             gap: 18px;
+        }
+
+
+        /* =========================
+           COUPONS
+        ========================= */
+
+        .coupon-icon {
+            background: #ffeaf3;
+
+            color: #e93d78;
+        }
+
+
+        .coupon-form {
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 10px 14px;
         }
 
 
@@ -925,18 +1267,19 @@
 
 
         .form-group.full {
-            grid-column: 1 / -1;
+            grid-column:
+                1 / -1;
         }
 
 
         .form-group label {
-            margin-bottom: 7px;
+            font-size: 9px;
 
-            color: #465066;
+            font-weight: 650;
 
-            font-size: 12px;
+            color: #24334f;
 
-            font-weight: 700;
+            margin-bottom: 5px;
         }
 
 
@@ -946,273 +1289,239 @@
             width: 100%;
 
             border:
-                1px solid
-                #dfe3eb;
+                1px solid #d7dfeb;
 
-            border-radius: 11px;
+            background: #fbfcff;
 
-            background: #fbfcfe;
+            border-radius: 6px;
 
-            padding: 12px 13px;
-
-            color: #20283a;
-
-            font-family: inherit;
-
-            font-size: 13px;
+            padding:
+                8px 10px;
 
             outline: none;
 
-            transition:
-                border 0.2s ease,
-                box-shadow 0.2s ease,
-                background 0.2s ease;
+            color: #263753;
+
+            font-size: 10px;
+        }
+
+
+        .form-group input,
+        .form-group select {
+            height: 34px;
         }
 
 
         .form-group textarea {
-            resize: vertical;
+            min-height: 72px;
 
-            min-height: 105px;
+            resize: vertical;
         }
 
 
         .form-group input:focus,
         .form-group select:focus,
         .form-group textarea:focus {
-            border-color: #756cf4;
+            border-color: #5d7cf1;
 
             background: white;
-
-            box-shadow:
-                0 0 0 4px
-                rgba(
-                    117,
-                    108,
-                    244,
-                    0.09
-                );
         }
 
 
-        .form-help {
-            margin-top: 6px;
+        .form-hint {
+            font-size: 8px;
 
-            color: #98a0b0;
+            color: #9aa5b7;
 
-            font-size: 11px;
+            margin-top: 3px;
         }
 
 
-        /* =====================================================
-           BUTTONS
-        ===================================================== */
+        .coupon-submit {
+            grid-column: 2;
 
-        .button-row {
-            display: flex;
+            justify-self: end;
 
-            gap: 10px;
-
-            align-items: center;
-
-            margin-top: 20px;
+            margin-top: 2px;
         }
 
 
         .primary-btn {
+            height: 36px;
+
+            padding:
+                0 15px;
+
             border: none;
 
-            border-radius: 11px;
+            border-radius: 7px;
 
-            padding: 12px 18px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #6559ed,
-                    #8278ff
-                );
+            background: #2563eb;
 
             color: white;
 
-            font-family: inherit;
-
-            font-size: 13px;
+            font-size: 10px;
 
             font-weight: 700;
 
             cursor: pointer;
 
             box-shadow:
-                0 8px 18px
-                rgba(
-                    101,
-                    89,
-                    237,
-                    0.2
-                );
-
-            transition:
-                all 0.2s ease;
+                0 5px 12px
+                rgba(37,99,235,0.20);
         }
 
 
         .primary-btn:hover {
-            transform:
-                translateY(-1px);
+            background: #1d4ed8;
+        }
 
-            box-shadow:
-                0 11px 24px
-                rgba(
-                    101,
-                    89,
-                    237,
-                    0.27
-                );
+
+        /* =========================
+           MAINTENANCE
+        ========================= */
+
+        .maintenance-icon {
+            background: #fff0dd;
+
+            color: #f28a17;
+        }
+
+
+        .maintenance-form {
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 10px 14px;
+        }
+
+
+        .maintenance-message {
+            grid-column:
+                1 / -1;
+        }
+
+
+        .maintenance-buttons {
+            grid-column:
+                1 / -1;
+
+            display: flex;
+
+            justify-content:
+                flex-end;
+
+            gap: 8px;
+
+            margin-top: 2px;
         }
 
 
         .secondary-btn {
+            height: 36px;
+
+            padding:
+                0 13px;
+
             border:
-                1px solid
-                #dfe3eb;
-
-            border-radius: 11px;
-
-            padding: 11px 17px;
+                1px solid #d9e0eb;
 
             background: white;
 
-            color: #5d6679;
+            color: #46566f;
 
-            font-family: inherit;
+            border-radius: 7px;
 
-            font-size: 13px;
+            font-size: 9px;
 
-            font-weight: 700;
+            font-weight: 650;
 
             cursor: pointer;
-
-            transition:
-                all 0.2s ease;
         }
 
 
         .secondary-btn:hover {
-            background: #f7f8fb;
-
-            border-color: #cdd2dd;
-        }
-
-
-        /* =====================================================
-           MAINTENANCE STATUS
-        ===================================================== */
-
-        #maintenanceStatus {
-            margin-top: 20px;
-
-            padding: 16px;
-
-            border-radius: 13px;
-
             background: #f7f9fc;
+        }
+
+
+        .maintenance-status {
+            grid-column:
+                1 / -1;
+
+            padding: 12px;
+
+            border-radius: 8px;
+
+            background: #effaf5;
 
             border:
-                1px solid
-                #e7eaf0;
+                1px solid #d9f1e4;
 
-            color: #687286;
-
-            font-size: 13px;
-
-            line-height: 1.6;
+            margin-top: 1px;
         }
 
 
-        /* =====================================================
-           MAINTENANCE CARD
-        ===================================================== */
+        .maintenance-status-title {
+            color: #15945a;
 
-        .maintenance-card {
-            border:
-                1px solid
-                #e6e3ff;
+            font-size: 10px;
+
+            font-weight: 700;
         }
 
 
-        .maintenance-card .section-icon {
-            background: #fff4df;
+        .maintenance-status-text {
+            color: #7b8a9e;
 
-            color: #e89a25;
+            font-size: 8px;
+
+            margin-top: 4px;
         }
 
 
-        /* =====================================================
-           COUPON CARD
-        ===================================================== */
-
-        .coupon-card .section-icon {
-            background: #fff0f7;
-
-            color: #d94c8d;
-        }
-
-
-        /* =====================================================
+        /* =========================
            FOOTER
-        ===================================================== */
+        ========================= */
 
-        .admin-footer {
-            text-align: center;
+        .footer {
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            color: #8995a8;
+
+            font-size: 9px;
 
             padding:
-                15px 0 5px;
-
-            color: #a0a7b5;
-
-            font-size: 11px;
+                3px 4px 10px;
         }
 
 
-        /* =====================================================
-           RESPONSIVE
-        ===================================================== */
+        .footer-right {
+            display: flex;
 
-        @media (max-width: 1200px) {
+            gap: 13px;
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 1150px) {
 
             .stats-grid {
                 grid-template-columns:
-                    repeat(
-                        3,
-                        1fr
-                    );
+                    repeat(2, 1fr);
             }
 
-        }
-
-
-        @media (max-width: 900px) {
-
-            .admin-sidebar {
-                width: 220px;
-            }
-
-
-            .admin-main {
-                width:
-                    calc(
-                        100% - 220px
-                    );
-
-                margin-left: 220px;
-
-                padding:
-                    24px 20px 40px;
-            }
-
-
-            .quick-actions {
+            .bottom-grid {
                 grid-template-columns:
                     1fr;
             }
@@ -1220,118 +1529,147 @@
         }
 
 
-        @media (max-width: 700px) {
+        @media (max-width: 800px) {
 
             .admin-sidebar {
-                position: relative;
-
-                width: 100%;
-
-                min-height: auto;
-
-                padding: 15px;
+                width: 190px;
+                min-width: 190px;
             }
-
-
-            .admin-layout {
-                display: block;
-            }
-
 
             .admin-main {
-                width: 100%;
+                margin-left: 190px;
 
-                margin-left: 0;
-
-                padding: 20px 15px 35px;
+                width:
+                    calc(100% - 190px);
             }
 
-
-            .admin-nav {
-                display: grid;
-
+            .quick-actions {
                 grid-template-columns:
-                    repeat(
-                        2,
-                        1fr
-                    );
-
-                gap: 5px;
-
-                margin-top: 15px;
+                    1fr;
             }
 
-
-            .admin-nav li {
-                margin-bottom: 0;
+            .topbar {
+                padding:
+                    0 18px;
             }
 
-
-            .nav-section-title,
-            .sidebar-bottom {
-                display: none;
+            .search-box {
+                width: 280px;
             }
 
-
-            .stats-grid {
-                grid-template-columns:
-                    repeat(
-                        2,
-                        1fr
-                    );
-            }
-
-
-            .welcome-section {
-                align-items: flex-start;
-
-                flex-direction: column;
-
-                gap: 12px;
-            }
-
-
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-
-            .form-group.full {
-                grid-column: auto;
-            }
-
-
-            .card-description {
-                margin-left: 0;
+            .content {
+                padding: 20px;
             }
 
         }
 
 
-        @media (max-width: 450px) {
+        @media (max-width: 650px) {
 
-            .stats-grid {
-                grid-template-columns: 1fr;
+            .admin-sidebar {
+                width: 65px;
+                min-width: 65px;
             }
 
+            .admin-main {
+                margin-left: 65px;
 
-            .admin-topbar {
-                align-items: flex-start;
+                width:
+                    calc(100% - 65px);
             }
 
-
-            .online-status {
+            .brand-text,
+            .sidebar-menu span,
+            .menu-label,
+            .profile-info {
                 display: none;
             }
 
+            .sidebar-brand {
+                justify-content: center;
 
-            .welcome-section h1 {
-                font-size: 25px;
+                padding:
+                    15px 8px;
             }
 
+            .sidebar-menu {
+                padding:
+                    15px 8px;
+            }
 
-            .admin-card {
-                padding: 18px;
+            .sidebar-menu a {
+                justify-content:
+                    center;
+
+                padding: 11px;
+            }
+
+            .sidebar-profile {
+                justify-content:
+                    center;
+
+                padding:
+                    12px 8px;
+            }
+
+            .stats-grid {
+                grid-template-columns:
+                    1fr;
+            }
+
+            .coupon-form,
+            .maintenance-form {
+                grid-template-columns:
+                    1fr;
+            }
+
+            .coupon-submit,
+            .maintenance-message,
+            .maintenance-buttons,
+            .maintenance-status {
+                grid-column: 1;
+            }
+
+            .coupon-submit {
+                justify-self: start;
+            }
+
+            .welcome-row {
+                align-items:
+                    flex-start;
+
+                flex-direction:
+                    column;
+
+                gap: 12px;
+            }
+
+            .status-area {
+                width: 100%;
+            }
+
+            .search-box {
+                width: 200px;
+            }
+
+            .admin-account {
+                display: none;
+            }
+
+            .notification-popup {
+                right: -65px;
+
+                width: 290px;
+            }
+
+            .footer {
+                flex-direction:
+                    column;
+
+                gap: 8px;
+
+                align-items:
+                    flex-start;
             }
 
         }
@@ -1347,18 +1685,18 @@
 <div class="admin-layout">
 
 
-    <!-- =====================================================
+    <!-- =========================
          SIDEBAR
-    ===================================================== -->
+    ========================== -->
 
     <aside class="admin-sidebar">
 
 
-        <div class="admin-brand">
+        <div class="sidebar-brand">
 
             <div class="brand-icon">
 
-                <i class="fa-solid fa-calendar-star"></i>
+                <i class="fa-solid fa-calendar-days"></i>
 
             </div>
 
@@ -1370,7 +1708,7 @@
                 </h2>
 
                 <span>
-                    Admin Panel
+                    ADMIN PANEL
                 </span>
 
             </div>
@@ -1378,979 +1716,1646 @@
         </div>
 
 
-        <ul class="admin-nav">
+
+        <nav class="sidebar-menu">
 
 
-            <li class="active">
+            <a
+                href="admin-dashboard.html"
+                class="active"
+            >
 
-                <a href="admin-dashboard.html">
+                <i class="fa-solid fa-house"></i>
 
-                    <i class="fa-solid fa-grid-2"></i>
+                <span>
+                    Dashboard
+                </span>
 
-                    <span>
-                        Dashboard
-                    </span>
-
-                </a>
-
-            </li>
-
-
-            <li>
-
-                <a href="add-event.html">
-
-                    <i class="fa-solid fa-circle-plus"></i>
-
-                    <span>
-                        Add Event
-                    </span>
-
-                </a>
-
-            </li>
+            </a>
 
 
-            <li>
 
-                <a href="view-events.html">
+            <a href="add-event.html">
 
-                    <i class="fa-solid fa-calendar-days"></i>
+                <i class="fa-solid fa-circle-plus"></i>
 
-                    <span>
-                        View Events
-                    </span>
+                <span>
+                    Add Event
+                </span>
 
-                </a>
-
-            </li>
+            </a>
 
 
-            <li>
 
-                <a href="admin-bookings.html">
+            <a href="view-events.html">
 
-                    <i class="fa-solid fa-ticket"></i>
+                <i class="fa-solid fa-calendar-days"></i>
 
-                    <span>
-                        Bookings
-                    </span>
+                <span>
+                    View Events
+                </span>
 
-                </a>
-
-            </li>
+            </a>
 
 
-            <li>
 
-                <a href="admin-customers.html">
+            <a href="admin-bookings.html">
 
-                    <i class="fa-solid fa-users"></i>
+                <i class="fa-solid fa-ticket"></i>
 
-                    <span>
-                        Customers
-                    </span>
+                <span>
+                    Bookings
+                </span>
 
-                </a>
-
-            </li>
+            </a>
 
 
-            <div class="nav-section-title">
+
+            <a href="admin-customers.html">
+
+                <i class="fa-solid fa-users"></i>
+
+                <span>
+                    Customers
+                </span>
+
+            </a>
+
+
+
+            <div class="menu-label">
                 Management
             </div>
 
 
-            <li>
 
-                <a href="#coupons">
+            <a href="#coupons">
 
-                    <i class="fa-solid fa-ticket-simple"></i>
+                <i class="fa-solid fa-tags"></i>
 
-                    <span>
-                        Discounts & Coupons
-                    </span>
+                <span>
+                    Discounts &amp; Coupons
+                </span>
 
-                </a>
-
-            </li>
+            </a>
 
 
-            <li>
 
-                <a href="#maintenance">
+            <a href="#maintenance">
 
-                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                <i class="fa-solid fa-screwdriver-wrench"></i>
 
-                    <span>
-                        Service Maintenance
-                    </span>
+                <span>
+                    Service Maintenance
+                </span>
 
-                </a>
-
-            </li>
+            </a>
 
 
-            <li>
+            <!-- SIDEBAR LOGOUT REMOVED -->
 
-                <a href="#"
-                   onclick="logout(); return false;">
-
-                    <i class="fa-solid fa-right-from-bracket"></i>
-
-                    <span>
-                        Logout
-                    </span>
-
-                </a>
-
-            </li>
+        </nav>
 
 
-        </ul>
+
+        <div class="sidebar-profile">
+
+            <div class="profile-avatar">
+
+                <i class="fa-solid fa-user"></i>
+
+            </div>
 
 
-        <div class="sidebar-bottom">
+            <div class="profile-info">
 
-            <div class="admin-profile-mini">
+                <strong>
+                    Administrator
+                </strong>
 
-                <div class="admin-avatar">
-
-                    <i class="fa-solid fa-user-shield"></i>
-
-                </div>
-
-
-                <div>
-
-                    <strong>
-                        Administrator
-                    </strong>
-
-                    <span>
-                        EventSphere Admin
-                    </span>
-
-                </div>
+                <span>
+                    EventSphere Admin
+                </span>
 
             </div>
 
         </div>
-
 
     </aside>
 
 
 
-    <!-- =====================================================
+    <!-- =========================
          MAIN
-    ===================================================== -->
+    ========================== -->
 
     <main class="admin-main">
 
 
-        <!-- TOP BAR -->
+        <!-- =========================
+             TOPBAR
+        ========================== -->
 
-        <div class="admin-topbar">
+        <header class="topbar">
 
-            <div class="breadcrumb">
 
-                EventSphere
-                /
-                <span>
-                    Dashboard
+            <div class="search-box">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="text"
+                    placeholder="Search anything..."
+                >
+
+            </div>
+
+
+
+            <div class="topbar-right">
+
+
+                <!-- NOTIFICATIONS -->
+
+                <div class="topbar-popup-container">
+
+
+                    <button
+                        class="notification-btn"
+                        type="button"
+                        id="notificationBtn"
+                    >
+
+                        <i class="fa-regular fa-bell"></i>
+
+                        <span
+                            class="notification-count"
+                            id="notificationCount"
+                        >
+                            3
+                        </span>
+
+                    </button>
+
+
+
+                    <div
+                        class="notification-popup"
+                        id="notificationPopup"
+                    >
+
+
+                        <div class="popup-header">
+
+                            <div>
+
+                                <strong>
+                                    Notifications
+                                </strong>
+
+                                <span>
+                                    Recent updates
+                                </span>
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                id="clearNotifications"
+                            >
+                                Clear
+                            </button>
+
+                        </div>
+
+
+
+                        <div
+                            class="notification-item"
+                        >
+
+                            <div
+                                class="notification-icon blue"
+                            >
+
+                                <i
+                                    class="fa-solid fa-calendar-plus"
+                                ></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+                                    New event added
+                                </strong>
+
+                                <p>
+                                    A new event has been added to EventSphere.
+                                </p>
+
+                                <small>
+                                    Recently
+                                </small>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div
+                            class="notification-item"
+                        >
+
+                            <div
+                                class="notification-icon green"
+                            >
+
+                                <i
+                                    class="fa-solid fa-ticket"
+                                ></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+                                    New booking received
+                                </strong>
+
+                                <p>
+                                    A customer has created a new booking.
+                                </p>
+
+                                <small>
+                                    Recently
+                                </small>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div
+                            class="notification-item"
+                        >
+
+                            <div
+                                class="notification-icon orange"
+                            >
+
+                                <i
+                                    class="fa-solid fa-screwdriver-wrench"
+                                ></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+                                    Service status
+                                </strong>
+
+                                <p>
+                                    Maintenance settings are available.
+                                </p>
+
+                                <small>
+                                    Recently
+                                </small>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div
+                            class="no-notifications"
+                            id="noNotifications"
+                        >
+
+                            No new notifications
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ADMIN PROFILE -->
+
+                <div class="topbar-popup-container">
+
+
+                    <button
+                        class="admin-account"
+                        type="button"
+                        id="adminAccountBtn"
+                    >
+
+                        <div class="account-avatar">
+                            A
+                        </div>
+
+                        <span>
+                            Admin
+                        </span>
+
+                        <i
+                            class="fa-solid fa-chevron-down"
+                        ></i>
+
+                    </button>
+
+
+
+                    <div
+                        class="admin-popup"
+                        id="adminPopup"
+                    >
+
+
+                        <div
+                            class="admin-popup-profile"
+                        >
+
+                            <div class="large-avatar">
+                                A
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+                                    Administrator
+                                </strong>
+
+                                <span>
+                                    EventSphere Admin
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="popup-divider"></div>
+
+
+
+                        <a
+                            href="admin-dashboard.html"
+                        >
+
+                            <i
+                                class="fa-solid fa-house"
+                            ></i>
+
+                            <span>
+                                Dashboard
+                            </span>
+
+                        </a>
+
+
+
+                        <a
+                            href="admin-customers.html"
+                        >
+
+                            <i
+                                class="fa-solid fa-users"
+                            ></i>
+
+                            <span>
+                                Customers
+                            </span>
+
+                        </a>
+
+
+
+                        <a
+                            href="admin-bookings.html"
+                        >
+
+                            <i
+                                class="fa-solid fa-ticket"
+                            ></i>
+
+                            <span>
+                                Bookings
+                            </span>
+
+                        </a>
+
+
+
+                        <div class="popup-divider"></div>
+
+
+
+                        <button
+                            type="button"
+                            id="adminLogoutBtn"
+                            class="popup-logout"
+                        >
+
+                            <i
+                                class="fa-solid fa-right-from-bracket"
+                            ></i>
+
+                            <span>
+                                Logout
+                            </span>
+
+                        </button>
+
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =========================
+             PAGE CONTENT
+        ========================== -->
+
+        <div class="content">
+
+
+            <!-- WELCOME -->
+
+            <div class="welcome-row">
+
+
+                <div>
+
+                    <h1 class="welcome-title">
+
+                        Welcome Back,
+                        <span>
+                            Admin!
+                        </span>
+
+                        👋
+
+                    </h1>
+
+
+                    <p class="welcome-text">
+                        Monitor and manage your EventSphere platform.
+                    </p>
+
+                </div>
+
+
+
+                <div class="status-area">
+
+
+                    <div class="system-status">
+
+                        <span class="status-dot"></span>
+
+                        System Online
+
+                    </div>
+
+
+
+                    <div class="date-box">
+
+                        <i
+                            class="fa-regular fa-calendar"
+                        ></i>
+
+                        <span id="currentDate">
+                            Loading...
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =========================
+                 STAT CARDS
+            ========================== -->
+
+            <div class="stats-grid">
+
+
+                <div class="stat-card">
+
+
+                    <div class="stat-top">
+
+                        <div
+                            class="stat-icon icon-blue"
+                        >
+
+                            <i
+                                class="fa-solid fa-users"
+                            ></i>
+
+                        </div>
+
+
+                        <div class="stat-arrow">
+
+                            <i
+                                class="fa-solid fa-chevron-right"
+                            ></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <h3>
+                        Total Customers
+                    </h3>
+
+
+                    <div
+                        class="stat-value"
+                        id="totalCustomers"
+                    >
+                        Loading...
+                    </div>
+
+
+                    <div class="stat-bottom">
+
+                        <span class="stat-up">
+                            ↑ +12%
+                        </span>
+
+                        <span class="stat-small">
+                            from last month
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="stat-card">
+
+
+                    <div class="stat-top">
+
+                        <div
+                            class="stat-icon icon-green"
+                        >
+
+                            <i
+                                class="fa-solid fa-calendar-check"
+                            ></i>
+
+                        </div>
+
+
+                        <div class="stat-arrow">
+
+                            <i
+                                class="fa-solid fa-chevron-right"
+                            ></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <h3>
+                        Total Bookings
+                    </h3>
+
+
+                    <div
+                        class="stat-value"
+                        id="totalBookings"
+                    >
+                        Loading...
+                    </div>
+
+
+                    <div class="stat-bottom">
+
+                        <span class="stat-up">
+                            ↑ +8%
+                        </span>
+
+                        <span class="stat-small">
+                            from last month
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="stat-card">
+
+
+                    <div class="stat-top">
+
+                        <div
+                            class="stat-icon icon-orange"
+                        >
+
+                            <i
+                                class="fa-solid fa-circle-check"
+                            ></i>
+
+                        </div>
+
+
+                        <div class="stat-arrow">
+
+                            <i
+                                class="fa-solid fa-chevron-right"
+                            ></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <h3>
+                        Active Bookings
+                    </h3>
+
+
+                    <div
+                        class="stat-value"
+                        id="activeBookings"
+                    >
+                        Loading...
+                    </div>
+
+
+                    <div class="stat-bottom">
+
+                        <span class="stat-up">
+                            ↑ +25%
+                        </span>
+
+                        <span class="stat-small">
+                            from last month
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="stat-card">
+
+
+                    <div class="stat-top">
+
+                        <div
+                            class="stat-icon icon-pink"
+                        >
+
+                            <i
+                                class="fa-solid fa-calendar-days"
+                            ></i>
+
+                        </div>
+
+
+                        <div class="stat-arrow">
+
+                            <i
+                                class="fa-solid fa-chevron-right"
+                            ></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <h3>
+                        Total Events
+                    </h3>
+
+
+                    <div
+                        class="stat-value"
+                        id="totalEvents"
+                    >
+                        Loading...
+                    </div>
+
+
+                    <div class="stat-bottom">
+
+                        <span class="stat-up">
+                            ↑ +0%
+                        </span>
+
+                        <span class="stat-small">
+                            from last month
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- Keep existing ID for admin.js -->
+
+            <div style="display:none;">
+
+                <span id="completedBookings">
+                    0
                 </span>
 
             </div>
 
 
-            <div class="topbar-right">
 
-                <div class="online-status">
+            <!-- =========================
+                 QUICK ACTIONS
+            ========================== -->
 
-                    <span class="online-dot"></span>
+            <section class="panel">
 
-                    System Online
 
-                </div>
+                <div class="panel-header">
 
 
-                <div class="top-icon">
+                    <div class="panel-icon">
 
-                    <i class="fa-regular fa-bell"></i>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- =================================================
-             WELCOME
-        ================================================= -->
-
-        <section class="welcome-section">
-
-
-            <div>
-
-                <h1>
-                    Admin Dashboard
-                </h1>
-
-                <p>
-                    Monitor and manage your EventSphere platform.
-                </p>
-
-            </div>
-
-
-            <div class="admin-date">
-
-                <i class="fa-regular fa-clock"></i>
-
-                Live Statistics
-
-            </div>
-
-
-        </section>
-
-
-
-        <!-- =================================================
-             STATISTICS
-        ================================================= -->
-
-        <div class="stats-grid">
-
-
-            <div class="stat-card">
-
-                <div class="stat-top">
-
-                    <div class="stat-icon icon-purple">
-
-                        <i class="fa-solid fa-users"></i>
-
-                    </div>
-
-                </div>
-
-
-                <div class="stat-label">
-                    Total Customers
-                </div>
-
-
-                <div class="stat-number"
-                     id="totalCustomers">
-
-                    Loading...
-
-                </div>
-
-            </div>
-
-
-
-            <div class="stat-card">
-
-                <div class="stat-top">
-
-                    <div class="stat-icon icon-blue">
-
-                        <i class="fa-solid fa-calendar-check"></i>
-
-                    </div>
-
-                </div>
-
-
-                <div class="stat-label">
-                    Total Bookings
-                </div>
-
-
-                <div class="stat-number"
-                     id="totalBookings">
-
-                    Loading...
-
-                </div>
-
-            </div>
-
-
-
-            <div class="stat-card">
-
-                <div class="stat-top">
-
-                    <div class="stat-icon icon-green">
-
-                        <i class="fa-solid fa-chart-line"></i>
-
-                    </div>
-
-                </div>
-
-
-                <div class="stat-label">
-                    Active Bookings
-                </div>
-
-
-                <div class="stat-number"
-                     id="activeBookings">
-
-                    Loading...
-
-                </div>
-
-            </div>
-
-
-
-            <div class="stat-card">
-
-                <div class="stat-top">
-
-                    <div class="stat-icon icon-orange">
-
-                        <i class="fa-solid fa-circle-check"></i>
-
-                    </div>
-
-                </div>
-
-
-                <div class="stat-label">
-                    Completed Bookings
-                </div>
-
-
-                <div class="stat-number"
-                     id="completedBookings">
-
-                    Loading...
-
-                </div>
-
-            </div>
-
-
-
-            <div class="stat-card">
-
-                <div class="stat-top">
-
-                    <div class="stat-icon icon-pink">
-
-                        <i class="fa-solid fa-calendar-days"></i>
-
-                    </div>
-
-                </div>
-
-
-                <div class="stat-label">
-                    Total Events
-                </div>
-
-
-                <div class="stat-number"
-                     id="totalEvents">
-
-                    Loading...
-
-                </div>
-
-            </div>
-
-
-        </div>
-
-
-
-        <!-- =================================================
-             QUICK ACTIONS
-        ================================================= -->
-
-        <section class="admin-card">
-
-
-            <div class="card-heading">
-
-                <div class="card-heading-left">
-
-                    <div class="section-icon">
-
-                        <i class="fa-solid fa-bolt"></i>
-
-                    </div>
-
-
-                    <h2>
-                        Quick Actions
-                    </h2>
-
-                </div>
-
-            </div>
-
-
-            <p class="card-description">
-
-                Quickly access the most frequently used
-                EventSphere management tools.
-
-            </p>
-
-
-            <div class="quick-actions">
-
-
-                <a class="quick-action"
-                   href="add-event.html">
-
-                    <div class="quick-action-icon">
-
-                        <i class="fa-solid fa-plus"></i>
+                        <i
+                            class="fa-solid fa-bolt"
+                        ></i>
 
                     </div>
 
 
                     <div>
 
-                        <strong>
-                            Create Event
-                        </strong>
+                        <h2>
+                            Quick Actions
+                        </h2>
 
-                        <span>
-                            Add a new event
-                        </span>
-
-                    </div>
-
-                </a>
-
-
-
-                <a class="quick-action"
-                   href="view-events.html">
-
-                    <div class="quick-action-icon">
-
-                        <i class="fa-solid fa-calendar-days"></i>
+                        <p>
+                            Access the most important tools quickly.
+                        </p>
 
                     </div>
 
 
-                    <div>
+                </div>
 
-                        <strong>
-                            Manage Events
-                        </strong>
 
-                        <span>
-                            View and manage events
-                        </span>
+
+                <div class="quick-actions">
+
+
+                    <a
+                        href="add-event.html"
+                        class="quick-action"
+                    >
+
+                        <div
+                            class="quick-action-icon"
+                        >
+
+                            <i
+                                class="fa-solid fa-plus"
+                            ></i>
+
+                        </div>
+
+
+                        <div
+                            class="quick-action-text"
+                        >
+
+                            <strong>
+                                Create Event
+                            </strong>
+
+                            <span>
+                                Add a new event
+                            </span>
+
+                        </div>
+
+
+                        <i
+                            class="fa-solid fa-chevron-right"
+                        ></i>
+
+                    </a>
+
+
+
+                    <a
+                        href="view-events.html"
+                        class="quick-action"
+                    >
+
+                        <div
+                            class="quick-action-icon"
+                        >
+
+                            <i
+                                class="fa-solid fa-calendar-days"
+                            ></i>
+
+                        </div>
+
+
+                        <div
+                            class="quick-action-text"
+                        >
+
+                            <strong>
+                                Manage Events
+                            </strong>
+
+                            <span>
+                                View and manage events
+                            </span>
+
+                        </div>
+
+
+                        <i
+                            class="fa-solid fa-chevron-right"
+                        ></i>
+
+                    </a>
+
+
+
+                    <a
+                        href="admin-bookings.html"
+                        class="quick-action"
+                    >
+
+                        <div
+                            class="quick-action-icon"
+                        >
+
+                            <i
+                                class="fa-solid fa-ticket"
+                            ></i>
+
+                        </div>
+
+
+                        <div
+                            class="quick-action-text"
+                        >
+
+                            <strong>
+                                Manage Bookings
+                            </strong>
+
+                            <span>
+                                Review customer bookings
+                            </span>
+
+                        </div>
+
+
+                        <i
+                            class="fa-solid fa-chevron-right"
+                        ></i>
+
+                    </a>
+
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =========================
+                 BOTTOM PANELS
+            ========================== -->
+
+            <div class="bottom-grid">
+
+
+                <!-- COUPONS -->
+
+                <section
+                    class="panel"
+                    id="coupons"
+                >
+
+
+                    <div class="panel-header">
+
+
+                        <div
+                            class="panel-icon coupon-icon"
+                        >
+
+                            <i
+                                class="fa-solid fa-tag"
+                            ></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <h2>
+                                Discounts &amp; Coupons
+                            </h2>
+
+                            <p>
+                                Create promotional coupons and offer discounts to EventSphere customers.
+                            </p>
+
+                        </div>
 
                     </div>
 
-                </a>
+
+
+                    <form
+                        id="couponForm"
+                        class="coupon-form"
+                    >
+
+
+                        <div class="form-group">
+
+                            <label for="couponCode">
+                                Coupon Code
+                            </label>
+
+                            <input
+                                type="text"
+                                id="couponCode"
+                                placeholder="Example: EVENT10"
+                                required
+                            >
+
+                        </div>
 
 
 
-                <a class="quick-action"
-                   href="admin-bookings.html">
+                        <div class="form-group">
 
-                    <div class="quick-action-icon">
+                            <label for="discountType">
+                                Discount Type
+                            </label>
 
-                        <i class="fa-solid fa-ticket"></i>
+                            <select
+                                id="discountType"
+                                required
+                            >
+
+                                <option value="percentage">
+                                    Percentage (%)
+                                </option>
+
+                                <option value="fixed">
+                                    Fixed Amount (₹)
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <div class="form-group">
+
+                            <label for="discountValue">
+                                Discount Value
+                            </label>
+
+                            <input
+                                type="number"
+                                id="discountValue"
+                                min="1"
+                                placeholder="Example: 10"
+                                required
+                            >
+
+                        </div>
+
+
+
+                        <div class="form-group">
+
+                            <label for="minimumAmount">
+                                Minimum Booking Amount
+                            </label>
+
+                            <input
+                                type="number"
+                                id="minimumAmount"
+                                min="0"
+                                value="0"
+                                placeholder="Example: 500"
+                            >
+
+                        </div>
+
+
+
+                        <div class="form-group">
+
+                            <label for="maximumDiscount">
+                                Maximum Discount
+                            </label>
+
+                            <input
+                                type="number"
+                                id="maximumDiscount"
+                                min="0"
+                                placeholder="Optional"
+                            >
+
+                            <span class="form-hint">
+                                Optional limit for percentage discounts.
+                            </span>
+
+                        </div>
+
+
+
+                        <div class="form-group">
+
+                            <label for="couponExpiry">
+                                Expiry Date
+                            </label>
+
+                            <input
+                                type="date"
+                                id="couponExpiry"
+                                required
+                            >
+
+                        </div>
+
+
+
+                        <div class="form-group">
+
+                            <label for="usageLimit">
+                                Usage Limit
+                            </label>
+
+                            <input
+                                type="number"
+                                id="usageLimit"
+                                min="1"
+                                value="100"
+                                placeholder="Example: 100"
+                                required
+                            >
+
+                        </div>
+
+
+
+                        <div class="coupon-submit">
+
+                            <button
+                                type="submit"
+                                class="primary-btn"
+                            >
+
+                                <i
+                                    class="fa-solid fa-plus"
+                                ></i>
+
+                                Create Coupon
+
+                            </button>
+
+                        </div>
+
+
+                    </form>
+
+                </section>
+
+
+
+                <!-- MAINTENANCE -->
+
+                <section
+                    class="panel"
+                    id="maintenance"
+                >
+
+
+                    <div class="panel-header">
+
+
+                        <div
+                            class="panel-icon maintenance-icon"
+                        >
+
+                            <i
+                                class="fa-solid fa-screwdriver-wrench"
+                            ></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <h2>
+                                Service Maintenance
+                            </h2>
+
+                            <p>
+                                Control customer access when EventSphere is undergoing maintenance.
+                            </p>
+
+                        </div>
 
                     </div>
 
 
-                    <div>
 
-                        <strong>
-                            Manage Bookings
-                        </strong>
+                    <form
+                        id="maintenanceForm"
+                        class="maintenance-form"
+                    >
 
-                        <span>
-                            Review customer bookings
-                        </span>
 
-                    </div>
+                        <div class="form-group">
 
-                </a>
+                            <label
+                                for="maintenanceEnabled"
+                            >
+                                Service Status
+                            </label>
+
+                            <select
+                                id="maintenanceEnabled"
+                            >
+
+                                <option value="false">
+                                    🟢 Service Online
+                                </option>
+
+                                <option value="true">
+                                    🔴 Enable Maintenance
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <div class="form-group">
+
+                            <label
+                                for="maintenanceStart"
+                            >
+                                Maintenance Start
+                            </label>
+
+                            <input
+                                type="datetime-local"
+                                id="maintenanceStart"
+                            >
+
+                        </div>
+
+
+
+                        <div class="form-group">
+
+                            <label
+                                for="maintenanceEnd"
+                            >
+                                Maintenance End
+                            </label>
+
+                            <input
+                                type="datetime-local"
+                                id="maintenanceEnd"
+                            >
+
+                        </div>
+
+
+
+                        <div
+                            class="form-group maintenance-message"
+                        >
+
+                            <label
+                                for="maintenanceMessage"
+                            >
+                                Maintenance Message
+                            </label>
+
+                            <textarea
+                                id="maintenanceMessage"
+                                rows="3"
+                                placeholder="Example: EventSphere is currently undergoing scheduled maintenance. Please check back soon."
+                            ></textarea>
+
+                        </div>
+
+
+
+                        <div
+                            class="maintenance-buttons"
+                        >
+
+
+                            <button
+                                type="submit"
+                                class="primary-btn"
+                            >
+
+                                <i
+                                    class="fa-solid fa-floppy-disk"
+                                ></i>
+
+                                Save Maintenance Settings
+
+                            </button>
+
+
+
+                            <button
+                                type="button"
+                                id="disableMaintenanceBtn"
+                                class="secondary-btn"
+                            >
+
+                                <i
+                                    class="fa-solid fa-pause"
+                                ></i>
+
+                                Disable Maintenance
+
+                            </button>
+
+
+                        </div>
+
+
+
+                        <div
+                            id="maintenanceStatus"
+                            class="maintenance-status"
+                        >
+
+                            <div
+                                class="maintenance-status-title"
+                            >
+
+                                <i
+                                    class="fa-solid fa-circle"
+                                ></i>
+
+                                Service Online
+
+                            </div>
+
+
+                            <div
+                                class="maintenance-status-text"
+                            >
+
+                                Maintenance mode is currently disabled.
+
+                            </div>
+
+                        </div>
+
+
+                    </form>
+
+                </section>
 
 
             </div>
 
 
-        </section>
+
+            <!-- =========================
+                 FOOTER
+            ========================== -->
+
+            <footer class="footer">
 
 
+                <div>
 
-        <!-- =================================================
-             COUPONS
-        ================================================= -->
-
-        <section id="coupons"
-                 class="admin-card coupon-card">
-
-
-            <div class="card-heading">
-
-                <div class="card-heading-left">
-
-                    <div class="section-icon">
-
-                        <i class="fa-solid fa-ticket-simple"></i>
-
-                    </div>
-
-
-                    <h2>
-                        Discounts & Coupons
-                    </h2>
+                    © 2026 EventSphere.
+                    All rights reserved.
 
                 </div>
 
-            </div>
 
+                <div class="footer-right">
 
-            <p class="card-description">
+                    <span>
+                        EventSphere Admin Panel
+                    </span>
 
-                Create promotional coupons and offer discounts
-                to EventSphere customers.
+                    <span>|</span>
 
-            </p>
+                    <span>
+                        Secure
+                    </span>
 
+                    <span>|</span>
 
-            <form id="couponForm">
+                    <span>
+                        Reliable
+                    </span>
 
+                    <span>|</span>
 
-                <div class="form-grid">
-
-
-                    <div class="form-group">
-
-                        <label for="couponCode">
-                            Coupon Code
-                        </label>
-
-                        <input
-                            type="text"
-                            id="couponCode"
-                            placeholder="Example: EVENT10"
-                            required
-                        >
-
-                    </div>
-
-
-
-                    <div class="form-group">
-
-                        <label for="discountType">
-                            Discount Type
-                        </label>
-
-                        <select
-                            id="discountType"
-                            required
-                        >
-
-                            <option value="percentage">
-                                Percentage (%)
-                            </option>
-
-                            <option value="fixed">
-                                Fixed Amount (₹)
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-
-                    <div class="form-group">
-
-                        <label for="discountValue">
-                            Discount Value
-                        </label>
-
-                        <input
-                            type="number"
-                            id="discountValue"
-                            min="1"
-                            placeholder="Example: 10"
-                            required
-                        >
-
-                    </div>
-
-
-
-                    <div class="form-group">
-
-                        <label for="minimumAmount">
-                            Minimum Booking Amount
-                        </label>
-
-                        <input
-                            type="number"
-                            id="minimumAmount"
-                            min="0"
-                            value="0"
-                            placeholder="Example: 500"
-                        >
-
-                    </div>
-
-
-
-                    <div class="form-group">
-
-                        <label for="maximumDiscount">
-                            Maximum Discount
-                        </label>
-
-                        <input
-                            type="number"
-                            id="maximumDiscount"
-                            min="0"
-                            placeholder="Optional"
-                        >
-
-                        <span class="form-help">
-                            Optional limit for percentage discounts.
-                        </span>
-
-                    </div>
-
-
-
-                    <div class="form-group">
-
-                        <label for="couponExpiry">
-                            Expiry Date
-                        </label>
-
-                        <input
-                            type="date"
-                            id="couponExpiry"
-                            required
-                        >
-
-                    </div>
-
-
-
-                    <div class="form-group">
-
-                        <label for="usageLimit">
-                            Usage Limit
-                        </label>
-
-                        <input
-                            type="number"
-                            id="usageLimit"
-                            min="1"
-                            value="100"
-                            placeholder="Example: 100"
-                            required
-                        >
-
-                    </div>
-
+                    <span>
+                        Easy to Manage
+                    </span>
 
                 </div>
 
 
+            </footer>
 
-                <div class="button-row">
-
-                    <button
-                        type="submit"
-                        class="primary-btn">
-
-                        <i class="fa-solid fa-plus"></i>
-
-                        Create Coupon
-
-                    </button>
-
-                </div>
-
-
-            </form>
-
-
-        </section>
-
-
-
-        <!-- =================================================
-             SERVICE MAINTENANCE
-        ================================================= -->
-
-        <section id="maintenance"
-                 class="admin-card maintenance-card">
-
-
-            <div class="card-heading">
-
-                <div class="card-heading-left">
-
-                    <div class="section-icon">
-
-                        <i class="fa-solid fa-screwdriver-wrench"></i>
-
-                    </div>
-
-
-                    <h2>
-                        Service Maintenance
-                    </h2>
-
-                </div>
-
-            </div>
-
-
-            <p class="card-description">
-
-                Control customer access when EventSphere is
-                undergoing scheduled maintenance or temporary
-                service interruptions.
-
-            </p>
-
-
-            <form id="maintenanceForm">
-
-
-                <div class="form-grid">
-
-
-                    <div class="form-group">
-
-                        <label for="maintenanceEnabled">
-                            Service Status
-                        </label>
-
-                        <select id="maintenanceEnabled">
-
-                            <option value="false">
-                                🟢 Service Online
-                            </option>
-
-                            <option value="true">
-                                🔴 Enable Maintenance
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-
-                    <div class="form-group">
-
-                        <label for="maintenanceStart">
-                            Maintenance Start
-                        </label>
-
-                        <input
-                            type="datetime-local"
-                            id="maintenanceStart"
-                        >
-
-                    </div>
-
-
-
-                    <div class="form-group">
-
-                        <label for="maintenanceEnd">
-                            Maintenance End
-                        </label>
-
-                        <input
-                            type="datetime-local"
-                            id="maintenanceEnd"
-                        >
-
-                    </div>
-
-
-
-                    <div class="form-group full">
-
-                        <label for="maintenanceMessage">
-                            Maintenance Message
-                        </label>
-
-                        <textarea
-                            id="maintenanceMessage"
-                            rows="4"
-                            placeholder="Example: EventSphere is currently undergoing scheduled maintenance to enhance your experience and improve our services. We'll be back shortly. Thank you for your patience and understanding."
-                        ></textarea>
-
-                    </div>
-
-
-                </div>
-
-
-
-                <div class="button-row">
-
-
-                    <button
-                        type="submit"
-                        class="primary-btn">
-
-                        <i class="fa-solid fa-screwdriver-wrench"></i>
-
-                        Save Maintenance Settings
-
-                    </button>
-
-
-
-                    <button
-                        type="button"
-                        id="disableMaintenanceBtn"
-                        class="secondary-btn">
-
-                        <i class="fa-solid fa-circle-check"></i>
-
-                        Disable Maintenance
-
-                    </button>
-
-
-                </div>
-
-
-            </form>
-
-
-
-            <div id="maintenanceStatus">
-
-                Loading maintenance status...
-
-            </div>
-
-
-        </section>
-
-
-
-        <!-- =================================================
-             FOOTER
-        ================================================= -->
-
-        <div class="admin-footer">
-
-            EventSphere Admin Panel
-            •
-            Secure Management Console
 
         </div>
-
 
     </main>
-
 
 </div>
 
 
 
-<!-- =====================================================
-     ADMIN AUTH + BACK PROTECTION
-===================================================== -->
+<!-- =========================
+     DATE
+========================= -->
 
-<script type="module">
+<script>
 
-import { auth }
-    from "./js/firebase-config.js";
-
-import {
-    signOut
-} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-
-
-auth.onAuthStateChanged(async (user) => {
-
-    const otpVerified =
-        sessionStorage.getItem(
-            "adminOtpVerified"
+    const dateElement =
+        document.getElementById(
+            "currentDate"
         );
 
 
-    if (
-        !user ||
-        otpVerified !== "true"
-    ) {
+    const today =
+        new Date();
 
-        sessionStorage.removeItem(
-            "adminOtpVerified"
+
+    const options = {
+        weekday: "short",
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+    };
+
+
+    dateElement.textContent =
+        today.toLocaleDateString(
+            "en-GB",
+            options
+        );
+
+</script>
+
+
+
+<!-- =========================
+     POPUP FUNCTIONALITY
+========================= -->
+
+<script>
+
+    const notificationBtn =
+        document.getElementById(
+            "notificationBtn"
         );
 
 
-        if (user) {
+    const notificationPopup =
+        document.getElementById(
+            "notificationPopup"
+        );
 
-            await signOut(auth);
+
+    const adminAccountBtn =
+        document.getElementById(
+            "adminAccountBtn"
+        );
+
+
+    const adminPopup =
+        document.getElementById(
+            "adminPopup"
+        );
+
+
+    notificationBtn.addEventListener(
+        "click",
+        function (event) {
+
+            event.stopPropagation();
+
+            notificationPopup.classList.toggle(
+                "show"
+            );
+
+            adminPopup.classList.remove(
+                "show"
+            );
 
         }
-
-
-        window.location.replace(
-            "admin-login.html"
-        );
-
-        return;
-
-    }
-
-
-    history.pushState(
-        {
-            adminDashboard: true
-        },
-        "",
-        window.location.href
     );
 
-});
+
+    adminAccountBtn.addEventListener(
+        "click",
+        function (event) {
+
+            event.stopPropagation();
+
+            adminPopup.classList.toggle(
+                "show"
+            );
+
+            notificationPopup.classList.remove(
+                "show"
+            );
+
+        }
+    );
 
 
+    document.addEventListener(
+        "click",
+        function (event) {
 
-window.addEventListener(
-    "popstate",
-    () => {
+            if (
+                !event.target.closest(
+                    ".topbar-popup-container"
+                )
+            ) {
 
-        const otpVerified =
-            sessionStorage.getItem(
-                "adminOtpVerified"
+                notificationPopup.classList.remove(
+                    "show"
+                );
+
+                adminPopup.classList.remove(
+                    "show"
+                );
+
+            }
+
+        }
+    );
+
+
+    const clearNotifications =
+        document.getElementById(
+            "clearNotifications"
+        );
+
+
+    const noNotifications =
+        document.getElementById(
+            "noNotifications"
+        );
+
+
+    clearNotifications.addEventListener(
+        "click",
+        function () {
+
+            const items =
+                document.querySelectorAll(
+                    ".notification-item"
+                );
+
+
+            items.forEach(
+                function (item) {
+
+                    item.style.display =
+                        "none";
+
+                }
             );
 
 
-        if (
-            auth.currentUser &&
-            otpVerified === "true"
-        ) {
+            noNotifications.style.display =
+                "block";
+
+
+            const count =
+                document.getElementById(
+                    "notificationCount"
+                );
+
+
+            count.style.display =
+                "none";
+
+        }
+    );
+
+</script>
+
+
+
+<!-- =========================
+     ADMIN AUTH
+========================= -->
+
+<script type="module">
+
+    import {
+        auth
+    } from "./js/firebase-config.js";
+
+
+    import {
+        signOut
+    } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+
+
+    auth.onAuthStateChanged(
+        async (user) => {
+
+            const otpVerified =
+                sessionStorage.getItem(
+                    "adminOtpVerified"
+                );
+
+
+            if (
+                !user ||
+                otpVerified !== "true"
+            ) {
+
+                sessionStorage.removeItem(
+                    "adminOtpVerified"
+                );
+
+
+                if (user) {
+
+                    await signOut(auth);
+
+                }
+
+
+                window.location.replace(
+                    "admin-login.html"
+                );
+
+                return;
+
+            }
+
 
             history.pushState(
                 {
@@ -2361,21 +3366,96 @@ window.addEventListener(
             );
 
         }
+    );
 
-    }
-);
+
+    window.addEventListener(
+        "popstate",
+        () => {
+
+            const otpVerified =
+                sessionStorage.getItem(
+                    "adminOtpVerified"
+                );
+
+
+            if (
+                auth.currentUser &&
+                otpVerified === "true"
+            ) {
+
+                history.pushState(
+                    {
+                        adminDashboard: true
+                    },
+                    "",
+                    window.location.href
+                );
+
+            }
+
+        }
+    );
+
+
+    /* =========================
+       ADMIN LOGOUT
+    ========================= */
+
+    const adminLogoutBtn =
+        document.getElementById(
+            "adminLogoutBtn"
+        );
+
+
+    adminLogoutBtn.addEventListener(
+        "click",
+        async function () {
+
+            try {
+
+                sessionStorage.removeItem(
+                    "adminOtpVerified"
+                );
+
+
+                await signOut(auth);
+
+
+                window.location.replace(
+                    "admin-login.html"
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Logout error:",
+                    error
+                );
+
+
+                alert(
+                    "Unable to logout. Please try again."
+                );
+
+            }
+
+        }
+    );
 
 </script>
 
 
 
-<!-- =====================================================
-     ADMIN JS
-===================================================== -->
+<!-- =========================
+     EXISTING ADMIN LOGIC
+========================= -->
 
-<script type="module"
-        src="js/admin.js">
-</script>
+<script
+    type="module"
+    src="js/admin.js"
+></script>
 
 
 </body>
