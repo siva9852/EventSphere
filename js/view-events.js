@@ -8,10 +8,19 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
+// ====================== ELEMENTS ======================
+
 const eventsContainer =
     document.getElementById("eventsContainer");
 
+const eventSearch =
+    document.getElementById("eventSearch");
+
 eventsContainer.className = "events-grid";
+
+
+// Store all events for search
+let allEvents = [];
 
 
 // ====================== IMAGE PATH ======================
@@ -19,11 +28,8 @@ eventsContainer.className = "events-grid";
 function getImagePath(image) {
 
     if (!image) {
-
         return "";
-
     }
-
 
     image = image.trim();
 
@@ -34,9 +40,7 @@ function getImagePath(image) {
         image.startsWith("http://") ||
         image.startsWith("https://")
     ) {
-
         return image;
-
     }
 
 
@@ -45,15 +49,189 @@ function getImagePath(image) {
     if (
         image.startsWith("images/")
     ) {
-
         return image;
-
     }
 
 
-    // If admin enters only the filename
+    // If admin enters only filename
 
     return "images/" + image;
+}
+
+
+// ====================== ESCAPE HTML ======================
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+// ====================== DISPLAY EVENTS ======================
+
+function displayEvents(events) {
+
+    eventsContainer.innerHTML = "";
+
+
+    if (events.length === 0) {
+
+        eventsContainer.innerHTML = `
+            <div class="no-events">
+
+                <div style="
+                    font-size:48px;
+                    margin-bottom:15px;
+                ">
+                    🎉
+                </div>
+
+                <h3>
+                    No events found
+                </h3>
+
+                <p>
+                    Try searching with a different event name or category.
+                </p>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    events.forEach(
+        (event) => {
+
+            const eventCard =
+                document.createElement("div");
+
+            eventCard.className =
+                "event-card";
+
+
+            const imagePath =
+                getImagePath(event.image);
+
+
+            const eventName =
+                escapeHtml(
+                    event.eventName || "Event"
+                );
+
+
+            const category =
+                escapeHtml(
+                    event.category || "Not specified"
+                );
+
+
+            const description =
+                escapeHtml(
+                    event.description || ""
+                );
+
+
+            const price =
+                Number(event.price || 0);
+
+
+            eventCard.innerHTML = `
+
+                <div class="event-image-container">
+
+                    <img
+                        src="${imagePath}"
+                        alt="${eventName}"
+                        class="event-image"
+                        onerror="
+                            this.onerror=null;
+                            this.src='images/family.jpg';
+                        "
+                    >
+
+                </div>
+
+
+                <div class="event-card-content">
+
+                    <div class="event-category">
+
+                        ${category}
+
+                    </div>
+
+
+                    <h2>
+                        ${eventName}
+                    </h2>
+
+
+                    <div class="event-info">
+
+                        <p>
+
+                            <strong>
+                                Category
+                            </strong>
+
+                            <span>
+                                ${category}
+                            </span>
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>
+                                Price
+                            </strong>
+
+                            <span>
+                                ₹${price}
+                            </span>
+
+                        </p>
+
+                    </div>
+
+
+                    <p class="event-description">
+
+                        ${description}
+
+                    </p>
+
+
+                    <button
+                        class="delete-event-button"
+                        onclick="deleteEvent('${event.id}')"
+                    >
+
+                        <i class="fa-solid fa-trash"></i>
+
+                        Delete Event
+
+                    </button>
+
+                </div>
+
+            `;
+
+
+            eventsContainer.appendChild(
+                eventCard
+            );
+
+        }
+    );
 
 }
 
@@ -64,6 +242,21 @@ async function loadEvents() {
 
     try {
 
+        eventsContainer.innerHTML = `
+
+            <div class="loading-events">
+
+                <div class="loading-spinner"></div>
+
+                <p>
+                    Loading events...
+                </p>
+
+            </div>
+
+        `;
+
+
         const querySnapshot =
             await getDocs(
                 collection(
@@ -73,25 +266,7 @@ async function loadEvents() {
             );
 
 
-        eventsContainer.innerHTML = "";
-
-
-        if (querySnapshot.empty) {
-
-            eventsContainer.innerHTML =
-                `
-                <div class="no-events">
-
-                    <p>
-                        No events found.
-                    </p>
-
-                </div>
-                `;
-
-            return;
-
-        }
+        allEvents = [];
 
 
         querySnapshot.forEach(
@@ -101,93 +276,20 @@ async function loadEvents() {
                     eventDoc.data();
 
 
-                const eventCard =
-                    document.createElement(
-                        "div"
-                    );
+                allEvents.push({
 
+                    id: eventDoc.id,
 
-                eventCard.className =
-                    "event-card";
+                    ...event
 
-
-                const imagePath =
-                    getImagePath(
-                        event.image
-                    );
-
-
-                eventCard.innerHTML = `
-
-                    <div class="event-image-container">
-
-                        <img
-                            src="${imagePath}"
-                            alt="${event.eventName || "Event"}"
-                            class="event-image"
-                            onerror="this.onerror=null; this.src='images/family.jpg';">
-
-                    </div>
-
-
-                    <div class="event-card-content">
-
-                        <h2>
-                            ${event.eventName || "Event"}
-                        </h2>
-
-
-                        <div class="event-info">
-
-                            <p>
-
-                                <strong>
-                                    Category:
-                                </strong>
-
-                                ${event.category || "Not specified"}
-
-                            </p>
-
-
-                            <p>
-
-                                <strong>
-                                    Price:
-                                </strong>
-
-                                ₹${event.price || 0}
-
-                            </p>
-
-                        </div>
-
-
-                        <p class="event-description">
-
-                            ${event.description || ""}
-
-                        </p>
-
-
-                        <button
-                            class="delete-event-button"
-                            onclick="deleteEvent('${eventDoc.id}')">
-
-                            Delete Event
-
-                        </button>
-
-                    </div>
-
-                `;
-
-
-                eventsContainer.appendChild(
-                    eventCard
-                );
+                });
 
             }
+        );
+
+
+        displayEvents(
+            allEvents
         );
 
     }
@@ -200,10 +302,97 @@ async function loadEvents() {
         );
 
 
-        eventsContainer.innerHTML =
-            "<p>Error loading events.</p>";
+        eventsContainer.innerHTML = `
+
+            <div class="no-events">
+
+                <div style="
+                    font-size:48px;
+                    margin-bottom:15px;
+                ">
+                    ⚠️
+                </div>
+
+                <h3>
+                    Unable to Load Events
+                </h3>
+
+                <p>
+                    Please refresh the page and try again.
+                </p>
+
+            </div>
+
+        `;
 
     }
+
+}
+
+
+// ====================== SEARCH EVENTS ======================
+
+if (eventSearch) {
+
+    eventSearch.addEventListener(
+        "input",
+        function () {
+
+            const searchText =
+                this.value
+                    .trim()
+                    .toLowerCase();
+
+
+            if (!searchText) {
+
+                displayEvents(
+                    allEvents
+                );
+
+                return;
+
+            }
+
+
+            const filteredEvents =
+                allEvents.filter(
+                    (event) => {
+
+                        const eventName =
+                            String(
+                                event.eventName || ""
+                            ).toLowerCase();
+
+
+                        const category =
+                            String(
+                                event.category || ""
+                            ).toLowerCase();
+
+
+                        const description =
+                            String(
+                                event.description || ""
+                            ).toLowerCase();
+
+
+                        return (
+                            eventName.includes(searchText) ||
+                            category.includes(searchText) ||
+                            description.includes(searchText)
+                        );
+
+                    }
+                );
+
+
+            displayEvents(
+                filteredEvents
+            );
+
+        }
+    );
 
 }
 
@@ -240,7 +429,76 @@ window.deleteEvent =
             );
 
 
-            loadEvents();
+            // Remove deleted event
+            allEvents =
+                allEvents.filter(
+                    (event) =>
+                        event.id !== eventId
+                );
+
+
+            // Refresh displayed events
+            if (eventSearch) {
+
+                const searchText =
+                    eventSearch.value
+                        .trim()
+                        .toLowerCase();
+
+
+                if (searchText) {
+
+                    const filteredEvents =
+                        allEvents.filter(
+                            (event) => {
+
+                                const eventName =
+                                    String(
+                                        event.eventName || ""
+                                    ).toLowerCase();
+
+
+                                const category =
+                                    String(
+                                        event.category || ""
+                                    ).toLowerCase();
+
+
+                                const description =
+                                    String(
+                                        event.description || ""
+                                    ).toLowerCase();
+
+
+                                return (
+                                    eventName.includes(searchText) ||
+                                    category.includes(searchText) ||
+                                    description.includes(searchText)
+                                );
+
+                            }
+                        );
+
+
+                    displayEvents(
+                        filteredEvents
+                    );
+
+                } else {
+
+                    displayEvents(
+                        allEvents
+                    );
+
+                }
+
+            } else {
+
+                displayEvents(
+                    allEvents
+                );
+
+            }
 
         }
 

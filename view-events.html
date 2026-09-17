@@ -5,56 +5,1520 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>View Events - EventSphere</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet"
+          href="css/style.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        body {
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            background: #f5f7fb;
+
+            color: #172033;
+        }
+
+
+        /* =====================================================
+           MAIN LAYOUT
+        ===================================================== */
+
+        .admin-layout {
+            min-height: 100vh;
+
+            display: flex;
+        }
+
+
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
+
+        .admin-sidebar {
+            width: 260px;
+
+            min-height: 100vh;
+
+            position: fixed;
+
+            left: 0;
+            top: 0;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #101b46 0%,
+                    #182a67 55%,
+                    #223b82 100%
+                );
+
+            color: white;
+
+            padding: 24px 16px;
+
+            z-index: 1000;
+
+            box-shadow:
+                8px 0 30px
+                rgba(
+                    16,
+                    27,
+                    70,
+                    0.12
+                );
+        }
+
+
+        .admin-brand {
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            padding:
+                8px 12px 28px;
+
+            border-bottom:
+                1px solid
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.12
+                );
+        }
+
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+
+            border-radius: 13px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #6c63ff,
+                    #8f7cff
+                );
+
+            font-size: 20px;
+
+            box-shadow:
+                0 8px 22px
+                rgba(
+                    108,
+                    99,
+                    255,
+                    0.35
+                );
+        }
+
+
+        .brand-text h2 {
+            font-size: 19px;
+
+            font-weight: 800;
+        }
+
+
+        .brand-text span {
+            display: block;
+
+            margin-top: 2px;
+
+            color:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.55
+                );
+
+            font-size: 11px;
+
+            font-weight: 600;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1px;
+        }
+
+
+        /* =====================================================
+           NAVIGATION
+        ===================================================== */
+
+        .admin-nav {
+            list-style: none;
+
+            margin-top: 28px;
+        }
+
+
+        .admin-nav li {
+            margin-bottom: 7px;
+        }
+
+
+        .admin-nav a {
+            display: flex;
+
+            align-items: center;
+
+            gap: 13px;
+
+            padding: 13px 14px;
+
+            color:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.72
+                );
+
+            text-decoration: none;
+
+            border-radius: 12px;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            transition:
+                all 0.25s ease;
+        }
+
+
+        .admin-nav a i {
+            width: 20px;
+
+            text-align: center;
+
+            font-size: 15px;
+        }
+
+
+        .admin-nav a:hover {
+            color: white;
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.09
+                );
+
+            transform:
+                translateX(3px);
+        }
+
+
+        .admin-nav .active a {
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #665df5,
+                    #8378ff
+                );
+
+            box-shadow:
+                0 8px 22px
+                rgba(
+                    102,
+                    93,
+                    245,
+                    0.28
+                );
+        }
+
+
+        .nav-section-title {
+            padding:
+                18px 14px 8px;
+
+            color:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.35
+                );
+
+            font-size: 10px;
+
+            font-weight: 800;
+
+            letter-spacing: 1.2px;
+
+            text-transform: uppercase;
+        }
+
+
+        /* =====================================================
+           SIDEBAR BOTTOM
+        ===================================================== */
+
+        .sidebar-bottom {
+            position: absolute;
+
+            left: 16px;
+            right: 16px;
+            bottom: 22px;
+
+            padding-top: 16px;
+
+            border-top:
+                1px solid
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.1
+                );
+        }
+
+
+        .admin-profile-mini {
+            display: flex;
+
+            align-items: center;
+
+            gap: 11px;
+
+            padding: 10px;
+        }
+
+
+        .admin-avatar {
+            width: 38px;
+            height: 38px;
+
+            border-radius: 50%;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #8a7cff,
+                    #6258e8
+                );
+        }
+
+
+        .admin-profile-mini strong {
+            display: block;
+
+            color: white;
+
+            font-size: 13px;
+        }
+
+
+        .admin-profile-mini span {
+            display: block;
+
+            margin-top: 2px;
+
+            color:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.48
+                );
+
+            font-size: 11px;
+        }
+
+
+        /* =====================================================
+           MAIN CONTENT
+        ===================================================== */
+
+        .admin-main {
+            width:
+                calc(
+                    100% - 260px
+                );
+
+            margin-left: 260px;
+
+            min-height: 100vh;
+
+            padding:
+                28px 34px 50px;
+        }
+
+
+        /* =====================================================
+           TOP BAR
+        ===================================================== */
+
+        .admin-topbar {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            margin-bottom: 30px;
+        }
+
+
+        .breadcrumb {
+            color: #7b8499;
+
+            font-size: 13px;
+
+            font-weight: 600;
+        }
+
+
+        .breadcrumb span {
+            color: #172033;
+        }
+
+
+        .topbar-right {
+            display: flex;
+
+            align-items: center;
+
+            gap: 14px;
+        }
+
+
+        .online-status {
+            display: flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            padding:
+                9px 13px;
+
+            border-radius: 20px;
+
+            background: #ecfdf3;
+
+            color: #15803d;
+
+            font-size: 12px;
+
+            font-weight: 700;
+        }
+
+
+        .online-dot {
+            width: 7px;
+            height: 7px;
+
+            border-radius: 50%;
+
+            background: #22c55e;
+        }
+
+
+        .top-icon {
+            width: 42px;
+            height: 42px;
+
+            border-radius: 12px;
+
+            background: white;
+
+            border:
+                1px solid
+                #e8ebf2;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            color: #69738a;
+        }
+
+
+        /* =====================================================
+           PAGE HEADER
+        ===================================================== */
+
+        .page-header {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            margin-bottom: 25px;
+        }
+
+
+        .page-title-area {
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+        }
+
+
+        .page-title-icon {
+            width: 52px;
+            height: 52px;
+
+            border-radius: 15px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #eeeaff,
+                    #f6f4ff
+                );
+
+            color: #6559ed;
+
+            font-size: 21px;
+        }
+
+
+        .page-title-area h1 {
+            font-size: 29px;
+
+            font-weight: 800;
+
+            letter-spacing: -0.8px;
+
+            color: #141b2d;
+        }
+
+
+        .page-title-area p {
+            margin-top: 5px;
+
+            color: #80899b;
+
+            font-size: 13px;
+        }
+
+
+        .add-event-btn {
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            padding:
+                12px 17px;
+
+            border-radius: 11px;
+
+            text-decoration: none;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #6559ed,
+                    #8278ff
+                );
+
+            color: white;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            box-shadow:
+                0 8px 20px
+                rgba(
+                    101,
+                    89,
+                    237,
+                    0.22
+                );
+
+            transition:
+                all 0.2s ease;
+        }
+
+
+        .add-event-btn:hover {
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 12px 25px
+                rgba(
+                    101,
+                    89,
+                    237,
+                    0.28
+                );
+        }
+
+
+        /* =====================================================
+           EVENTS AREA
+        ===================================================== */
+
+        .events-panel {
+            background: white;
+
+            border:
+                1px solid
+                #e8ebf2;
+
+            border-radius: 20px;
+
+            padding: 24px;
+
+            box-shadow:
+                0 5px 20px
+                rgba(
+                    30,
+                    40,
+                    70,
+                    0.035
+                );
+        }
+
+
+        .events-panel-header {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            margin-bottom: 22px;
+        }
+
+
+        .events-panel-header h2 {
+            font-size: 17px;
+
+            color: #1b2336;
+
+            font-weight: 800;
+        }
+
+
+        .events-panel-header p {
+            margin-top: 4px;
+
+            color: #8a93a5;
+
+            font-size: 12px;
+        }
+
+
+        .event-count {
+            padding:
+                8px 12px;
+
+            border-radius: 20px;
+
+            background: #f0edff;
+
+            color: #6559ed;
+
+            font-size: 12px;
+
+            font-weight: 700;
+        }
+
+
+        /* =====================================================
+           SEARCH
+        ===================================================== */
+
+        .events-toolbar {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            margin-bottom: 24px;
+
+            padding-bottom: 20px;
+
+            border-bottom:
+                1px solid
+                #edf0f5;
+        }
+
+
+        .search-box {
+            width: 340px;
+
+            position: relative;
+        }
+
+
+        .search-box i {
+            position: absolute;
+
+            left: 14px;
+            top: 50%;
+
+            transform:
+                translateY(-50%);
+
+            color: #9aa2b2;
+
+            font-size: 13px;
+        }
+
+
+        .search-box input {
+            width: 100%;
+
+            height: 42px;
+
+            padding:
+                0 14px 0 40px;
+
+            border:
+                1px solid
+                #e0e4eb;
+
+            border-radius: 11px;
+
+            background: #fafbfc;
+
+            outline: none;
+
+            color: #20283a;
+
+            font-family: inherit;
+
+            font-size: 13px;
+
+            transition:
+                all 0.2s ease;
+        }
+
+
+        .search-box input:focus {
+            background: white;
+
+            border-color: #756cf4;
+
+            box-shadow:
+                0 0 0 4px
+                rgba(
+                    117,
+                    108,
+                    244,
+                    0.08
+                );
+        }
+
+
+        .view-label {
+            color: #8a93a5;
+
+            font-size: 12px;
+
+            font-weight: 600;
+        }
+
+
+        /* =====================================================
+           IMPORTANT:
+           EXISTING JS USES eventsContainer
+        ===================================================== */
+
+        #eventsContainer {
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    3,
+                    minmax(
+                        0,
+                        1fr
+                    )
+                );
+
+            gap: 20px;
+        }
+
+
+        /* =====================================================
+           EVENT CARDS
+           These styles also work with common
+           card elements created by view-events.js
+        ===================================================== */
+
+        .event-card {
+            overflow: hidden;
+
+            background: white;
+
+            border:
+                1px solid
+                #e7eaf1;
+
+            border-radius: 17px;
+
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease,
+                border 0.25s ease;
+        }
+
+
+        .event-card:hover {
+            transform:
+                translateY(-5px);
+
+            border-color:
+                #ddd9ff;
+
+            box-shadow:
+                0 15px 35px
+                rgba(
+                    35,
+                    48,
+                    90,
+                    0.09
+                );
+        }
+
+
+        .event-card img {
+            width: 100%;
+
+            height: 190px;
+
+            object-fit: cover;
+
+            display: block;
+
+            background: #eef1f6;
+        }
+
+
+        .event-card-content {
+            padding: 18px;
+        }
+
+
+        .event-card h3 {
+            color: #1b2336;
+
+            font-size: 16px;
+
+            font-weight: 800;
+
+            margin-bottom: 7px;
+        }
+
+
+        .event-card p {
+            color: #7e8799;
+
+            font-size: 12px;
+
+            line-height: 1.6;
+        }
+
+
+        .event-card .price {
+            color: #6559ed;
+
+            font-size: 15px;
+
+            font-weight: 800;
+
+            margin-top: 12px;
+        }
+
+
+        .event-card button {
+            width: 100%;
+
+            margin-top: 14px;
+
+            padding: 11px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #6559ed,
+                    #8278ff
+                );
+
+            color: white;
+
+            font-family: inherit;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+
+        /* =====================================================
+           LOADING
+        ===================================================== */
+
+        #eventsContainer > p {
+            grid-column: 1 / -1;
+
+            text-align: center;
+
+            padding: 60px 20px;
+
+            color: #8992a5;
+
+            font-size: 13px;
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        .admin-footer {
+            text-align: center;
+
+            padding:
+                25px 0 5px;
+
+            color: #a0a7b5;
+
+            font-size: 11px;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 1150px) {
+
+            #eventsContainer {
+                grid-template-columns:
+                    repeat(
+                        2,
+                        minmax(
+                            0,
+                            1fr
+                        )
+                    );
+            }
+
+        }
+
+
+        @media (max-width: 900px) {
+
+            .admin-sidebar {
+                width: 220px;
+            }
+
+
+            .admin-main {
+                width:
+                    calc(
+                        100% - 220px
+                    );
+
+                margin-left: 220px;
+
+                padding:
+                    24px 20px 40px;
+            }
+
+
+            .search-box {
+                width: 280px;
+            }
+
+        }
+
+
+        @media (max-width: 700px) {
+
+            .admin-layout {
+                display: block;
+            }
+
+
+            .admin-sidebar {
+                position: relative;
+
+                width: 100%;
+
+                min-height: auto;
+
+                padding: 15px;
+            }
+
+
+            .admin-main {
+                width: 100%;
+
+                margin-left: 0;
+
+                padding:
+                    20px 15px 35px;
+            }
+
+
+            .admin-nav {
+                display: grid;
+
+                grid-template-columns:
+                    repeat(
+                        2,
+                        1fr
+                    );
+
+                gap: 5px;
+
+                margin-top: 15px;
+            }
+
+
+            .admin-nav li {
+                margin-bottom: 0;
+            }
+
+
+            .nav-section-title,
+            .sidebar-bottom {
+                display: none;
+            }
+
+
+            .page-header {
+                align-items: flex-start;
+
+                flex-direction: column;
+            }
+
+
+            .add-event-btn {
+                width: 100%;
+
+                justify-content: center;
+            }
+
+
+            .events-toolbar {
+                align-items: stretch;
+
+                flex-direction: column;
+            }
+
+
+            .search-box {
+                width: 100%;
+            }
+
+        }
+
+
+        @media (max-width: 520px) {
+
+            #eventsContainer {
+                grid-template-columns: 1fr;
+            }
+
+
+            .events-panel {
+                padding: 17px;
+            }
+
+
+            .page-title-area h1 {
+                font-size: 24px;
+            }
+
+
+            .online-status {
+                display: none;
+            }
+
+        }
+
+    </style>
 
 </head>
 
+
 <body>
 
-<div class="dashboard">
 
-    <div class="sidebar">
+<div class="admin-layout">
 
-        <h2>EventSphere</h2>
 
-        <ul>
+    <!-- =====================================================
+         SIDEBAR
+    ===================================================== -->
 
-            <li><a href="admin-dashboard.html">🏠 Dashboard</a></li>
+    <aside class="admin-sidebar">
 
-            <li><a href="add-event.html">➕ Add Event</a></li>
 
-            <li><a href="view-events.html">🎉 View Events</a></li>
+        <div class="admin-brand">
 
-            <li><a href="#">📅 Bookings</a></li>
+            <div class="brand-icon">
 
-            <li><a href="#">👥 Customers</a></li>
+                <i class="fa-solid fa-calendar-star"></i>
 
-            <li><a href="#" onclick="logout()">🚪 Logout</a></li>
+            </div>
 
-        </ul>
 
-    </div>
+            <div class="brand-text">
 
-    <div class="dashboard-content">
+                <h2>
+                    EventSphere
+                </h2>
 
-        <h1>All Events</h1>
+                <span>
+                    Admin Panel
+                </span>
 
-        <div id="eventsContainer">
-
-            <p>Loading events...</p>
+            </div>
 
         </div>
 
-    </div>
+
+        <ul class="admin-nav">
+
+
+            <li>
+
+                <a href="admin-dashboard.html">
+
+                    <i class="fa-solid fa-grid-2"></i>
+
+                    <span>
+                        Dashboard
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <li>
+
+                <a href="add-event.html">
+
+                    <i class="fa-solid fa-circle-plus"></i>
+
+                    <span>
+                        Add Event
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <li class="active">
+
+                <a href="view-events.html">
+
+                    <i class="fa-solid fa-calendar-days"></i>
+
+                    <span>
+                        View Events
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <li>
+
+                <a href="admin-bookings.html">
+
+                    <i class="fa-solid fa-ticket"></i>
+
+                    <span>
+                        Bookings
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <li>
+
+                <a href="admin-customers.html">
+
+                    <i class="fa-solid fa-users"></i>
+
+                    <span>
+                        Customers
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <div class="nav-section-title">
+                Management
+            </div>
+
+
+            <li>
+
+                <a href="admin-dashboard.html#coupons">
+
+                    <i class="fa-solid fa-ticket-simple"></i>
+
+                    <span>
+                        Discounts & Coupons
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <li>
+
+                <a href="admin-dashboard.html#maintenance">
+
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+
+                    <span>
+                        Service Maintenance
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <li>
+
+                <a href="#"
+                   onclick="logout(); return false;">
+
+                    <i class="fa-solid fa-right-from-bracket"></i>
+
+                    <span>
+                        Logout
+                    </span>
+
+                </a>
+
+            </li>
+
+
+        </ul>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="admin-profile-mini">
+
+                <div class="admin-avatar">
+
+                    <i class="fa-solid fa-user-shield"></i>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        Administrator
+                    </strong>
+
+                    <span>
+                        EventSphere Admin
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ===================================================== -->
+
+    <main class="admin-main">
+
+
+        <!-- TOP BAR -->
+
+        <div class="admin-topbar">
+
+
+            <div class="breadcrumb">
+
+                EventSphere
+                /
+                <span>
+                    View Events
+                </span>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+
+                <div class="online-status">
+
+                    <span class="online-dot"></span>
+
+                    System Online
+
+                </div>
+
+
+                <div class="top-icon">
+
+                    <i class="fa-regular fa-bell"></i>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             PAGE HEADER
+        ================================================= -->
+
+        <div class="page-header">
+
+
+            <div class="page-title-area">
+
+
+                <div class="page-title-icon">
+
+                    <i class="fa-solid fa-calendar-days"></i>
+
+                </div>
+
+
+                <div>
+
+                    <h1>
+                        All Events
+                    </h1>
+
+                    <p>
+                        View and manage all events available on EventSphere.
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+            <a href="add-event.html"
+               class="add-event-btn">
+
+                <i class="fa-solid fa-plus"></i>
+
+                Add New Event
+
+            </a>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             EVENTS PANEL
+        ================================================= -->
+
+        <section class="events-panel">
+
+
+            <div class="events-panel-header">
+
+
+                <div>
+
+                    <h2>
+                        Event Management
+                    </h2>
+
+                    <p>
+                        All events created by the administrator.
+                    </p>
+
+                </div>
+
+
+                <div class="event-count">
+
+                    <i class="fa-solid fa-calendar-check"></i>
+
+                    Events
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 TOOLBAR
+            ================================================= -->
+
+            <div class="events-toolbar">
+
+
+                <div class="search-box">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="text"
+                        id="eventSearch"
+                        placeholder="Search events..."
+                    >
+
+                </div>
+
+
+                <div class="view-label">
+
+                    <i class="fa-solid fa-layer-group"></i>
+
+                    Event Collection
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 EXISTING JS CONTAINER
+            ================================================= -->
+
+            <div id="eventsContainer">
+
+                <p>
+                    Loading events...
+                </p>
+
+            </div>
+
+
+        </section>
+
+
+
+        <div class="admin-footer">
+
+            EventSphere Admin Panel
+            •
+            Secure Management Console
+
+        </div>
+
+
+    </main>
+
 
 </div>
 
-<script type="module" src="js/admin.js"></script>
-<script type="module" src="js/view-events.js"></script>
+
+
+<!-- =====================================================
+     ADMIN JS
+===================================================== -->
+
+<script type="module"
+        src="js/admin.js">
+</script>
+
+
+<script type="module"
+        src="js/view-events.js">
+</script>
+
 
 </body>
 
