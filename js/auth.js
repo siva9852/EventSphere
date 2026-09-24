@@ -545,7 +545,6 @@ if (forgotPassword) {
 
 }
 
-
 // =========================================================
 // CUSTOMER LOGOUT
 // =========================================================
@@ -572,16 +571,20 @@ window.logout =
 
 
             window.showEventSphereMessage(
-    "warning",
-    "Session Expired",
-    "You have been logged out due to inactivity."
-);
+                "success",
+                "Logged Out",
+                "You have been logged out successfully.",
+                () => {
 
-            window.location.replace(
-                "customer-login.html"
+                    window.location.replace(
+                        "customer-login.html"
+                    );
+
+                }
             );
 
         }
+
 
         catch (error) {
 
@@ -592,10 +595,11 @@ window.logout =
 
 
             window.showEventSphereMessage(
-    "error",
-    "Logout Failed",
-    error.message || "Unable to log out. Please try again."
-);
+                "error",
+                "Logout Failed",
+                error.message ||
+                "Unable to log out. Please try again."
+            );
 
         }
 
