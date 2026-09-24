@@ -2107,15 +2107,12 @@
     import {
         auth,
         db
-    }
-    from "./js/firebase-config.js";
-
+    } from "./js/firebase-config.js";
 
     import {
         doc,
         setDoc
-    }
-    from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+    } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
     /* =====================================================
@@ -2123,27 +2120,20 @@
     ===================================================== */
 
     const description =
-        document.getElementById(
-            "description"
-        );
+        document.getElementById("description");
 
     const descriptionCount =
-        document.getElementById(
-            "descriptionCount"
-        );
-
+        document.getElementById("descriptionCount");
 
     description.addEventListener(
         "input",
         function () {
 
             descriptionCount.textContent =
-                this.value.length +
-                "/500";
+                this.value.length + "/500";
 
         }
     );
-
 
 
     /* =====================================================
@@ -2151,36 +2141,27 @@
     ===================================================== */
 
     const imageFile =
-        document.getElementById(
-            "imageFile"
-        );
+        document.getElementById("imageFile");
 
     const imagePreview =
-        document.getElementById(
-            "imagePreview"
-        );
+        document.getElementById("imagePreview");
 
     const previewPlaceholder =
-        document.getElementById(
-            "previewPlaceholder"
-        );
+        document.getElementById("previewPlaceholder");
 
 
     imageFile.addEventListener(
         "change",
         function () {
 
-            const file =
-                this.files[0];
+            const file = this.files[0];
 
             if (!file) {
                 return;
             }
 
-
             const reader =
                 new FileReader();
-
 
             reader.onload =
                 function (event) {
@@ -2193,17 +2174,11 @@
 
                     previewPlaceholder.style.display =
                         "none";
-
                 };
 
-
-            reader.readAsDataURL(
-                file
-            );
-
+            reader.readAsDataURL(file);
         }
     );
-
 
 
     /* =====================================================
@@ -2211,10 +2186,7 @@
     ===================================================== */
 
     const imageUrl =
-        document.getElementById(
-            "imageUrl"
-        );
-
+        document.getElementById("imageUrl");
 
     imageUrl.addEventListener(
         "input",
@@ -2222,7 +2194,6 @@
 
             const url =
                 this.value.trim();
-
 
             if (!url) {
 
@@ -2233,13 +2204,9 @@
                     "block";
 
                 return;
-
             }
 
-
-            imagePreview.src =
-                url;
-
+            imagePreview.src = url;
 
             imagePreview.onload =
                 function () {
@@ -2249,9 +2216,7 @@
 
                     previewPlaceholder.style.display =
                         "none";
-
                 };
-
 
             imagePreview.onerror =
                 function () {
@@ -2261,12 +2226,9 @@
 
                     previewPlaceholder.style.display =
                         "block";
-
                 };
-
         }
     );
-
 
 
     /* =====================================================
@@ -2274,9 +2236,7 @@
     ===================================================== */
 
     const eventForm =
-        document.getElementById(
-            "eventForm"
-        );
+        document.getElementById("eventForm");
 
 
     eventForm.addEventListener(
@@ -2290,19 +2250,40 @@
                 auth.currentUser;
 
 
+            /* =================================================
+               CHECK ADMIN SESSION
+            ================================================= */
+
             if (!user) {
 
-                alert(
-                    "Admin login session expired. Please login again."
-                );
+                if (
+                    typeof window.showEventSphereMessage ===
+                    "function"
+                ) {
+
+                    window.showEventSphereMessage(
+                        "error",
+                        "Session Expired",
+                        "Admin login session expired. Please login again."
+                    );
+
+                } else {
+
+                    alert(
+                        "Admin login session expired. Please login again."
+                    );
+                }
 
                 window.location.href =
                     "admin-login.html";
 
                 return;
-
             }
 
+
+            /* =================================================
+               GET FORM VALUES
+            ================================================= */
 
             const eventName =
                 document.getElementById(
@@ -2372,6 +2353,10 @@
                 ).checked;
 
 
+            /* =================================================
+               VALIDATION
+            ================================================= */
+
             if (
                 !eventName ||
                 !category ||
@@ -2382,17 +2367,33 @@
                 !imageUrlValue
             ) {
 
-                alert(
-                    "Please fill all required fields."
-                );
+                if (
+                    typeof window.showEventSphereMessage ===
+                    "function"
+                ) {
+
+                    window.showEventSphereMessage(
+                        "error",
+                        "Incomplete Details",
+                        "Please fill all required fields."
+                    );
+
+                } else {
+
+                    alert(
+                        "Please fill all required fields."
+                    );
+                }
 
                 return;
-
             }
 
 
-            try {
+            /* =================================================
+               SAVE EVENT
+            ================================================= */
 
+            try {
 
                 const eventRef =
                     doc(
@@ -2449,13 +2450,38 @@
                 );
 
 
-                alert(
-                    "Event added successfully! 🎉"
+                /* =================================================
+                   SUCCESS MESSAGE
+                ================================================= */
+
+                if (
+                    typeof window.showEventSphereMessage ===
+                    "function"
+                ) {
+
+                    window.showEventSphereMessage(
+                        "success",
+                        "Event Created",
+                        "Event added successfully!"
+                    );
+
+                } else {
+
+                    alert(
+                        "Event added successfully! 🎉"
+                    );
+                }
+
+
+                setTimeout(
+                    function () {
+
+                        window.location.href =
+                            "view-events.html";
+
+                    },
+                    1200
                 );
-
-
-                window.location.href =
-                    "view-events.html";
 
 
             }
@@ -2467,10 +2493,23 @@
                 );
 
 
-                alert(
-                    error.message ||
-                    "Unable to add event."
-                );
+                if (
+                    typeof window.showEventSphereMessage ===
+                    "function"
+                ) {
+
+                    window.showEventSphereMessage(
+                        "error",
+                        "Unable to Add Event",
+                        "Something went wrong while creating the event. Please try again."
+                    );
+
+                } else {
+
+                    alert(
+                        "Unable to add event. Please try again."
+                    );
+                }
 
             }
 
@@ -2480,14 +2519,23 @@
 </script>
 
 
-<!-- EXISTING ADMIN AUTH / INACTIVITY -->
+<!-- =====================================================
+     EVENTSPHERE COMMON MESSAGE SYSTEM
+===================================================== -->
+
+<script
+    src="js/app-messages.js">
+</script>
+
+
+<!-- =====================================================
+     EXISTING ADMIN AUTH / INACTIVITY
+===================================================== -->
 
 <script
     type="module"
-    src="js/admin.js"
-></script>
-
+    src="js/admin.js">
+</script>
 
 </body>
-
 </html>

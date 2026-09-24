@@ -197,9 +197,11 @@ if (registerForm) {
                 confirmPassword
             ) {
 
-                alert(
-                    "Passwords do not match!"
-                );
+               window.showEventSphereMessage(
+    "error",
+    "Registration Failed",
+    "Passwords do not match. Please enter the same password in both fields."
+);
 
                 return;
 
@@ -248,9 +250,11 @@ if (registerForm) {
 
                 if (!data.success) {
 
-                    alert(
-                        data.message
-                    );
+                  window.showEventSphereMessage(
+    "error",
+    "OTP Failed",
+    data.message || "Unable to send the registration OTP."
+);
 
                     return;
 
@@ -283,10 +287,11 @@ if (registerForm) {
                 );
 
 
-                alert(
-                    "Customer Registration OTP has been sent to your email."
-                );
-
+                window.showEventSphereMessage(
+    "success",
+    "OTP Sent",
+    "Customer registration OTP has been sent to your email."
+);
 
                 // =================================================
                 // GO TO REGISTRATION OTP
@@ -305,10 +310,11 @@ if (registerForm) {
                     error
                 );
 
-                alert(
-                    "Server Error"
-                );
-
+                window.showEventSphereMessage(
+    "error",
+    "Server Error",
+    "Unable to send the registration OTP. Please try again later."
+);
             }
 
         }
@@ -361,10 +367,11 @@ if (loginForm) {
                 );
 
 
-                alert(
-                    "Login Successful!"
-                );
-
+                window.showEventSphereMessage(
+    "success",
+    "Login Successful",
+    "You have logged in successfully."
+);
 
                 // =================================================
                 // CUSTOMER DASHBOARD
@@ -453,10 +460,11 @@ if (loginForm) {
 
     }
 
-
-    alert(
-        message
-    );
+window.showEventSphereMessage(
+    "error",
+    "Login Failed",
+    message
+);
 
 }
 
@@ -493,9 +501,11 @@ if (forgotPassword) {
 
             if (email === "") {
 
-                alert(
-                    "Please enter your email address first."
-                );
+               window.showEventSphereMessage(
+    "warning",
+    "Email Required",
+    "Please enter your email address first."
+);
 
                 return;
 
@@ -509,11 +519,11 @@ if (forgotPassword) {
                     email
                 );
 
-
-                alert(
-                    "Password reset email has been sent."
-                );
-
+                  window.showEventSphereMessage(
+    "success",
+    "Reset Email Sent",
+    "Password reset email has been sent to your email address."
+);
             }
 
             catch (error) {
@@ -524,9 +534,11 @@ if (forgotPassword) {
                 );
 
 
-                alert(
-                    error.message
-                );
+                window.showEventSphereMessage(
+    "error",
+    "Password Reset Failed",
+    error.message || "Unable to send the password reset email."
+);
 
             }
 
@@ -561,10 +573,11 @@ window.logout =
             }
 
 
-            alert(
-                "Logged out successfully!"
-            );
-
+            window.showEventSphereMessage(
+    "warning",
+    "Session Expired",
+    "You have been logged out due to inactivity."
+);
 
             window.location.replace(
                 "customer-login.html"

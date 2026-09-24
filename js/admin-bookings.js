@@ -1360,10 +1360,11 @@ function viewBookingDetails(
 
     if (!booking) {
 
-        alert(
-            "Booking details not found."
-        );
-
+       window.showEventSphereMessage(
+    "error",
+    "Booking Not Found",
+    "The booking details could not be found."
+);
         return;
 
     }
@@ -1896,9 +1897,11 @@ window.approveBooking =
                     !data.success
                 ) {
 
-                    alert(
-                        "Booking approved, but email could not be sent."
-                    );
+                    window.showEventSphereMessage(
+    "warning",
+    "Email Not Sent",
+    "Booking was approved, but the confirmation email could not be sent."
+);
 
                     await loadBookings();
 
@@ -1925,11 +1928,11 @@ window.approveBooking =
 
             }
 
-
-            alert(
-                "Booking approved successfully!"
-            );
-
+           window.showEventSphereMessage(
+    "success",
+    "Booking Approved",
+    "The booking has been approved successfully."
+);
 
             await loadBookings();
 
@@ -1942,11 +1945,11 @@ window.approveBooking =
             );
 
 
-            alert(
-                error.message ||
-                "Unable to approve booking."
-            );
-
+            window.showEventSphereMessage(
+    "error",
+    "Approval Failed",
+    error.message || "Unable to approve the booking."
+);
         }
 
     };
@@ -2098,10 +2101,11 @@ window.rejectBooking =
 
                 if (!reason) {
 
-                    alert(
-                        "Please enter a reason for rejection."
-                    );
-
+                    window.showEventSphereMessage(
+    "warning",
+    "Reason Required",
+    "Please enter a reason before rejecting the booking."
+);
                     reasonInput.focus();
 
                     return;
@@ -2194,10 +2198,12 @@ window.rejectBooking =
                         if (
                             !data.success
                         ) {
-
-                            alert(
-                                "Booking rejected, but email could not be sent."
-                            );
+                           
+                            window.showEventSphereMessage(
+    "warning",
+    "Email Not Sent",
+    "Booking was rejected, but the rejection email could not be sent."
+);
 
                             await loadBookings();
 
@@ -2217,10 +2223,11 @@ window.rejectBooking =
                         overlay.remove();
 
 
-                        alert(
-                            "Booking rejected, but email could not be sent."
-                        );
-
+                     window.showEventSphereMessage(
+    "warning",
+    "Email Not Sent",
+    "Booking was rejected, but the rejection email could not be sent."
+);
 
                         await loadBookings();
 
@@ -2229,10 +2236,11 @@ window.rejectBooking =
                     }
 
 
-                    alert(
-                        "Booking rejected successfully!"
-                    );
-
+                    window.showEventSphereMessage(
+    "success",
+    "Booking Rejected",
+    "The booking has been rejected successfully."
+);
 
                     await loadBookings();
 
@@ -2252,10 +2260,11 @@ window.rejectBooking =
                         "Reject Booking";
 
 
-                    alert(
-                        error.message ||
-                        "Unable to reject booking."
-                    );
+                     window.showEventSphereMessage(
+        "error",
+    "Rejection Failed",
+    error.message || "Unable to reject the booking."
+);
 
                 }
 

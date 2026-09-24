@@ -187,10 +187,11 @@ if (adminOtpForm) {
 
             if (!email) {
 
-                alert(
-                    "Admin login session expired. Please login again."
-                );
-
+               window.showEventSphereMessage(
+    "warning",
+    "Session Expired",
+    "Your admin login session has expired. Please login again."
+);
 
                 window.location.replace(
                     "admin-login.html"
@@ -210,9 +211,11 @@ if (adminOtpForm) {
                 otp.length !== 6
             ) {
 
-                alert(
-                    "Please enter the complete 6-digit OTP."
-                );
+                window.showEventSphereMessage(
+    "warning",
+    "OTP Required",
+    "Please enter the complete 6-digit OTP."
+);
 
 
                 return;
@@ -299,10 +302,12 @@ if (adminOtpForm) {
                     !data.success
                 ) {
 
-                    alert(
-                        data.message ||
-                        "Invalid OTP."
-                    );
+                    window.showEventSphereMessage(
+    "error",
+    "Invalid OTP",
+    data.message ||
+    "The OTP is incorrect or has expired."
+);
 
 
                     if (verifyButton) {
@@ -352,9 +357,11 @@ if (adminOtpForm) {
 
                 if (!adminUid) {
 
-                    alert(
-                        "Admin login session expired. Please login again."
-                    );
+                    window.showEventSphereMessage(
+    "warning",
+    "Session Expired",
+    "Your admin login session has expired. Please login again."
+);
 
 
                     if (verifyButton) {
@@ -409,9 +416,11 @@ if (adminOtpForm) {
                     );
 
 
-                    alert(
-                        "Admin account not found."
-                    );
+                    window.showEventSphereMessage(
+    "error",
+    "Admin Account Not Found",
+    "The administrator account could not be found."
+);
 
 
                     window.location.replace(
@@ -447,9 +456,11 @@ if (adminOtpForm) {
                     );
 
 
-                    alert(
-                        "Access denied. This account is not an admin."
-                    );
+                    window.showEventSphereMessage(
+    "error",
+    "Access Denied",
+    "This account does not have administrator access."
+);
 
 
                     window.location.replace(
@@ -487,18 +498,17 @@ if (adminOtpForm) {
                 );
 
 
-                console.log(
-                    "ADMIN LOGIN SUCCESSFUL"
-                );
+                window.showEventSphereMessage(
+    "success",
+    "Login Successful",
+    "Admin login successful. Welcome to the EventSphere Admin Panel."
+);
 
-
-                // =================================================
-                // OPEN ADMIN DASHBOARD
-                // =================================================
-
-                window.location.replace(
-                    "admin-dashboard.html"
-                );
+setTimeout(() => {
+    window.location.replace(
+        "admin-dashboard.html"
+    );
+}, 1200);
 
             }
 
@@ -511,10 +521,12 @@ if (adminOtpForm) {
                 );
 
 
-                alert(
-                    error.message ||
-                    "Unable to verify OTP. Please try again."
-                );
+                window.showEventSphereMessage(
+    "error",
+    "OTP Verification Failed",
+    error.message ||
+    "Unable to verify OTP. Please try again."
+);
 
 
                 if (verifyButton) {
@@ -553,9 +565,11 @@ if (resendButton) {
 
             if (!email) {
 
-                alert(
-                    "Admin login session expired. Please login again."
-                );
+                window.showEventSphereMessage(
+    "warning",
+    "Session Expired",
+    "Your admin login session has expired. Please login again."
+);
 
 
                 window.location.replace(
@@ -617,10 +631,12 @@ if (resendButton) {
                     !data.success
                 ) {
 
-                    alert(
-                        data.message ||
-                        "Unable to resend OTP."
-                    );
+                    window.showEventSphereMessage(
+    "error",
+    "OTP Resend Failed",
+    data.message ||
+    "Unable to resend OTP."
+);
 
 
                     resendButton.disabled =
@@ -666,10 +682,11 @@ if (resendButton) {
                 }
 
 
-                alert(
-                    "A new Admin OTP has been sent to your email."
-                );
-
+                window.showEventSphereMessage(
+    "success",
+    "OTP Sent",
+    "A new admin OTP has been sent to your email."
+);
 
                 resendButton.disabled =
                     false;
@@ -689,9 +706,11 @@ if (resendButton) {
                 );
 
 
-                alert(
-                    "Unable to resend OTP. Please try again."
-                );
+                window.showEventSphereMessage(
+    "error",
+    "OTP Resend Failed",
+    "Unable to resend OTP. Please try again."
+);
 
 
                 resendButton.disabled =

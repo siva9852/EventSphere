@@ -40,8 +40,11 @@ bookingForm.addEventListener("submit", async (e) => {
 
     if (!user) {
 
-        alert("Please login first.");
-
+       window.showEventSphereMessage(
+    "warning",
+    "Login Required",
+    "Please login first to continue with your booking."
+);
         window.location.href =
             "customer-login.html";
 
@@ -59,8 +62,12 @@ bookingForm.addEventListener("submit", async (e) => {
 
 
         if (!eventDoc.exists()) {
-
-            alert("Event not found.");
+     
+            window.showEventSphereMessage(
+    "error",
+    "Event Not Found",
+    "The selected event could not be found."
+);
 
             return;
 
@@ -97,7 +104,11 @@ bookingForm.addEventListener("submit", async (e) => {
 
         if (!data.success) {
 
-            alert(data.message);
+            window.showEventSphereMessage(
+    "error",
+    "Verification Failed",
+    data.message || "Unable to send the verification code."
+);
 
             return;
 
@@ -144,10 +155,11 @@ bookingForm.addEventListener("submit", async (e) => {
         );
 
 
-        alert(
-            "Verification code has been sent to your email."
-        );
-
+        window.showEventSphereMessage(
+    "success",
+    "Verification Code Sent",
+    "A verification code has been sent to your email."
+);
 
         window.location.href =
             "booking-otp.html";
@@ -158,7 +170,11 @@ bookingForm.addEventListener("submit", async (e) => {
 
         console.error(error);
 
-        alert("Unable to send verification code.");
+        window.showEventSphereMessage(
+    "error",
+    "Verification Failed",
+    "Unable to send the verification code. Please try again."
+);
 
     }
 

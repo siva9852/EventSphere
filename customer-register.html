@@ -1,16 +1,22 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>Customer Register - EventSphere</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link
+        rel="stylesheet"
+        href="css/style.css">
 
-    <link rel="stylesheet"
+    <link
+        rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 </head>
@@ -85,8 +91,10 @@
                     placeholder="Password"
                     required>
 
-                <i class="fa-solid fa-eye password-eye"
-                    id="togglePassword"></i>
+                <i
+                    class="fa-solid fa-eye password-eye"
+                    id="togglePassword">
+                </i>
 
             </div>
 
@@ -101,8 +109,10 @@
                     placeholder="Confirm Password"
                     required>
 
-                <i class="fa-solid fa-eye password-eye"
-                    id="toggleConfirmPassword"></i>
+                <i
+                    class="fa-solid fa-eye password-eye"
+                    id="toggleConfirmPassword">
+                </i>
 
             </div>
 
@@ -189,9 +199,36 @@ toggleConfirmPassword.addEventListener("click", () => {
 </script>
 
 
-<script type="module" src="js/firebase-config.js"></script>
-<script type="module" src="js/auth.js"></script>
+<!-- =====================================================
+     EVENTSPHERE COMMON MESSAGE SYSTEM
+     ===================================================== -->
+
+<script
+    src="js/app-messages.js">
+</script>
+
+
+<!-- =====================================================
+     FIREBASE
+     ===================================================== -->
+
+<script
+    type="module"
+    src="js/firebase-config.js">
+</script>
+
+
+<!-- =====================================================
+     CUSTOMER AUTH
+     ===================================================== -->
+
+<script
+    type="module"
+    src="js/auth.js">
+</script>
+
 
 </body>
 
 </html>
+```

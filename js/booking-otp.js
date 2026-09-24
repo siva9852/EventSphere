@@ -97,10 +97,11 @@ document
 
         if (!user) {
 
-            alert(
-                "Please login first."
-            );
-
+           window.showEventSphereMessage(
+    "warning",
+    "Login Required",
+    "Please login first to continue."
+);
             window.location.href =
                 "customer-login.html";
 
@@ -115,9 +116,11 @@ document
 
         if (otp.length !== 6) {
 
-            alert(
-                "Please enter the complete 6-digit OTP."
-            );
+            window.showEventSphereMessage(
+    "warning",
+    "OTP Required",
+    "Please enter the complete 6-digit OTP."
+);
 
             return;
 
@@ -136,9 +139,11 @@ document
 
         if (!savedBookingData) {
 
-            alert(
-                "Booking information not found."
-            );
+            window.showEventSphereMessage(
+    "error",
+    "Booking Information Missing",
+    "Booking information was not found. Please create the booking again."
+);
 
             window.location.href =
                 "customer-events.html";
@@ -167,9 +172,11 @@ document
                 error
             );
 
-            alert(
-                "Invalid booking information. Please create the booking again."
-            );
+           window.showEventSphereMessage(
+    "error",
+    "Invalid Booking",
+    "The booking information is invalid. Please create the booking again."
+);
 
             return;
 
@@ -224,10 +231,12 @@ document
                 !otpData.success
             ) {
 
-                alert(
-                    otpData.message ||
-                    "Incorrect or expired OTP."
-                );
+                window.showEventSphereMessage(
+    "error",
+    "Invalid OTP",
+    otpData.message ||
+    "The OTP is incorrect or has expired. Please try again."
+);
 
                 return;
 
@@ -373,9 +382,11 @@ document
             // STEP 5 — SUCCESS
             // =================================================
 
-            alert(
-                "Booking verified successfully! Waiting for admin approval."
-            );
+            window.showEventSphereMessage(
+    "success",
+    "Booking Submitted",
+    "Booking verified successfully! Your booking is waiting for admin approval."
+);
 
 
             window.location.href =
@@ -396,11 +407,12 @@ document
             // SHOW ACTUAL ERROR
             // =================================================
 
-            alert(
-                "Booking could not be completed.\n\n" +
-                (error.message ||
-                "Please try again.")
-            );
+            window.showEventSphereMessage(
+    "error",
+    "Booking Failed",
+    error.message ||
+    "Booking could not be completed. Please try again."
+);
 
         }
 
@@ -421,9 +433,11 @@ document
 
         if (!user) {
 
-            alert(
-                "Please login first."
-            );
+            window.showEventSphereMessage(
+    "warning",
+    "Login Required",
+    "Please login first to continue."
+);
 
             return;
 
@@ -467,19 +481,21 @@ document
                 data.success
             ) {
 
-                alert(
-                    "New OTP has been sent to your email."
-                );
-
+                window.showEventSphereMessage(
+    "success",
+    "OTP Resent",
+    "A new OTP has been sent to your email."
+);
             }
 
             else {
 
-                alert(
-                    data.message ||
-                    "Unable to resend OTP."
-                );
-
+                window.showEventSphereMessage(
+    "error",
+    "OTP Resend Failed",
+    data.message ||
+    "Unable to resend OTP."
+);
             }
 
         }
@@ -492,9 +508,11 @@ document
             );
 
 
-            alert(
-                "Unable to resend OTP. Please try again."
-            );
+           window.showEventSphereMessage(
+    "error",
+    "OTP Resend Failed",
+    "Unable to resend OTP. Please try again."
+);
 
         }
 
