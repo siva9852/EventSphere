@@ -45,9 +45,11 @@ function startInactivityTimer() {
 
                     await signOut(auth);
 
-                    alert(
-                        "You have been logged out due to inactivity."
-                    );
+                   window.showEventSphereMessage(
+    "warning",
+    "Session Expired",
+    "You have been logged out due to inactivity."
+);
 
                     window.location.replace(
                         "customer-login.html"
@@ -367,20 +369,16 @@ if (loginForm) {
                 );
 
 
-                window.showEventSphereMessage(
+              window.showEventSphereMessage(
     "success",
     "Login Successful",
-    "You have logged in successfully."
+    "You have logged in successfully.",
+    () => {
+        window.location.replace(
+            "customer-dashboard.html"
+        );
+    }
 );
-
-                // =================================================
-                // CUSTOMER DASHBOARD
-                // =================================================
-
-                window.location.replace(
-                    "customer-dashboard.html"
-                );
-
             }
 
            catch (error) {
@@ -593,9 +591,11 @@ window.logout =
             );
 
 
-            alert(
-                error.message
-            );
+            window.showEventSphereMessage(
+    "error",
+    "Logout Failed",
+    error.message || "Unable to log out. Please try again."
+);
 
         }
 

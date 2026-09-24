@@ -203,11 +203,12 @@
     // =====================================================
 
     window.showEventSphereMessage =
-        function (
-            type = "info",
-            title = "EventSphere",
-            message = ""
-        ) {
+    function (
+        type = "info",
+        title = "EventSphere",
+        message = "",
+        onOk = null
+    ) {
 
             // Remove existing message
             const existing =
@@ -333,10 +334,17 @@
             if (okButton) {
 
                 okButton.addEventListener(
-                    "click",
-                    closeMessage
-                );
+    "click",
+    () => {
 
+        closeMessage();
+
+        if (typeof onOk === "function") {
+            onOk();
+        }
+
+    }
+);
                 okButton.focus();
 
             }
