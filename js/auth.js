@@ -376,19 +376,89 @@ if (loginForm) {
 
             }
 
-            catch (error) {
+           catch (error) {
 
-                console.error(
-                    "Customer Login Error:",
-                    error
-                );
+    console.error(
+        "Customer Login Error:",
+        error
+    );
+
+    let message =
+        "Unable to login. Please try again.";
+
+    switch (error.code) {
+
+        case "auth/invalid-credential":
+
+            message =
+                "Incorrect email or password. Please try again.";
+
+            break;
 
 
-                alert(
-                    error.message
-                );
+        case "auth/wrong-password":
 
-            }
+            message =
+                "Incorrect password. Please try again.";
+
+            break;
+
+
+        case "auth/user-not-found":
+
+            message =
+                "No account found with this email. Please register first.";
+
+            break;
+
+
+        case "auth/invalid-email":
+
+            message =
+                "Please enter a valid email address.";
+
+            break;
+
+
+        case "auth/user-disabled":
+
+            message =
+                "This account has been disabled. Please contact support.";
+
+            break;
+
+
+        case "auth/too-many-requests":
+
+            message =
+                "Too many login attempts. Please try again later.";
+
+            break;
+
+
+        case "auth/network-request-failed":
+
+            message =
+                "Unable to connect. Please check your internet connection.";
+
+            break;
+
+
+        default:
+
+            message =
+                "Login failed. Please check your email and password and try again.";
+
+            break;
+
+    }
+
+
+    alert(
+        message
+    );
+
+}
 
         }
     );
