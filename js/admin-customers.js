@@ -510,16 +510,89 @@ window.deleteCustomer =
         customerId,
         customerEmail
     ) {
+        window.showEventSphereConfirm(
+    "Delete Customer?",
+    "Are you sure you want to delete this customer?",
+    async () => {
 
-        const confirmDelete =
-            confirm(
-                "Are you sure you want to delete this customer?"
+        try {
+
+            const response =
+                await fetch(
+                    "https://eventsphere-dndh.onrender.com/delete-customer",
+                    {
+                        method: "DELETE",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify({
+                                email:
+                                    customerEmail
+                            })
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!data.success) {
+
+                window.showEventSphereMessage(
+                    "error",
+                    "Delete Failed",
+                    data.message ||
+                    "Failed to delete customer."
+                );
+
+                return;
+            }
+
+
+            await deleteDoc(
+                doc(
+                    db,
+                    "users",
+                    customerId
+                )
             );
 
 
-        if (!confirmDelete) {
-            return;
+            window.showEventSphereMessage(
+                "success",
+                "Customer Deleted",
+                "Customer deleted successfully."
+            );
+
+
+            loadCustomers();
+
         }
+
+
+        catch (error) {
+
+            console.error(
+                "Delete Customer Error:",
+                error
+            );
+
+
+            window.showEventSphereMessage(
+                "error",
+                "Delete Failed",
+                "Failed to delete customer."
+            );
+
+        }
+
+    }
+);
 
 
         try {

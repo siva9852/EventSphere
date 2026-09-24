@@ -10,6 +10,10 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
+// =========================================================
+// OTP FORM
+// =========================================================
+
 const otpForm =
     document.getElementById("otpForm");
 
@@ -39,20 +43,27 @@ otpForm.addEventListener(
             );
 
 
+        // =====================================================
+        // CHECK REGISTRATION SESSION
+        // =====================================================
+
         if (
             !email ||
             !registerDataString
         ) {
 
-            alert(
-                "Registration session expired. Please register again."
+            window.showEventSphereMessage(
+                "warning",
+                "Registration Session Expired",
+                "Your registration session has expired. Please register again.",
+                () => {
+
+                    window.location.replace(
+                        "customer-register.html"
+                    );
+
+                }
             );
-
-
-            window.location.replace(
-                "customer-register.html"
-            );
-
 
             return;
 
@@ -65,9 +76,15 @@ otpForm.addEventListener(
             );
 
 
+        // =====================================================
+        // CHECK OTP LENGTH
+        // =====================================================
+
         if (otp.length !== 6) {
 
-            alert(
+            window.showEventSphereMessage(
+                "warning",
+                "OTP Required",
                 "Please enter the complete 6-digit OTP."
             );
 
@@ -78,7 +95,9 @@ otpForm.addEventListener(
 
         try {
 
-            // ================= VERIFY OTP =================
+            // =================================================
+            // VERIFY OTP
+            // =================================================
 
             const response =
                 await fetch(
@@ -105,6 +124,10 @@ otpForm.addEventListener(
                 );
 
 
+            // =================================================
+            // SERVER CONNECTION ERROR
+            // =================================================
+
             if (!response.ok) {
 
                 throw new Error(
@@ -118,10 +141,17 @@ otpForm.addEventListener(
                 await response.json();
 
 
+            // =================================================
+            // INVALID OTP
+            // =================================================
+
             if (!data.success) {
 
-                alert(
-                    data.message
+                window.showEventSphereMessage(
+                    "error",
+                    "OTP Verification Failed",
+                    data.message ||
+                    "The OTP is incorrect or has expired."
                 );
 
                 return;
@@ -129,7 +159,9 @@ otpForm.addEventListener(
             }
 
 
-            // ================= CREATE FIREBASE ACCOUNT =================
+            // =================================================
+            // CREATE FIREBASE ACCOUNT
+            // =================================================
 
             const userCredential =
                 await createUserWithEmailAndPassword(
@@ -143,7 +175,9 @@ otpForm.addEventListener(
                 userCredential.user;
 
 
-            // ================= SAVE CUSTOMER DETAILS =================
+            // =================================================
+            // SAVE CUSTOMER DETAILS
+            // =================================================
 
             await setDoc(
                 doc(
@@ -172,7 +206,9 @@ otpForm.addEventListener(
             );
 
 
-            // ================= CLEAR TEMPORARY DATA =================
+            // =================================================
+            // CLEAR TEMPORARY DATA
+            // =================================================
 
             localStorage.removeItem(
                 "otpEmail"
@@ -184,24 +220,29 @@ otpForm.addEventListener(
             );
 
 
-            alert(
-                "Registration Successful!"
-            );
+            // =================================================
+            // REGISTRATION SUCCESS
+            // =================================================
 
+            window.showEventSphereMessage(
+                "success",
+                "Registration Successful",
+                "Your EventSphere account has been created successfully.",
+                () => {
 
-            /*
-             * IMPORTANT:
-             * replace() prevents the OTP page
-             * from appearing again when the
-             * user presses Chrome Back.
-             */
+                    window.location.replace(
+                        "customer-login.html"
+                    );
 
-            window.location.replace(
-                "customer-login.html"
+                }
             );
 
         }
 
+
+        // =====================================================
+        // ERROR
+        // =====================================================
 
         catch (error) {
 
@@ -211,7 +252,9 @@ otpForm.addEventListener(
             );
 
 
-            alert(
+            window.showEventSphereMessage(
+                "error",
+                "Registration Failed",
                 error.message ||
                 "Failed to verify OTP. Please try again."
             );
