@@ -10,7 +10,8 @@ const axios = require("axios");
 const fs = require("fs");
 const crypto = require("crypto");
 const Razorpay = require("razorpay");
-const nodemailer = require("nodemailer");               
+const nodemailer = require("nodemailer");
+const QRCode = require("qrcode");             
 
 const {
     initializeApp,
@@ -3294,7 +3295,1101 @@ app.post(
 
     }
 );
+// =========================================================
+// ADMIN AUTHENTICATOR / TOTP
+// =========================================================
 
+const TOTP_ISSUER = "EventSphere";
+const TOTP_PERIOD = 30;
+const TOTP_DIGITS = 6;
+
+const TOTP_ENCRYPTION_KEY =
+    process.env.TOTP_ENCRYPTION_KEY || "";
+
+
+// =========================================================
+// BASE32 ENCODE
+// =========================================================
+
+function base32Encode(buffer) {
+
+    const alphabet =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
+    let bits = "";
+    let output = "";
+
+    for (const byte of buffer) {
+
+        bits += byte
+            .toString(2)
+            .padStart(8, "0");
+
+    }
+
+    for (
+        let i = 0;
+        i + 5 <= bits.length;
+        i += 5
+    ) {
+
+        output +=
+            alphabet[
+                parseInt(
+                    bits.slice(i, i + 5),
+                    2
+                )
+            ];
+
+    }
+
+    const remaining =
+        bits.length % 5;
+
+    if (remaining !== 0) {
+
+        output +=
+            alphabet[
+                parseInt(
+                    bits
+                        .slice(
+                            bits.length -
+                            remaining
+                        )
+                        .padEnd(5, "0"),
+                    2
+                )
+            ];
+
+    }
+
+    return output;
+
+}
+
+
+// =========================================================
+// BASE32 DECODE
+// =========================================================
+
+function base32Decode(input) {
+
+    const alphabet =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
+    const clean =
+        String(input || "")
+            .toUpperCase()
+            .replace(/=+$/g, "")
+            .replace(/\s+/g, "");
+
+    let bits = "";
+
+    for (const char of clean) {
+
+        const value =
+            alphabet.indexOf(char);
+
+        if (value === -1) {
+
+            throw new Error(
+                "Invalid TOTP secret."
+            );
+
+        }
+
+        bits += value
+            .toString(2)
+            .padStart(5, "0");
+
+    }
+
+    const bytes = [];
+
+    for (
+        let i = 0;
+        i + 8 <= bits.length;
+        i += 8
+    ) {
+
+        bytes.push(
+            parseInt(
+                bits.slice(i, i + 8),
+                2
+            )
+        );
+
+    }
+
+    return Buffer.from(bytes);
+
+}
+
+
+// =========================================================
+// GENERATE TOTP CODE
+// =========================================================
+
+function generateTotpCode(
+    secret,
+    counter
+) {
+
+    const key =
+        base32Decode(secret);
+
+    const counterBuffer =
+        Buffer.alloc(8);
+
+    counterBuffer.writeBigUInt64BE(
+        BigInt(counter),
+        0
+    );
+
+    const hmac =
+        crypto
+            .createHmac(
+                "sha1",
+                key
+            )
+            .update(counterBuffer)
+            .digest();
+
+    const offset =
+        hmac[
+            hmac.length - 1
+        ] & 0x0f;
+
+    const binary =
+        ((hmac[offset] & 0x7f) << 24) |
+        ((hmac[offset + 1] & 0xff) << 16) |
+        ((hmac[offset + 2] & 0xff) << 8) |
+        (hmac[offset + 3] & 0xff);
+
+    return String(
+        binary % 1000000
+    ).padStart(
+        6,
+        "0"
+    );
+
+}
+
+
+// =========================================================
+// VERIFY TOTP CODE
+// =========================================================
+
+function verifyTotpCode(
+    secret,
+    code
+) {
+
+    const normalizedCode =
+        String(code || "")
+            .trim();
+
+    if (
+        !/^\d{6}$/.test(
+            normalizedCode
+        )
+    ) {
+
+        return false;
+
+    }
+
+    const currentCounter =
+        Math.floor(
+            Date.now() /
+            1000 /
+            TOTP_PERIOD
+        );
+
+    // Allow one time period before
+    // and after the current period.
+    for (
+        const offset of [
+            -1,
+            0,
+            1
+        ]
+    ) {
+
+        const expected =
+            generateTotpCode(
+                secret,
+                currentCounter +
+                offset
+            );
+
+        const a =
+            Buffer.from(
+                normalizedCode
+            );
+
+        const b =
+            Buffer.from(
+                expected
+            );
+
+        if (
+            a.length === b.length &&
+            crypto.timingSafeEqual(
+                a,
+                b
+            )
+        ) {
+
+            return true;
+
+        }
+
+    }
+
+    return false;
+
+}
+
+
+// =========================================================
+// ENCRYPT TOTP SECRET
+// =========================================================
+
+function encryptTotpSecret(
+    secret
+) {
+
+    if (!TOTP_ENCRYPTION_KEY) {
+
+        throw new Error(
+            "TOTP_ENCRYPTION_KEY is not configured."
+        );
+
+    }
+
+    const key =
+        Buffer.from(
+            TOTP_ENCRYPTION_KEY,
+            "hex"
+        );
+
+    if (key.length !== 32) {
+
+        throw new Error(
+            "TOTP_ENCRYPTION_KEY must contain exactly 64 hexadecimal characters."
+        );
+
+    }
+
+    const iv =
+        crypto.randomBytes(12);
+
+    const cipher =
+        crypto.createCipheriv(
+            "aes-256-gcm",
+            key,
+            iv
+        );
+
+    const encrypted =
+        Buffer.concat([
+            cipher.update(
+                secret,
+                "utf8"
+            ),
+            cipher.final()
+        ]);
+
+    const authTag =
+        cipher.getAuthTag();
+
+    return [
+        iv.toString("hex"),
+        authTag.toString("hex"),
+        encrypted.toString("hex")
+    ].join(":");
+
+}
+
+
+// =========================================================
+// DECRYPT TOTP SECRET
+// =========================================================
+
+function decryptTotpSecret(
+    value
+) {
+
+    if (!TOTP_ENCRYPTION_KEY) {
+
+        throw new Error(
+            "TOTP_ENCRYPTION_KEY is not configured."
+        );
+
+    }
+
+    const key =
+        Buffer.from(
+            TOTP_ENCRYPTION_KEY,
+            "hex"
+        );
+
+    if (key.length !== 32) {
+
+        throw new Error(
+            "TOTP_ENCRYPTION_KEY must contain exactly 64 hexadecimal characters."
+        );
+
+    }
+
+    const parts =
+        String(value || "")
+            .split(":");
+
+    if (parts.length !== 3) {
+
+        throw new Error(
+            "Invalid encrypted TOTP secret."
+        );
+
+    }
+
+    const iv =
+        Buffer.from(
+            parts[0],
+            "hex"
+        );
+
+    const authTag =
+        Buffer.from(
+            parts[1],
+            "hex"
+        );
+
+    const encrypted =
+        Buffer.from(
+            parts[2],
+            "hex"
+        );
+
+    const decipher =
+        crypto.createDecipheriv(
+            "aes-256-gcm",
+            key,
+            iv
+        );
+
+    decipher.setAuthTag(
+        authTag
+    );
+
+    return Buffer.concat([
+        decipher.update(
+            encrypted
+        ),
+        decipher.final()
+    ]).toString(
+        "utf8"
+    );
+
+}
+
+
+// =========================================================
+// VERIFY FIREBASE ADMIN REQUEST
+// =========================================================
+
+async function verifyFirebaseAdminRequest(
+    req
+) {
+
+    if (
+        !firebaseAuth ||
+        !firebaseDb
+    ) {
+
+        throw new Error(
+            "Firebase Admin is not initialized."
+        );
+
+    }
+
+    const authHeader =
+        req.headers.authorization ||
+        "";
+
+    if (
+        !authHeader.startsWith(
+            "Bearer "
+        )
+    ) {
+
+        const error =
+            new Error(
+                "Authorization token is required."
+            );
+
+        error.statusCode = 401;
+
+        throw error;
+
+    }
+
+    const idToken =
+        authHeader
+            .substring(7)
+            .trim();
+
+    if (!idToken) {
+
+        const error =
+            new Error(
+                "Authorization token is required."
+            );
+
+        error.statusCode = 401;
+
+        throw error;
+
+    }
+
+    const decodedToken =
+        await firebaseAuth
+            .verifyIdToken(
+                idToken
+            );
+
+    const userSnap =
+        await firebaseDb
+            .collection("users")
+            .doc(
+                decodedToken.uid
+            )
+            .get();
+
+    if (!userSnap.exists) {
+
+        const error =
+            new Error(
+                "Admin account was not found."
+            );
+
+        error.statusCode = 403;
+
+        throw error;
+
+    }
+
+    const userData =
+        userSnap.data() || {};
+
+    if (
+        String(
+            userData.role || ""
+        ).toLowerCase() !==
+        "admin"
+    ) {
+
+        const error =
+            new Error(
+                "Admin access is required."
+            );
+
+        error.statusCode = 403;
+
+        throw error;
+
+    }
+
+    return {
+
+        uid:
+            decodedToken.uid,
+
+        email:
+            decodedToken.email ||
+            userData.email ||
+            ""
+
+    };
+
+}
+
+
+// =========================================================
+// AUTHENTICATOR STATUS
+// =========================================================
+
+app.get(
+    "/admin/authenticator/status",
+    async (req, res) => {
+
+        try {
+
+            const admin =
+                await verifyFirebaseAdminRequest(
+                    req
+                );
+
+            const snap =
+                await firebaseDb
+                    .collection(
+                        "adminMFA"
+                    )
+                    .doc(
+                        admin.uid
+                    )
+                    .get();
+
+            return res.json({
+
+                success: true,
+
+                enabled:
+                    snap.exists &&
+                    snap.data()?.enabled ===
+                    true
+
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "AUTHENTICATOR STATUS ERROR:",
+                error.message
+            );
+
+            return res
+                .status(
+                    error.statusCode ||
+                    500
+                )
+                .json({
+
+                    success: false,
+
+                    message:
+                        error.statusCode
+                            ? error.message
+                            : "Unable to check authenticator status."
+
+                });
+
+        }
+
+    }
+);
+
+
+// =========================================================
+// AUTHENTICATOR SETUP
+// GENERATE SECRET + QR CODE
+// =========================================================
+
+app.post(
+    "/admin/authenticator/setup",
+    async (req, res) => {
+
+        try {
+
+            const admin =
+                await verifyFirebaseAdminRequest(
+                    req
+                );
+
+            if (
+                !TOTP_ENCRYPTION_KEY
+            ) {
+
+                return res
+                    .status(500)
+                    .json({
+
+                        success: false,
+
+                        message:
+                            "Authenticator encryption is not configured on the server."
+
+                    });
+
+            }
+
+            const mfaRef =
+                firebaseDb
+                    .collection(
+                        "adminMFA"
+                    )
+                    .doc(
+                        admin.uid
+                    );
+
+            const existing =
+                await mfaRef.get();
+
+            if (
+                existing.exists &&
+                existing.data()?.enabled ===
+                true
+            ) {
+
+                return res.json({
+
+                    success: true,
+
+                    enabled: true,
+
+                    message:
+                        "Authenticator is already enabled."
+
+                });
+
+            }
+
+            // Generate a secure
+            // random TOTP secret.
+
+            const secret =
+                base32Encode(
+                    crypto.randomBytes(
+                        20
+                    )
+                );
+
+            const accountName =
+                admin.email ||
+                admin.uid;
+
+            const label =
+                `${TOTP_ISSUER}:${accountName}`;
+
+            const otpauthUri =
+                `otpauth://totp/${encodeURIComponent(
+                    label
+                )}?secret=${encodeURIComponent(
+                    secret
+                )}&issuer=${encodeURIComponent(
+                    TOTP_ISSUER
+                )}&algorithm=SHA1&digits=6&period=30`;
+
+            const qrCode =
+                await QRCode.toDataURL(
+                    otpauthUri,
+                    {
+                        width: 280,
+                        margin: 2
+                    }
+                );
+
+            const encryptedSecret =
+                encryptTotpSecret(
+                    secret
+                );
+
+            await mfaRef.set({
+
+                uid:
+                    admin.uid,
+
+                email:
+                    accountName,
+
+                secret:
+                    encryptedSecret,
+
+                enabled:
+                    false,
+
+                createdAt:
+                    FieldValue
+                        .serverTimestamp(),
+
+                updatedAt:
+                    FieldValue
+                        .serverTimestamp()
+
+            });
+
+            return res.json({
+
+                success: true,
+
+                enabled: false,
+
+                qrCode:
+
+                    qrCode,
+
+                secret:
+
+                    secret,
+
+                message:
+                    "Scan the QR code with Google Authenticator, then enter the 6-digit code."
+
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "AUTHENTICATOR SETUP ERROR:",
+                error.message
+            );
+
+            return res
+                .status(
+                    error.statusCode ||
+                    500
+                )
+                .json({
+
+                    success: false,
+
+                    message:
+                        error.statusCode
+                            ? error.message
+                            : "Unable to create authenticator setup."
+
+                });
+
+        }
+
+    }
+);
+
+
+// =========================================================
+// VERIFY AUTHENTICATOR SETUP
+// =========================================================
+
+app.post(
+    "/admin/authenticator/verify-setup",
+    async (req, res) => {
+
+        try {
+
+            const admin =
+                await verifyFirebaseAdminRequest(
+                    req
+                );
+
+            const code =
+                String(
+                    req.body?.code ||
+                    ""
+                ).trim();
+
+            if (
+                !/^\d{6}$/.test(
+                    code
+                )
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success: false,
+
+                        message:
+                            "Enter the 6-digit authenticator code."
+
+                    });
+
+            }
+
+            const mfaRef =
+                firebaseDb
+                    .collection(
+                        "adminMFA"
+                    )
+                    .doc(
+                        admin.uid
+                    );
+
+            const snap =
+                await mfaRef.get();
+
+            if (!snap.exists) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success: false,
+
+                        message:
+                            "Authenticator setup has not been started."
+
+                    });
+
+            }
+
+            const data =
+                snap.data() || {};
+
+            const secret =
+                decryptTotpSecret(
+                    data.secret
+                );
+
+            if (
+                !verifyTotpCode(
+                    secret,
+                    code
+                )
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success: false,
+
+                        message:
+                            "Invalid authenticator code. Please enter the current 6-digit code."
+
+                    });
+
+            }
+
+            await mfaRef.update({
+
+                enabled:
+                    true,
+
+                verifiedAt:
+                    FieldValue
+                        .serverTimestamp(),
+
+                updatedAt:
+                    FieldValue
+                        .serverTimestamp()
+
+            });
+
+            return res.json({
+
+                success: true,
+
+                enabled: true,
+
+                message:
+                    "Google Authenticator enabled successfully."
+
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "AUTHENTICATOR SETUP VERIFY ERROR:",
+                error.message
+            );
+
+            return res
+                .status(
+                    error.statusCode ||
+                    500
+                )
+                .json({
+
+                    success: false,
+
+                    message:
+                        error.statusCode
+                            ? error.message
+                            : "Unable to verify authenticator setup."
+
+                });
+
+        }
+
+    }
+);
+
+
+// =========================================================
+// AUTHENTICATOR LOGIN VERIFICATION
+// =========================================================
+
+app.post(
+    "/admin/authenticator/verify",
+    async (req, res) => {
+
+        try {
+
+            const admin =
+                await verifyFirebaseAdminRequest(
+                    req
+                );
+
+            const code =
+                String(
+                    req.body?.code ||
+                    ""
+                ).trim();
+
+            if (
+                !/^\d{6}$/.test(
+                    code
+                )
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success: false,
+
+                        message:
+                            "Enter the 6-digit authenticator code."
+
+                    });
+
+            }
+
+            const snap =
+                await firebaseDb
+                    .collection(
+                        "adminMFA"
+                    )
+                    .doc(
+                        admin.uid
+                    )
+                    .get();
+
+            if (!snap.exists) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success: false,
+
+                        message:
+                            "Authenticator is not configured for this admin account."
+
+                    });
+
+            }
+
+            const data =
+                snap.data() || {};
+
+            if (
+                data.enabled !==
+                true
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success: false,
+
+                        message:
+                            "Authenticator setup is not completed."
+
+                    });
+
+            }
+
+            const secret =
+                decryptTotpSecret(
+                    data.secret
+                );
+
+            if (
+                !verifyTotpCode(
+                    secret,
+                    code
+                )
+            ) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        success: false,
+
+                        message:
+                            "Invalid authenticator code."
+
+                    });
+
+            }
+
+            await firebaseDb
+                .collection(
+                    "adminMFA"
+                )
+                .doc(
+                    admin.uid
+                )
+                .update({
+
+                    lastVerifiedAt:
+                        FieldValue
+                            .serverTimestamp(),
+
+                    updatedAt:
+                        FieldValue
+                            .serverTimestamp()
+
+                });
+
+            return res.json({
+
+                success: true,
+
+                verified: true,
+
+                uid:
+                    admin.uid,
+
+                email:
+                    admin.email,
+
+                message:
+                    "Authenticator verification successful."
+
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "AUTHENTICATOR VERIFY ERROR:",
+                error.message
+            );
+
+            return res
+                .status(
+                    error.statusCode ||
+                    500
+                )
+                .json({
+
+                    success: false,
+
+                    message:
+                        error.statusCode
+                            ? error.message
+                            : "Unable to verify authenticator code."
+
+                });
+
+        }
+
+    }
+);
 // =========================================================
 // UNKNOWN API ROUTE
 // =========================================================
