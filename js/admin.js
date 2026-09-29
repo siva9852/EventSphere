@@ -60,10 +60,10 @@ function startInactivityTimer() {
                     );
 
                     window.showEventSphereMessage(
-    "warning",
-    "Session Expired",
-    "You have been logged out due to inactivity."
-);
+                        "warning",
+                        "Session Expired",
+                        "You have been logged out due to inactivity."
+                    );
 
                     window.location.replace(
                         "admin-login.html"
@@ -174,27 +174,24 @@ if (adminLoginForm) {
 
             e.preventDefault();
 
-
             const email =
                 document.getElementById(
                     "adminEmail"
                 ).value.trim();
-
 
             const password =
                 document.getElementById(
                     "adminPassword"
                 ).value;
 
-
             try {
-
-                // =================================================
-                // CLEAR OLD OTP DATA
-                // =================================================
 
                 sessionStorage.removeItem(
                     "adminOtpVerified"
+                );
+
+                sessionStorage.removeItem(
+                    "adminAuthenticatorVerified"
                 );
 
                 sessionStorage.removeItem(
@@ -205,11 +202,6 @@ if (adminLoginForm) {
                     "adminOtpEmail"
                 );
 
-
-                // =================================================
-                // ADMIN FIREBASE LOGIN
-                // =================================================
-
                 const userCredential =
                     await signInWithEmailAndPassword(
                         auth,
@@ -217,24 +209,13 @@ if (adminLoginForm) {
                         password
                     );
 
-
                 const user =
                     userCredential.user;
-
-
-                // =================================================
-                // SAVE ADMIN UID
-                // =================================================
 
                 sessionStorage.setItem(
                     "adminUid",
                     user.uid
                 );
-
-
-                // =================================================
-                // CHECK ADMIN ROLE
-                // =================================================
 
                 const docRef =
                     doc(
@@ -243,12 +224,10 @@ if (adminLoginForm) {
                         user.uid
                     );
 
-
                 const docSnap =
                     await getDoc(
                         docRef
                     );
-
 
                 if (
                     !docSnap.exists() ||
@@ -256,10 +235,10 @@ if (adminLoginForm) {
                 ) {
 
                     window.showEventSphereMessage(
-    "error",
-    "Access Denied",
-    "You do not have administrator access."
-);
+                        "error",
+                        "Access Denied",
+                        "You do not have administrator access."
+                    );
 
                     sessionStorage.removeItem(
                         "adminUid"
@@ -273,102 +252,25 @@ if (adminLoginForm) {
 
                 }
 
-
-                // =================================================
-                // SEND ADMIN OTP
-                // =================================================
-
-                const response =
-                    await fetch(
-                        "https://eventsphere-dndh.onrender.com/send-otp",
-                        {
-
-                            method:
-                                "POST",
-
-                            headers: {
-
-                                "Content-Type":
-                                    "application/json"
-
-                            },
-
-                            body:
-                                JSON.stringify({
-
-                                    email:
-                                        email,
-
-                                    loginType:
-                                        "admin"
-
-                                })
-
-                        }
-                    );
-
-
-                const data =
-                    await response.json();
-
-
-                // =================================================
-                // OTP SEND FAILED
-                // =================================================
-
-                if (!data.success) {
-
-                    window.showEventSphereMessage(
-    "error",
-    "OTP Failed",
-    data.message ||
-    "Unable to send the admin OTP."
-);
-
-                    sessionStorage.removeItem(
-                        "adminUid"
-                    );
-
-                    await signOut(
-                        auth
-                    );
-
-                    return;
-
-                }
-
-
-                // =================================================
-                // STORE ADMIN EMAIL
-                // =================================================
-
+                // Store the admin email for the verification page.
                 localStorage.setItem(
                     "adminOtpEmail",
                     email
                 );
 
-
-                sessionStorage.removeItem(
-                    "adminOtpVerified"
-                );
-
-
+                // The verification page will check whether
+                // Google Authenticator is already enabled.
                 window.showEventSphereMessage(
-    "success",
-    "OTP Sent",
-    "Admin login OTP has been sent to your email."
-);
-
-                // =================================================
-                // GO TO OTP PAGE
-                // =================================================
+                    "success",
+                    "Login Successful",
+                    "Choose your verification method to continue."
+                );
 
                 window.location.replace(
                     "admin-otp.html"
                 );
 
             }
-
 
             catch (error) {
 
@@ -382,11 +284,11 @@ if (adminLoginForm) {
                 );
 
                 window.showEventSphereMessage(
-    "error",
-    "Admin Login Failed",
-    error.message ||
-    "Unable to login. Please try again."
-);
+                    "error",
+                    "Admin Login Failed",
+                    error.message ||
+                    "Unable to login. Please try again."
+                );
 
             }
 
@@ -688,10 +590,10 @@ window.logout =
 
 
             window.showEventSphereMessage(
-    "success",
-    "Logged Out",
-    "You have been logged out successfully."
-);
+                "success",
+                "Logged Out",
+                "You have been logged out successfully."
+            );
 
             window.location.replace(
                 "admin-login.html"
@@ -702,10 +604,10 @@ window.logout =
         catch (error) {
 
             window.showEventSphereMessage(
-    "error",
-    "Logout Failed",
-    error.message || "Unable to log out. Please try again."
-);
+                "error",
+                "Logout Failed",
+                error.message || "Unable to log out. Please try again."
+            );
 
         }
 
@@ -815,11 +717,11 @@ if (couponForm) {
 
                 if (!user) {
 
-                   window.showEventSphereMessage(
-    "warning",
-    "Session Expired",
-    "Your admin login session has expired. Please login again."
-);
+                    window.showEventSphereMessage(
+                        "warning",
+                        "Session Expired",
+                        "Your admin login session has expired. Please login again."
+                    );
 
                     return;
 
@@ -896,21 +798,21 @@ if (couponForm) {
                 ) {
 
                     window.showEventSphereMessage(
-    "error",
-    "Coupon Creation Failed",
-    data.message || "Unable to create coupon."
-);
+                        "error",
+                        "Coupon Creation Failed",
+                        data.message || "Unable to create coupon."
+                    );
 
                     return;
 
                 }
 
 
-               window.showEventSphereMessage(
-    "success",
-    "Coupon Created",
-    "Coupon created successfully! 🎉"
-);
+                window.showEventSphereMessage(
+                    "success",
+                    "Coupon Created",
+                    "Coupon created successfully! 🎉"
+                );
 
                 couponForm.reset();
 
@@ -926,10 +828,10 @@ if (couponForm) {
 
 
                 window.showEventSphereMessage(
-    "error",
-    "Coupon Error",
-    error.message || "Unable to connect to the server."
-);
+                    "error",
+                    "Coupon Error",
+                    error.message || "Unable to connect to the server."
+                );
 
             }
 
@@ -937,6 +839,7 @@ if (couponForm) {
     );
 
 }
+
 
 // =====================================================
 // SERVICE MAINTENANCE MANAGEMENT
@@ -1154,10 +1057,10 @@ if (maintenanceForm) {
             if (!user) {
 
                 window.showEventSphereMessage(
-    "warning",
-    "Session Expired",
-    "Your admin login session has expired. Please login again."
-);
+                    "warning",
+                    "Session Expired",
+                    "Your admin login session has expired. Please login again."
+                );
 
                 return;
             }
@@ -1190,10 +1093,10 @@ if (maintenanceForm) {
             if (enabled && !message) {
 
                 window.showEventSphereMessage(
-    "warning",
-    "Message Required",
-    "Please enter a maintenance message."
-);
+                    "warning",
+                    "Message Required",
+                    "Please enter a maintenance message."
+                );
 
                 return;
             }
@@ -1208,10 +1111,10 @@ if (maintenanceForm) {
             ) {
 
                 window.showEventSphereMessage(
-    "warning",
-    "Invalid Time",
-    "Maintenance end time must be after the start time."
-);
+                    "warning",
+                    "Invalid Time",
+                    "Maintenance end time must be after the start time."
+                );
                 return;
             }
 
@@ -1263,14 +1166,14 @@ if (maintenanceForm) {
 
 
                 window.showEventSphereMessage(
-    "success",
-    enabled
-        ? "Maintenance Enabled"
-        : "Service Online",
-    enabled
-        ? "Maintenance mode has been enabled successfully."
-        : "EventSphere is now available to customers."
-);
+                    "success",
+                    enabled
+                        ? "Maintenance Enabled"
+                        : "Service Online",
+                    enabled
+                        ? "Maintenance mode has been enabled successfully."
+                        : "EventSphere is now available to customers."
+                );
 
 
                 await loadMaintenanceSettings();
@@ -1286,11 +1189,11 @@ if (maintenanceForm) {
 
 
                 window.showEventSphereMessage(
-    "error",
-    "Maintenance Update Failed",
-    error.message ||
-    "Unable to save maintenance settings."
-);
+                    "error",
+                    "Maintenance Update Failed",
+                    error.message ||
+                    "Unable to save maintenance settings."
+                );
             }
 
         }
@@ -1316,71 +1219,71 @@ if (disableMaintenanceBtn) {
             if (!user) {
 
                 window.showEventSphereMessage(
-    "warning",
-    "Session Expired",
-    "Your admin login session has expired. Please login again."
-);
+                    "warning",
+                    "Session Expired",
+                    "Your admin login session has expired. Please login again."
+                );
 
                 return;
             }
 
 
             window.showEventSphereConfirm(
-    "Disable Maintenance?",
-    "Are you sure you want to make EventSphere available to customers?",
-    async () => {
-        try {
-            const maintenanceRef =
-                doc(
-                    db,
-                    "settings",
-                    "maintenance"
-                );
+                "Disable Maintenance?",
+                "Are you sure you want to make EventSphere available to customers?",
+                async () => {
+                    try {
+                        const maintenanceRef =
+                            doc(
+                                db,
+                                "settings",
+                                "maintenance"
+                            );
 
-            const { setDoc } =
-                await import(
-                    "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js"
-                );
+                        const { setDoc } =
+                            await import(
+                                "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js"
+                            );
 
-            await setDoc(
-                maintenanceRef,
-                {
-                    enabled: false,
-                    updatedAt: new Date().toISOString(),
-                    updatedBy: user.uid
-                },
-                {
-                    merge: true
+                        await setDoc(
+                            maintenanceRef,
+                            {
+                                enabled: false,
+                                updatedAt: new Date().toISOString(),
+                                updatedBy: user.uid
+                            },
+                            {
+                                merge: true
+                            }
+                        );
+
+                        document.getElementById(
+                            "maintenanceEnabled"
+                        ).value = "false";
+
+                        window.showEventSphereMessage(
+                            "success",
+                            "Service Online",
+                            "Maintenance has been disabled. EventSphere is now available to customers."
+                        );
+
+                        await loadMaintenanceSettings();
+
+                    } catch (error) {
+                        console.error(
+                            "Maintenance Disable Error:",
+                            error
+                        );
+
+                        window.showEventSphereMessage(
+                            "error",
+                            "Maintenance Update Failed",
+                            error.message ||
+                            "Unable to disable maintenance."
+                        );
+                    }
                 }
             );
-
-            document.getElementById(
-                "maintenanceEnabled"
-            ).value = "false";
-
-            window.showEventSphereMessage(
-                "success",
-                "Service Online",
-                "Maintenance has been disabled. EventSphere is now available to customers."
-            );
-
-            await loadMaintenanceSettings();
-
-        } catch (error) {
-            console.error(
-                "Maintenance Disable Error:",
-                error
-            );
-
-            window.showEventSphereMessage(
-                "error",
-                "Maintenance Update Failed",
-                error.message ||
-                "Unable to disable maintenance."
-            );
-        }
-    }
-);
 
             try {
 
@@ -1425,10 +1328,10 @@ if (disableMaintenanceBtn) {
 
 
                 window.showEventSphereMessage(
-    "success",
-    "Service Online",
-    "Maintenance has been disabled. EventSphere is now available to customers."
-);
+                    "success",
+                    "Service Online",
+                    "Maintenance has been disabled. EventSphere is now available to customers."
+                );
 
 
                 await loadMaintenanceSettings();
@@ -1444,11 +1347,11 @@ if (disableMaintenanceBtn) {
 
 
                 window.showEventSphereMessage(
-    "error",
-    "Maintenance Update Failed",
-    error.message ||
-    "Unable to disable maintenance."
-);
+                    "error",
+                    "Maintenance Update Failed",
+                    error.message ||
+                    "Unable to disable maintenance."
+                );
 
             }
 

@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,7 +9,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1.0">
 
-    <title>Admin OTP Verification - EventSphere</title>
+    <title>Admin Verification - EventSphere</title>
 
     <link
         rel="stylesheet"
@@ -36,84 +35,275 @@
         </h1>
 
 
-        <p>
-            Enter the OTP sent to your admin email<br>
-            to access the dashboard.
+        <p id="verificationDescription">
+            Choose a verification method
+            <br>
+            to access the admin dashboard.
         </p>
 
 
         <div class="otp-line"></div>
 
 
-        <form id="adminOtpForm">
+        <!-- =====================================================
+             VERIFICATION METHOD SELECTION
+             ===================================================== -->
 
-            <div class="otp-inputs">
+        <div
+            id="verificationMethods"
+            style="
+                display:flex;
+                flex-direction:column;
+                gap:12px;
+                margin:20px 0;
+            ">
+
+            <button
+                type="button"
+                id="emailOtpMethod"
+                style="
+                    width:100%;
+                    padding:14px;
+                    border:none;
+                    border-radius:10px;
+                    cursor:pointer;
+                    font-size:15px;
+                    font-weight:600;
+                ">
+
+                📧 Email OTP
+
+            </button>
+
+
+            <button
+                type="button"
+                id="authenticatorMethod"
+                style="
+                    width:100%;
+                    padding:14px;
+                    border:none;
+                    border-radius:10px;
+                    cursor:pointer;
+                    font-size:15px;
+                    font-weight:600;
+                ">
+
+                🔐 Google Authenticator
+
+            </button>
+
+        </div>
+
+
+        <!-- =====================================================
+             EMAIL OTP SECTION
+             ===================================================== -->
+
+        <div
+            id="emailOtpSection"
+            style="display:none;">
+
+            <p>
+                Enter the 6-digit OTP sent to your admin email.
+            </p>
+
+
+            <form id="adminOtpForm">
+
+                <div class="otp-inputs">
+
+                    <input
+                        type="text"
+                        maxlength="1"
+                        class="otp-digit"
+                        autofocus
+                        inputmode="numeric"
+                        autocomplete="one-time-code">
+
+                    <input
+                        type="text"
+                        maxlength="1"
+                        class="otp-digit"
+                        inputmode="numeric">
+
+                    <input
+                        type="text"
+                        maxlength="1"
+                        class="otp-digit"
+                        inputmode="numeric">
+
+                    <input
+                        type="text"
+                        maxlength="1"
+                        class="otp-digit"
+                        inputmode="numeric">
+
+                    <input
+                        type="text"
+                        maxlength="1"
+                        class="otp-digit"
+                        inputmode="numeric">
+
+                    <input
+                        type="text"
+                        maxlength="1"
+                        class="otp-digit"
+                        inputmode="numeric">
+
+                </div>
+
 
                 <input
-                    type="text"
-                    maxlength="1"
-                    class="otp-digit"
-                    autofocus
-                    inputmode="numeric"
-                    autocomplete="one-time-code">
+                    type="hidden"
+                    id="adminOtp">
 
-                <input
-                    type="text"
-                    maxlength="1"
-                    class="otp-digit"
-                    inputmode="numeric">
 
-                <input
-                    type="text"
-                    maxlength="1"
-                    class="otp-digit"
-                    inputmode="numeric">
+                <button type="submit">
+                    Verify Email OTP
+                </button>
 
-                <input
-                    type="text"
-                    maxlength="1"
-                    class="otp-digit"
-                    inputmode="numeric">
+            </form>
 
-                <input
-                    type="text"
-                    maxlength="1"
-                    class="otp-digit"
-                    inputmode="numeric">
 
-                <input
-                    type="text"
-                    maxlength="1"
-                    class="otp-digit"
-                    inputmode="numeric">
+            <p class="resend-text">
+                Didn't receive the OTP?
+            </p>
+
+
+            <button
+                id="resendAdminOtp"
+                class="resend-button">
+
+                Resend OTP
+
+            </button>
+
+
+            <button
+                type="button"
+                id="backToMethodsEmail"
+                class="resend-button"
+                style="margin-top:10px;">
+
+                ← Choose Another Method
+
+            </button>
+
+        </div>
+
+
+        <!-- =====================================================
+             AUTHENTICATOR SECTION
+             ===================================================== -->
+
+        <div
+            id="authenticatorSection"
+            style="display:none;">
+
+            <div id="authenticatorSetup">
+
+                <p>
+                    Scan this QR code using
+                    <strong>Google Authenticator</strong>.
+                </p>
+
+
+                <div
+                    id="qrContainer"
+                    style="
+                        display:flex;
+                        justify-content:center;
+                        margin:18px 0;
+                    ">
+
+                </div>
+
+
+                <p>
+                    If you cannot scan the QR code,
+                    enter this setup key manually:
+                </p>
+
+
+                <div
+                    id="manualSecret"
+                    style="
+                        word-break:break-all;
+                        padding:12px;
+                        margin:10px 0 18px;
+                        border-radius:8px;
+                        background:rgba(0,0,0,0.08);
+                        font-weight:600;
+                        letter-spacing:1px;
+                    ">
+
+                    Loading...
+
+                </div>
+
+
+                <p>
+                    Enter the 6-digit code shown in
+                    Google Authenticator.
+                </p>
 
             </div>
 
 
-            <input
-                type="hidden"
-                id="adminOtp">
+            <div
+                id="authenticatorExisting"
+                style="display:none;">
+
+                <p>
+                    Open your
+                    <strong>Google Authenticator</strong>
+                    app and enter the current 6-digit code.
+                </p>
+
+            </div>
 
 
-            <button type="submit">
-                Verify OTP
+            <form id="authenticatorForm">
+
+                <input
+                    type="text"
+                    id="authenticatorCode"
+                    maxlength="6"
+                    inputmode="numeric"
+                    autocomplete="one-time-code"
+                    placeholder="6-digit code"
+                    style="
+                        width:100%;
+                        box-sizing:border-box;
+                        padding:14px;
+                        margin:12px 0;
+                        border-radius:10px;
+                        border:1px solid #ccc;
+                        text-align:center;
+                        font-size:20px;
+                        letter-spacing:6px;
+                    ">
+
+
+                <button type="submit">
+                    Verify Authenticator
+                </button>
+
+            </form>
+
+
+            <button
+                type="button"
+                id="backToMethodsAuthenticator"
+                class="resend-button"
+                style="margin-top:10px;">
+
+                ← Choose Another Method
+
             </button>
 
-        </form>
-
-
-        <p class="resend-text">
-            Didn't receive the OTP?
-        </p>
-
-
-        <button
-            id="resendAdminOtp"
-            class="resend-button">
-
-            Resend OTP
-
-        </button>
+        </div>
 
 
         <div class="secure-text">
@@ -128,86 +318,6 @@
 
 
 
-<!-- ================= OTP INPUT ================= -->
-
-<script>
-
-const otpInputs =
-    document.querySelectorAll(
-        ".otp-digit"
-    );
-
-
-const hiddenOtp =
-    document.getElementById(
-        "adminOtp"
-    );
-
-
-otpInputs.forEach(
-    (input, index) => {
-
-        input.addEventListener(
-            "input",
-            () => {
-
-                input.value =
-                    input.value.replace(
-                        /\D/g,
-                        ""
-                    );
-
-
-                if (
-                    input.value &&
-                    index <
-                    otpInputs.length - 1
-                ) {
-
-                    otpInputs[
-                        index + 1
-                    ].focus();
-
-                }
-
-
-                hiddenOtp.value =
-                    Array.from(otpInputs)
-                        .map(
-                            input => input.value
-                        )
-                        .join("");
-
-            }
-        );
-
-
-        input.addEventListener(
-            "keydown",
-            (e) => {
-
-                if (
-                    e.key === "Backspace" &&
-                    !input.value &&
-                    index > 0
-                ) {
-
-                    otpInputs[
-                        index - 1
-                    ].focus();
-
-                }
-
-            }
-        );
-
-    }
-);
-
-</script>
-
-
-
 <!-- =====================================================
      EVENTSPHERE COMMON MESSAGE SYSTEM
      ===================================================== -->
@@ -218,7 +328,9 @@ otpInputs.forEach(
 
 
 
-<!-- ================= ADMIN OTP JS ================= -->
+<!-- =====================================================
+     ADMIN OTP / AUTHENTICATOR JS
+     ===================================================== -->
 
 <script
     type="module"
@@ -227,7 +339,9 @@ otpInputs.forEach(
 
 
 
-<!-- ================= CHECK OTP SESSION ================= -->
+<!-- =====================================================
+     CHECK ADMIN LOGIN SESSION
+     ===================================================== -->
 
 <script type="module">
 
@@ -238,12 +352,11 @@ const adminOtpEmail =
 
 
 /*
- * Only check whether the OTP process
- * was started.
+ * Only check whether the admin login
+ * process was started.
  *
- * DO NOT check Firebase auth here,
- * because Firebase login happens before
- * OTP verification.
+ * Firebase authentication happens
+ * before reaching this page.
  */
 
 if (!adminOtpEmail) {
@@ -260,4 +373,3 @@ if (!adminOtpEmail) {
 </body>
 
 </html>
-```
