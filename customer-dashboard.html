@@ -2845,7 +2845,657 @@
             }
 
         }
+/* =====================================================
+   EDIT PROFILE POPUP
+===================================================== */
 
+.es-edit-profile-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(15, 23, 42, 0.55);
+
+    backdrop-filter: blur(5px);
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    z-index: 99999;
+
+    padding: 20px;
+}
+
+
+.es-edit-profile-overlay.show {
+
+    display: flex;
+}
+
+
+.es-edit-profile-card {
+
+    width: 100%;
+
+    max-width: 480px;
+
+    background: #ffffff;
+
+    border-radius: 20px;
+
+    padding: 28px;
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.25);
+}
+
+
+.es-edit-profile-header {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    margin-bottom: 25px;
+}
+
+
+.es-edit-profile-header h2 {
+
+    margin: 0;
+
+    font-size: 24px;
+
+    color: #172033;
+}
+
+
+.es-edit-profile-header p {
+
+    margin: 6px 0 0;
+
+    font-size: 13px;
+
+    color: #718096;
+}
+
+
+.es-edit-profile-close {
+
+    width: 36px;
+
+    height: 36px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #f1f5f9;
+
+    color: #475569;
+
+    cursor: pointer;
+
+    font-size: 15px;
+}
+
+
+.es-edit-profile-close:hover {
+
+    background: #e2e8f0;
+}
+
+
+.es-edit-profile-field {
+
+    margin-bottom: 18px;
+}
+
+
+.es-edit-profile-field label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: #334155;
+}
+
+
+.es-edit-profile-field input {
+
+    width: 100%;
+
+    border: 1px solid #dbe2ea;
+
+    border-radius: 11px;
+
+    padding: 13px;
+
+    outline: none;
+
+    background: #f8fafc;
+
+    font-size: 14px;
+
+    color: #172033;
+
+    box-sizing: border-box;
+}
+
+
+.es-edit-profile-field input:focus {
+
+    border-color: #4f46e5;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(79, 70, 229, 0.08);
+}
+
+
+.es-edit-profile-field input:read-only {
+
+    color: #64748b;
+
+    background: #f1f5f9;
+
+    cursor: not-allowed;
+}
+
+
+.es-edit-profile-field small {
+
+    display: block;
+
+    margin-top: 5px;
+
+    font-size: 11px;
+
+    color: #94a3b8;
+}
+
+
+.es-edit-profile-actions {
+
+    display: flex;
+
+    gap: 10px;
+
+    justify-content: flex-end;
+
+    margin-top: 25px;
+}
+
+
+.es-edit-profile-actions button {
+
+    border: none;
+
+    border-radius: 10px;
+
+    padding: 11px 18px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.es-edit-profile-actions button:first-child {
+
+    background: #f1f5f9;
+
+    color: #475569;
+}
+
+
+.es-edit-profile-actions button:first-child:hover {
+
+    background: #e2e8f0;
+}
+
+
+#saveProfileBtn {
+
+    background: #4f46e5;
+
+    color: #ffffff;
+}
+
+
+#saveProfileBtn:hover {
+
+    background: #4338ca;
+}
+
+
+#saveProfileBtn:disabled {
+
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+
+@media (max-width: 520px) {
+
+    .es-edit-profile-card {
+
+        padding: 22px;
+
+        border-radius: 16px;
+    }
+
+    .es-edit-profile-actions {
+
+        flex-direction: column;
+    }
+
+    .es-edit-profile-actions button {
+
+        width: 100%;
+    }
+
+}
+/* =====================================================
+   PHONE VERIFICATION POPUP
+===================================================== */
+
+.es-phone-verify-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(15, 23, 42, 0.55);
+
+    backdrop-filter: blur(5px);
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    z-index: 100000;
+
+    padding: 20px;
+}
+
+
+.es-phone-verify-overlay.show {
+
+    display: flex;
+}
+
+
+.es-phone-verify-card {
+
+    width: 100%;
+
+    max-width: 480px;
+
+    background: #ffffff;
+
+    border-radius: 20px;
+
+    padding: 28px;
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.25);
+
+    animation:
+        phoneVerifyPopupIn
+        0.2s ease;
+}
+
+
+@keyframes phoneVerifyPopupIn {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(10px)
+            scale(0.98);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+
+    }
+
+}
+
+
+.es-phone-verify-header {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    margin-bottom: 20px;
+}
+
+
+.es-phone-verify-header h2 {
+
+    margin: 0;
+
+    font-size: 24px;
+
+    color: #172033;
+}
+
+
+.es-phone-verify-header p {
+
+    margin: 7px 0 0;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+    color: #718096;
+
+    max-width: 350px;
+}
+
+
+.es-phone-verify-close {
+
+    width: 36px;
+
+    height: 36px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #f1f5f9;
+
+    color: #475569;
+
+    cursor: pointer;
+
+    font-size: 15px;
+}
+
+
+.es-phone-verify-close:hover {
+
+    background: #e2e8f0;
+}
+
+
+.es-phone-verify-icon {
+
+    width: 58px;
+
+    height: 58px;
+
+    margin: 5px auto 15px;
+
+    border-radius: 16px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #eef3ff,
+            #f0eaff
+        );
+
+    color: #4f46e5;
+
+    font-size: 24px;
+}
+
+
+.es-phone-verify-message {
+
+    text-align: center;
+
+    margin-bottom: 22px;
+}
+
+
+.es-phone-verify-message strong {
+
+    display: block;
+
+    font-size: 14px;
+
+    color: #172033;
+}
+
+
+.es-phone-verify-message span {
+
+    display: block;
+
+    margin-top: 5px;
+
+    font-size: 12px;
+
+    color: #718096;
+
+    word-break: break-word;
+}
+
+
+.es-phone-verify-field {
+
+    margin-bottom: 20px;
+}
+
+
+.es-phone-verify-field label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: #334155;
+}
+
+
+.es-phone-verify-field input {
+
+    width: 100%;
+
+    border: 1px solid #dbe2ea;
+
+    border-radius: 11px;
+
+    padding: 13px;
+
+    outline: none;
+
+    background: #f8fafc;
+
+    font-size: 18px;
+
+    color: #172033;
+
+    text-align: center;
+
+    letter-spacing: 5px;
+
+    box-sizing: border-box;
+}
+
+
+.es-phone-verify-field input:focus {
+
+    border-color: #4f46e5;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(79, 70, 229, 0.08);
+}
+
+
+.es-phone-verify-actions {
+
+    display: flex;
+
+    gap: 10px;
+
+    justify-content: flex-end;
+
+    margin-top: 10px;
+}
+
+
+.es-phone-verify-actions button {
+
+    border: none;
+
+    border-radius: 10px;
+
+    padding: 11px 18px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.es-phone-verify-actions button:first-child {
+
+    background: #f1f5f9;
+
+    color: #475569;
+}
+
+
+.es-phone-verify-actions button:first-child:hover {
+
+    background: #e2e8f0;
+}
+
+
+#verifyPhoneBtn {
+
+    background: #4f46e5;
+
+    color: #ffffff;
+}
+
+
+#verifyPhoneBtn:hover {
+
+    background: #4338ca;
+}
+
+
+#verifyPhoneBtn:disabled {
+
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+
+.es-resend-code-btn {
+
+    display: block;
+
+    margin: 17px auto 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: #4f46e5;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.es-resend-code-btn:hover {
+
+    text-decoration: underline;
+}
+
+
+.es-resend-code-btn:disabled {
+
+    color: #94a3b8;
+
+    cursor: not-allowed;
+
+    text-decoration: none;
+}
+
+
+@media (max-width: 520px) {
+
+    .es-phone-verify-card {
+
+        padding: 22px;
+
+        border-radius: 16px;
+
+    }
+
+
+    .es-phone-verify-actions {
+
+        flex-direction: column;
+
+    }
+
+
+    .es-phone-verify-actions button {
+
+        width: 100%;
+
+    }
+
+}
 
     </style>
 
@@ -3201,16 +3851,13 @@
 
 
                     <button
-                        type="button"
-                        class="es-popup-link"
-                        onclick="showComingSoon('My Profile')"
-                    >
-
-                        <i class="fa-regular fa-user"></i>
-
-                        My Profile
-
-                    </button>
+    type="button"
+    class="es-popup-link"
+    onclick="openEditProfile()"
+>
+    <i class="fa-regular fa-user"></i>
+    My Profile
+</button>
 
 
                     <button
@@ -3245,7 +3892,230 @@
             </div>
 
         </div>
+<!-- EDIT PROFILE POPUP -->
 
+<div
+    class="es-edit-profile-overlay"
+    id="editProfileOverlay"
+>
+
+    <div class="es-edit-profile-card">
+
+        <div class="es-edit-profile-header">
+
+            <div>
+                <h2>Edit Profile</h2>
+
+                <p>
+                    Update your personal information
+                </p>
+            </div>
+
+            <button
+                type="button"
+                class="es-edit-profile-close"
+                onclick="closeEditProfile()"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+
+        <form id="editProfileForm">
+
+            <!-- Full Name -->
+
+            <div class="es-edit-profile-field">
+
+                <label for="editProfileName">
+                    Full Name
+                </label>
+
+                <input
+                    type="text"
+                    id="editProfileName"
+                    placeholder="Enter your full name"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Email -->
+
+            <div class="es-edit-profile-field">
+
+                <label for="editProfileEmail">
+                    Email Address
+                </label>
+
+                <input
+                    type="email"
+                    id="editProfileEmail"
+                    placeholder="Email address"
+                    readonly
+                >
+
+                <small>
+                    Email address cannot be changed here.
+                </small>
+
+            </div>
+
+
+            <!-- Phone -->
+
+            <div class="es-edit-profile-field">
+
+                <label for="editProfilePhone">
+                    Phone Number
+                </label>
+
+                <input
+                    type="tel"
+                    id="editProfilePhone"
+                    placeholder="Enter your phone number"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Buttons -->
+
+            <div class="es-edit-profile-actions">
+
+                <button
+                    type="button"
+                    onclick="closeEditProfile()"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    id="saveProfileBtn"
+                >
+                    Save Changes
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+<!-- PHONE CHANGE VERIFICATION POPUP -->
+
+<div
+    class="es-phone-verify-overlay"
+    id="phoneVerifyOverlay"
+>
+
+    <div class="es-phone-verify-card">
+
+        <div class="es-phone-verify-header">
+
+            <div>
+
+                <h2>
+                    Verify Phone Number
+                </h2>
+
+                <p>
+                    We sent a verification code to your registered email address.
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="es-phone-verify-close"
+                onclick="closePhoneVerification()"
+            >
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+
+        <div class="es-phone-verify-icon">
+
+            <i class="fa-solid fa-envelope-circle-check"></i>
+
+        </div>
+
+
+        <div class="es-phone-verify-message">
+
+            <strong>
+                Check your email
+            </strong>
+
+            <span id="phoneVerifyEmail">
+                your registered email
+            </span>
+
+        </div>
+
+
+        <div class="es-phone-verify-field">
+
+            <label for="phoneVerificationCode">
+                Enter 6-digit verification code
+            </label>
+
+            <input
+                type="text"
+                id="phoneVerificationCode"
+                placeholder="Enter verification code"
+                maxlength="6"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+            >
+
+        </div>
+
+
+        <div class="es-phone-verify-actions">
+
+            <button
+                type="button"
+                onclick="closePhoneVerification()"
+            >
+                Cancel
+            </button>
+
+
+            <button
+                type="button"
+                id="verifyPhoneBtn"
+                onclick="verifyPhoneChange()"
+            >
+                Verify & Update
+            </button>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="es-resend-code-btn"
+            id="resendPhoneCodeBtn"
+            onclick="resendPhoneVerificationCode()"
+        >
+            <i class="fa-solid fa-rotate-right"></i>
+            Resend Code
+        </button>
+
+    </div>
+
+</div>
 
 
         <!-- =================================================
@@ -4046,14 +4916,14 @@
 
 
     import {
-        doc,
-        getDoc,
-        getDocs,
-        collection,
-        query,
-        where
-    }
-    from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+    doc,
+    getDoc,
+    getDocs,
+    updateDoc,
+    collection,
+    query,
+    where
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
     import {
@@ -4301,8 +5171,751 @@
         return customerName;
 
     }
+/* =====================================================
+   EDIT PROFILE
+===================================================== */
+
+window.openEditProfile = async function () {
+
+    if (!currentUser) {
+
+        window.showEventSphereMessage(
+            "warning",
+            "Login Required",
+            "Please login again to edit your profile."
+        );
+
+        return;
+    }
 
 
+    try {
+
+        const userRef = doc(
+            db,
+            "users",
+            currentUser.uid
+        );
+
+
+        const userSnapshot = await getDoc(
+            userRef
+        );
+
+
+        let profileData = {};
+
+        if (userSnapshot.exists()) {
+
+            profileData =
+                userSnapshot.data();
+
+        }
+
+
+        document.getElementById(
+            "editProfileName"
+        ).value =
+            profileData.fullName || "";
+
+
+        document.getElementById(
+            "editProfileEmail"
+        ).value =
+            currentUser.email ||
+            profileData.email ||
+            "";
+
+
+        document.getElementById(
+            "editProfilePhone"
+        ).value =
+            profileData.phone || "";
+
+
+        /* Close profile menu */
+
+        document.getElementById(
+            "profilePopup"
+        ).classList.remove("show");
+
+
+        /* Open edit profile popup */
+
+        document.getElementById(
+            "editProfileOverlay"
+        ).classList.add("show");
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Load Profile Error:",
+            error
+        );
+
+        window.showEventSphereMessage(
+            "error",
+            "Profile Error",
+            "Unable to load your profile details."
+        );
+
+    }
+
+};
+
+
+
+/* =====================================================
+   CLOSE EDIT PROFILE
+===================================================== */
+
+window.closeEditProfile = function () {
+
+    document.getElementById(
+        "editProfileOverlay"
+    ).classList.remove("show");
+
+};
+
+
+
+/* =====================================================
+   SAVE PROFILE
+===================================================== */
+
+let pendingProfileName = "";
+let pendingProfilePhone = "";
+let pendingProfileEmail = "";
+
+const editProfileForm =
+    document.getElementById(
+        "editProfileForm"
+    );
+
+if (editProfileForm) {
+
+    editProfileForm.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+            if (!currentUser) {
+
+                window.showEventSphereMessage(
+                    "warning",
+                    "Login Required",
+                    "Please login again."
+                );
+
+                return;
+            }
+
+            const name =
+                document.getElementById(
+                    "editProfileName"
+                ).value.trim();
+
+            const phone =
+                document.getElementById(
+                    "editProfilePhone"
+                ).value.trim();
+
+            if (!name) {
+
+                window.showEventSphereMessage(
+                    "warning",
+                    "Name Required",
+                    "Please enter your full name."
+                );
+
+                return;
+            }
+
+            if (!phone) {
+
+                window.showEventSphereMessage(
+                    "warning",
+                    "Phone Required",
+                    "Please enter your phone number."
+                );
+
+                return;
+            }
+
+            const saveButton =
+                document.getElementById(
+                    "saveProfileBtn"
+                );
+
+            saveButton.disabled = true;
+
+            saveButton.textContent =
+                "Saving...";
+
+            try {
+
+                const userRef = doc(
+                    db,
+                    "users",
+                    currentUser.uid
+                );
+
+                const userSnapshot =
+                    await getDoc(userRef);
+
+                const profileData =
+                    userSnapshot.exists()
+                        ? userSnapshot.data()
+                        : {};
+
+                const oldPhone =
+                    String(
+                        profileData.phone || ""
+                    ).trim();
+
+                const registeredEmail =
+                    String(
+                        currentUser.email ||
+                        profileData.email ||
+                        ""
+                    )
+                        .trim()
+                        .toLowerCase();
+
+                /* =========================================
+                   PHONE NUMBER CHANGED
+                ========================================= */
+
+                if (phone !== oldPhone) {
+
+                    if (!registeredEmail) {
+
+                        window.showEventSphereMessage(
+                            "error",
+                            "Email Not Found",
+                            "Your registered email address could not be found."
+                        );
+
+                        return;
+                    }
+
+                    pendingProfileName =
+                        name;
+
+                    pendingProfilePhone =
+                        phone;
+
+                    pendingProfileEmail =
+                        registeredEmail;
+
+                    const response =
+                        await fetch(
+                            "https://eventsphere-dndh.onrender.com/send-otp",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body: JSON.stringify({
+                                    email:
+                                        registeredEmail,
+
+                                    loginType:
+                                        "customer"
+                                })
+                            }
+                        );
+
+                    const data =
+                        await response.json();
+
+                    if (!response.ok ||
+                        !data.success) {
+
+                        throw new Error(
+                            data.message ||
+                            "Unable to send verification code."
+                        );
+                    }
+
+                    document.getElementById(
+                        "phoneVerifyEmail"
+                    ).textContent =
+                        registeredEmail;
+
+                    document.getElementById(
+                        "phoneVerificationCode"
+                    ).value = "";
+
+                    closeEditProfile();
+
+                    document.getElementById(
+                        "phoneVerifyOverlay"
+                    ).classList.add("show");
+
+                    return;
+                }
+
+                /* =========================================
+                   ONLY NAME CHANGED
+                ========================================= */
+
+                await updateDoc(
+                    userRef,
+                    {
+                        fullName: name
+                    }
+                );
+
+                updateDashboardProfileName(
+                    name
+                );
+
+                closeEditProfile();
+
+                window.showEventSphereMessage(
+                    "success",
+                    "Profile Updated",
+                    "Your profile has been updated successfully."
+                );
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Update Profile Error:",
+                    error
+                );
+
+                window.showEventSphereMessage(
+                    "error",
+                    "Update Failed",
+                    error.message ||
+                    "Unable to update your profile. Please try again."
+                );
+
+            }
+            finally {
+
+                saveButton.disabled =
+                    false;
+
+                saveButton.textContent =
+                    "Save Changes";
+
+            }
+
+        }
+    );
+
+}
+/* =====================================================
+   UPDATE DASHBOARD PROFILE NAME
+===================================================== */
+
+function updateDashboardProfileName(name) {
+
+    const firstLetter =
+        name
+            .charAt(0)
+            .toUpperCase();
+
+
+    const topProfileName =
+        document.getElementById(
+            "topProfileName"
+        );
+
+    if (topProfileName) {
+
+        topProfileName.textContent =
+            "Hi, " + name;
+
+    }
+
+
+    const topAvatar =
+        document.getElementById(
+            "topAvatar"
+        );
+
+    if (topAvatar) {
+
+        topAvatar.textContent =
+            firstLetter;
+
+    }
+
+
+    const heroCustomerName =
+        document.getElementById(
+            "heroCustomerName"
+        );
+
+    if (heroCustomerName) {
+
+        heroCustomerName.textContent =
+            name;
+
+    }
+
+
+    const popupCustomerName =
+        document.getElementById(
+            "popupCustomerName"
+        );
+
+    if (popupCustomerName) {
+
+        popupCustomerName.textContent =
+            name;
+
+    }
+
+
+    const popupAvatar =
+        document.getElementById(
+            "popupAvatar"
+        );
+
+    if (popupAvatar) {
+
+        popupAvatar.textContent =
+            firstLetter;
+
+    }
+
+
+    const welcomeName =
+        document.getElementById(
+            "welcomeCardName"
+        );
+
+    if (welcomeName) {
+
+        welcomeName.textContent =
+            "Hi, " + name + " 👋";
+
+    }
+
+
+    const welcomeAvatar =
+        document.getElementById(
+            "welcomeAvatar"
+        );
+
+    if (welcomeAvatar) {
+
+        welcomeAvatar.textContent =
+            firstLetter;
+
+    }
+
+}
+
+/* =====================================================
+   PHONE VERIFICATION
+===================================================== */
+
+window.closePhoneVerification = function () {
+
+    document.getElementById(
+        "phoneVerifyOverlay"
+    ).classList.remove("show");
+
+    document.getElementById(
+        "phoneVerificationCode"
+    ).value = "";
+
+};
+
+
+
+/* =====================================================
+   VERIFY PHONE CHANGE OTP
+===================================================== */
+
+window.verifyPhoneChange = async function () {
+
+    const code =
+        document.getElementById(
+            "phoneVerificationCode"
+        ).value.trim();
+
+    const verifyButton =
+        document.getElementById(
+            "verifyPhoneBtn"
+        );
+
+    if (!code) {
+
+        window.showEventSphereMessage(
+            "warning",
+            "Code Required",
+            "Please enter the 6-digit verification code."
+        );
+
+        return;
+    }
+
+    if (!/^\d{6}$/.test(code)) {
+
+        window.showEventSphereMessage(
+            "warning",
+            "Invalid Code",
+            "Please enter a valid 6-digit verification code."
+        );
+
+        return;
+    }
+
+    if (
+        !pendingProfileName ||
+        !pendingProfilePhone ||
+        !pendingProfileEmail
+    ) {
+
+        window.showEventSphereMessage(
+            "error",
+            "Verification Error",
+            "Your profile verification session has expired. Please try again."
+        );
+
+        closePhoneVerification();
+
+        return;
+    }
+
+    verifyButton.disabled = true;
+
+    verifyButton.textContent =
+        "Verifying...";
+
+    try {
+
+        /* =========================================
+           VERIFY OTP
+        ========================================= */
+
+        const response =
+            await fetch(
+                "https://eventsphere-dndh.onrender.com/verify-otp",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        email:
+                            pendingProfileEmail,
+
+                        otp:
+                            code
+                    })
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok ||
+            !data.success) {
+
+            throw new Error(
+                data.message ||
+                "Invalid verification code."
+            );
+        }
+
+
+        /* =========================================
+           OTP VERIFIED
+           NOW UPDATE FIRESTORE
+        ========================================= */
+
+        const userRef =
+            doc(
+                db,
+                "users",
+                currentUser.uid
+            );
+
+        await updateDoc(
+            userRef,
+            {
+                fullName:
+                    pendingProfileName,
+
+                phone:
+                    pendingProfilePhone
+            }
+        );
+
+
+        closePhoneVerification();
+
+window.showEventSphereMessage(
+    "success",
+    "Profile Updated",
+    "Your phone number has been verified and your profile has been updated successfully."
+);
+
+updateDashboardProfileName(
+    pendingProfileName
+);
+
+pendingProfileName = "";
+
+pendingProfilePhone = "";
+
+pendingProfileEmail = "";
+
+       
+    }
+
+    catch (error) {
+
+        console.error(
+            "Phone Verification Error:",
+            error
+        );
+
+        window.showEventSphereMessage(
+            "error",
+            "Verification Failed",
+            error.message ||
+            "Unable to verify the code. Please try again."
+        );
+
+    }
+
+    finally {
+
+        verifyButton.disabled =
+            false;
+
+        verifyButton.textContent =
+            "Verify & Update";
+
+    }
+
+};
+
+
+
+/* =====================================================
+   RESEND PHONE VERIFICATION CODE
+===================================================== */
+
+window.resendPhoneVerificationCode =
+    async function () {
+
+        if (!pendingProfileEmail) {
+
+            window.showEventSphereMessage(
+                "error",
+                "Verification Error",
+                "Your verification session has expired. Please try again."
+            );
+
+            closePhoneVerification();
+
+            return;
+        }
+
+        const resendButton =
+            document.getElementById(
+                "resendPhoneCodeBtn"
+            );
+
+        resendButton.disabled = true;
+
+        resendButton.innerHTML =
+            '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+
+        try {
+
+            const response =
+                await fetch(
+                    "https://eventsphere-dndh.onrender.com/send-otp",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            email:
+                                pendingProfileEmail,
+
+                            loginType:
+                                "customer"
+                        })
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok ||
+                !data.success) {
+
+                throw new Error(
+                    data.message ||
+                    "Unable to resend verification code."
+                );
+            }
+
+            document.getElementById(
+                "phoneVerificationCode"
+            ).value = "";
+
+            window.showEventSphereMessage(
+                "success",
+                "Code Sent",
+                "A new verification code has been sent to your registered email."
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Resend OTP Error:",
+                error
+            );
+
+            window.showEventSphereMessage(
+                "error",
+                "Resend Failed",
+                error.message ||
+                "Unable to resend the verification code."
+            );
+
+        }
+
+        finally {
+
+            resendButton.disabled =
+                false;
+
+            resendButton.innerHTML =
+                '<i class="fa-solid fa-rotate-right"></i> Resend Code';
+
+        }
+
+    };
 
     /* =====================================================
        LOAD EVENTS
@@ -5772,6 +7385,7 @@
 
 
 
+
     /* =====================================================
        NOTIFICATION POPUP
     ===================================================== */
@@ -6098,7 +7712,13 @@
     type="module"
     src="js/maintenance.js"
 ></script>
+<!-- =====================================================
+     EVENTSPHERE COMMON MESSAGE SYSTEM
+===================================================== -->
 
+<script
+    src="js/app-messages.js"
+></script>
 
 </body>
 

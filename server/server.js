@@ -572,15 +572,6 @@ app.post(
     }
 );
 
-app.post(
-    "/verify-otp",
-    (req, res) => {
-
-        // existing code...
-
-    }
-);
-
 
 // =========================================================
 // CUSTOMER LOGIN - EMAIL FROM PHONE NUMBER
