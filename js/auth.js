@@ -344,10 +344,10 @@ if (loginForm) {
             e.preventDefault();
 
 
-            const email =
+            const loginInput =
                 document.getElementById(
                     "loginEmail"
-                ).value;
+                ).value.trim();
 
 
             const password =
@@ -356,121 +356,204 @@ if (loginForm) {
                 ).value;
 
 
+            if (!loginInput) {
+
+                window.showEventSphereMessage(
+                    "warning",
+                    "Login Required",
+                    "Please enter your email or phone number."
+                );
+
+                return;
+
+            }
+
+
             try {
 
+                let loginEmail =
+                    loginInput;
+
+
                 // =================================================
-                // NORMAL CUSTOMER LOGIN
+                // CHECK WHETHER INPUT IS PHONE NUMBER
+                // =================================================
+
+                const isPhone =
+                    !loginInput.includes("@");
+
+
+                if (isPhone) {
+
+                    const response =
+                        await fetch(
+                            "https://eventsphere-dndh.onrender.com/customer-login-email",
+                            {
+
+                                method:
+                                    "POST",
+
+                                headers: {
+
+                                    "Content-Type":
+                                        "application/json"
+
+                                },
+
+                                body:
+                                    JSON.stringify({
+
+                                        phone:
+                                            loginInput
+
+                                    })
+
+                            }
+                        );
+
+
+                    const data =
+                        await response.json();
+
+
+                    if (!data.success) {
+
+                        window.showEventSphereMessage(
+                            "error",
+                            "Login Failed",
+                            data.message ||
+                            "No account found with this phone number."
+                        );
+
+                        return;
+
+                    }
+
+
+                    loginEmail =
+                        data.email;
+
+                }
+
+
+                // =================================================
+                // FIREBASE LOGIN
                 // =================================================
 
                 await signInWithEmailAndPassword(
                     auth,
-                    email,
+                    loginEmail,
                     password
                 );
 
 
-              window.showEventSphereMessage(
-    "success",
-    "Login Successful",
-    "You have logged in successfully.",
-    () => {
-        window.location.replace(
-            "customer-dashboard.html"
-        );
-    }
-);
+                window.showEventSphereMessage(
+                    "success",
+                    "Login Successful",
+                    "You have logged in successfully.",
+                    () => {
+
+                        window.location.replace(
+                            "customer-dashboard.html"
+                        );
+
+                    }
+                );
+
             }
 
-           catch (error) {
+            catch (error) {
 
-    console.error(
-        "Customer Login Error:",
-        error
-    );
-
-    let message =
-        "Unable to login. Please try again.";
-
-    switch (error.code) {
-
-        case "auth/invalid-credential":
-
-            message =
-                "Incorrect email or password. Please try again.";
-
-            break;
+                console.error(
+                    "Customer Login Error:",
+                    error
+                );
 
 
-        case "auth/wrong-password":
-
-            message =
-                "Incorrect password. Please try again.";
-
-            break;
+                let message =
+                    "Unable to login. Please try again.";
 
 
-        case "auth/user-not-found":
+                switch (error.code) {
 
-            message =
-                "No account found with this email. Please register first.";
+                    case "auth/invalid-credential":
 
-            break;
+                        message =
+                            "Incorrect email/phone number or password. Please try again.";
 
-
-        case "auth/invalid-email":
-
-            message =
-                "Please enter a valid email address.";
-
-            break;
+                        break;
 
 
-        case "auth/user-disabled":
+                    case "auth/wrong-password":
 
-            message =
-                "This account has been disabled. Please contact support.";
+                        message =
+                            "Incorrect password. Please try again.";
 
-            break;
-
-
-        case "auth/too-many-requests":
-
-            message =
-                "Too many login attempts. Please try again later.";
-
-            break;
+                        break;
 
 
-        case "auth/network-request-failed":
+                    case "auth/user-not-found":
 
-            message =
-                "Unable to connect. Please check your internet connection.";
+                        message =
+                            "No account found. Please register first.";
 
-            break;
+                        break;
 
 
-        default:
+                    case "auth/invalid-email":
 
-            message =
-                "Login failed. Please check your email and password and try again.";
+                        message =
+                            "Please enter a valid email address or phone number.";
 
-            break;
+                        break;
 
-    }
 
-window.showEventSphereMessage(
-    "error",
-    "Login Failed",
-    message
-);
+                    case "auth/user-disabled":
 
-}
+                        message =
+                            "This account has been disabled. Please contact support.";
+
+                        break;
+
+
+                    case "auth/too-many-requests":
+
+                        message =
+                            "Too many login attempts. Please try again later.";
+
+                        break;
+
+
+                    case "auth/network-request-failed":
+
+                        message =
+                            "Unable to connect. Please check your internet connection.";
+
+                        break;
+
+
+                    default:
+
+                        message =
+                            "Login failed. Please check your email/phone number and password and try again.";
+
+                        break;
+
+                }
+
+
+                window.showEventSphereMessage(
+                    "error",
+                    "Login Failed",
+                    message
+                );
+
+            }
 
         }
     );
 
 }
-
 
 // =========================================================
 // FORGOT PASSWORD
@@ -491,19 +574,19 @@ if (forgotPassword) {
             e.preventDefault();
 
 
-            const email =
+            const loginInput =
                 document.getElementById(
                     "loginEmail"
-                ).value;
+                ).value.trim();
 
 
-            if (email === "") {
+            if (loginInput === "") {
 
-               window.showEventSphereMessage(
-    "warning",
-    "Email Required",
-    "Please enter your email address first."
-);
+                window.showEventSphereMessage(
+                    "warning",
+                    "Email or Phone Required",
+                    "Please enter your email address or phone number first."
+                );
 
                 return;
 
@@ -512,16 +595,87 @@ if (forgotPassword) {
 
             try {
 
+                let resetEmail =
+                    loginInput;
+
+
+                // =================================================
+                // PHONE NUMBER
+                // =================================================
+
+                const isPhone =
+                    !loginInput.includes("@");
+
+
+                if (isPhone) {
+
+                    const response =
+                        await fetch(
+                            "https://eventsphere-dndh.onrender.com/customer-login-email",
+                            {
+
+                                method:
+                                    "POST",
+
+                                headers: {
+
+                                    "Content-Type":
+                                        "application/json"
+
+                                },
+
+                                body:
+                                    JSON.stringify({
+
+                                        phone:
+                                            loginInput
+
+                                    })
+
+                            }
+                        );
+
+
+                    const data =
+                        await response.json();
+
+
+                    if (!data.success) {
+
+                        window.showEventSphereMessage(
+                            "error",
+                            "Account Not Found",
+                            data.message ||
+                            "No account found with this phone number."
+                        );
+
+                        return;
+
+                    }
+
+
+                    resetEmail =
+                        data.email;
+
+                }
+
+
+                // =================================================
+                // SEND RESET EMAIL
+                // =================================================
+
                 await sendPasswordResetEmail(
                     auth,
-                    email
+                    resetEmail
                 );
 
-                  window.showEventSphereMessage(
-    "success",
-    "Reset Email Sent",
-    "Password reset email has been sent to your email address."
-);
+
+                window.showEventSphereMessage(
+                    "success",
+                    "Reset Email Sent",
+                    "Password reset email has been sent to your registered email address."
+                );
+
             }
 
             catch (error) {
@@ -533,10 +687,11 @@ if (forgotPassword) {
 
 
                 window.showEventSphereMessage(
-    "error",
-    "Password Reset Failed",
-    error.message || "Unable to send the password reset email."
-);
+                    "error",
+                    "Password Reset Failed",
+                    error.message ||
+                    "Unable to send the password reset email."
+                );
 
             }
 

@@ -572,6 +572,181 @@ app.post(
     }
 );
 
+app.post(
+    "/verify-otp",
+    (req, res) => {
+
+        // existing code...
+
+    }
+);
+
+
+// =========================================================
+// CUSTOMER LOGIN - EMAIL FROM PHONE NUMBER
+// =========================================================
+
+function normalizePhone(phone) {
+
+    let digits =
+        String(phone || "")
+            .replace(/\D/g, "");
+
+    if (
+        digits.length === 12 &&
+        digits.startsWith("91")
+    ) {
+        digits = digits.substring(2);
+    }
+
+    if (
+        digits.length === 11 &&
+        digits.startsWith("0")
+    ) {
+        digits = digits.substring(1);
+    }
+
+    return digits;
+}
+
+
+app.post(
+    "/customer-login-email",
+    async (req, res) => {
+
+        try {
+
+            if (!firebaseDb) {
+
+                return res.status(500).json({
+
+                    success: false,
+
+                    message:
+                        "Firebase Admin is not initialized."
+
+                });
+
+            }
+
+
+            const phone =
+                normalizePhone(
+                    req.body?.phone
+                );
+
+
+            if (!phone) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Phone number is required."
+
+                });
+
+            }
+
+
+            const usersSnapshot =
+                await firebaseDb
+                    .collection("users")
+                    .get();
+
+
+            let customerEmail = "";
+
+
+            usersSnapshot.forEach(
+                (userDoc) => {
+
+                    if (customerEmail) {
+                        return;
+                    }
+
+
+                    const userData =
+                        userDoc.data() || {};
+
+
+                    const storedPhone =
+                        normalizePhone(
+                            userData.phone
+                        );
+
+
+                    if (
+                        storedPhone &&
+                        storedPhone === phone
+                    ) {
+
+                        customerEmail =
+                            String(
+                                userData.email || ""
+                            )
+                                .trim()
+                                .toLowerCase();
+
+                    }
+
+                }
+            );
+
+
+            if (!customerEmail) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    message:
+                        "No account found with this phone number."
+
+                });
+
+            }
+
+
+            return res.json({
+
+                success: true,
+
+                email:
+                    customerEmail
+
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "CUSTOMER PHONE LOGIN ERROR:",
+                error
+            );
+
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    "Unable to find the customer account."
+
+            });
+
+        }
+
+    }
+);
+
+
+// =========================================================
+// BOOKING STATUS EMAIL
+// =========================================================
+
 
 // =========================================================
 // BOOKING STATUS EMAIL
