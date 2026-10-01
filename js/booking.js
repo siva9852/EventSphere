@@ -155,14 +155,8 @@ bookingForm.addEventListener("submit", async (e) => {
         );
 
 
-        window.showEventSphereMessage(
-    "success",
-    "Verification Code Sent",
-    "A verification code has been sent to your email."
-);
-
         window.location.href =
-            "booking-otp.html";
+    "booking-otp.html";
 
     }
 

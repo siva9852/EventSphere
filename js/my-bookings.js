@@ -7,7 +7,11 @@ import {
     where,
     updateDoc,
     doc,
-    getDoc
+    getDoc,
+    addDoc,
+    onSnapshot,
+    serverTimestamp,
+    arrayUnion
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 
@@ -1016,6 +1020,19 @@ for (const payment of paymentHistory) {
 
                 <div class="booking-bottom">
 
+                <button
+    type="button"
+    class="view-details-btn"
+    onclick="
+        openCustomerBookingConversation(
+            '${bookingDoc.id}'
+        )
+    "
+>
+    <i class="fa-solid fa-message"></i>
+    Message Admin
+</button>
+
 
                     <button
                         type="button"
@@ -1137,7 +1154,705 @@ for (const payment of paymentHistory) {
     }
 
 }
+// =========================================================
+// CUSTOMER BOOKING CHAT
+// =========================================================
 
+window.openCustomerBookingConversation =
+    async function(bookingId) {
+
+        try {
+
+            const user =
+                auth.currentUser;
+
+            if (!user) {
+
+                window.showEventSphereMessage(
+                    "warning",
+                    "Login Required",
+                    "Please login first."
+                );
+
+                return;
+            }
+
+
+            // =========================================
+            // GET BOOKING
+            // =========================================
+
+            const bookingSnapshot =
+                await getDoc(
+                    doc(
+                        db,
+                        "bookings",
+                        bookingId
+                    )
+                );
+
+
+            if (!bookingSnapshot.exists()) {
+
+                window.showEventSphereMessage(
+                    "error",
+                    "Booking Not Found",
+                    "This booking could not be found."
+                );
+
+                return;
+            }
+
+
+            const booking =
+                bookingSnapshot.data();
+
+
+            // =========================================
+            // CHECK CUSTOMER
+            // =========================================
+
+            if (
+                booking.customerId !==
+                user.uid
+            ) {
+
+                window.showEventSphereMessage(
+                    "error",
+                    "Access Denied",
+                    "You cannot access this conversation."
+                );
+
+                return;
+            }
+
+
+            // =========================================
+            // REMOVE OLD CHAT
+            // =========================================
+
+            const oldChat =
+                document.getElementById(
+                    "customerBookingChatModal"
+                );
+
+            if (oldChat) {
+                oldChat.remove();
+            }
+
+
+            // =========================================
+            // CREATE CHAT
+            // =========================================
+
+            const modal =
+                document.createElement("div");
+
+            modal.id =
+                "customerBookingChatModal";
+
+
+            modal.innerHTML = `
+
+                <div style="
+                    position:fixed;
+                    inset:0;
+                    background:rgba(15,23,42,.55);
+                    backdrop-filter:blur(5px);
+                    z-index:99999;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    padding:20px;
+                ">
+
+                    <div style="
+                        width:100%;
+                        max-width:520px;
+                        height:650px;
+                        background:#ffffff;
+                        border-radius:18px;
+                        box-shadow:0 20px 60px rgba(15,23,42,.25);
+                        display:flex;
+                        flex-direction:column;
+                        overflow:hidden;
+                    ">
+
+
+                        <!-- HEADER -->
+
+                        <div style="
+                            padding:18px 20px;
+                            background:#2563eb;
+                            color:#ffffff;
+                            display:flex;
+                            justify-content:space-between;
+                            align-items:center;
+                        ">
+
+                            <div>
+
+                                <div style="
+                                    font-size:18px;
+                                    font-weight:800;
+                                ">
+                                    <i class="fa-solid fa-message"></i>
+                                    &nbsp;Message Admin
+                                </div>
+
+                                <div style="
+                                    font-size:12px;
+                                    margin-top:4px;
+                                    opacity:.9;
+                                ">
+                                    ${booking.eventName || "Event Booking"}
+                                </div>
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                onclick="closeCustomerBookingChat()"
+                                style="
+                                    border:none;
+                                    background:rgba(255,255,255,.15);
+                                    color:#ffffff;
+                                    width:36px;
+                                    height:36px;
+                                    border-radius:50%;
+                                    cursor:pointer;
+                                    font-size:16px;
+                                "
+                            >
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+
+                        </div>
+
+
+                        <!-- BOOKING INFO -->
+
+                        <div style="
+                            padding:12px 18px;
+                            background:#f8fafc;
+                            border-bottom:1px solid #e2e8f0;
+                            font-size:12px;
+                            color:#64748b;
+                        ">
+
+                            <strong style="color:#1e293b;">
+                                Booking:
+                            </strong>
+
+                            ${bookingId}
+
+                        </div>
+
+
+                        <!-- MESSAGES -->
+
+                        <div
+                            id="customerChatMessages"
+                            style="
+                                flex:1;
+                                padding:18px;
+                                overflow-y:auto;
+                                background:#f8fafc;
+                                display:flex;
+                                flex-direction:column;
+                                gap:10px;
+                            "
+                        >
+
+                            <div style="
+                                text-align:center;
+                                color:#94a3b8;
+                                font-size:13px;
+                                padding:30px;
+                            ">
+                                Loading messages...
+                            </div>
+
+                        </div>
+
+
+                        <!-- INPUT -->
+
+                        <div style="
+                            padding:14px;
+                            border-top:1px solid #e2e8f0;
+                            background:#ffffff;
+                            display:flex;
+                            gap:10px;
+                        ">
+
+                            <textarea
+                                id="customerChatInput"
+                                rows="2"
+                                placeholder="Type your message..."
+                                style="
+                                    flex:1;
+                                    resize:none;
+                                    border:1px solid #cbd5e1;
+                                    border-radius:12px;
+                                    padding:11px 13px;
+                                    font-family:inherit;
+                                    font-size:13px;
+                                    outline:none;
+                                "
+                            ></textarea>
+
+
+                            <button
+                                type="button"
+                                onclick="
+                                    sendCustomerBookingMessage(
+                                        '${bookingId}'
+                                    )
+                                "
+                                style="
+                                    width:80px;
+                                    border:none;
+                                    border-radius:12px;
+                                    background:#2563eb;
+                                    color:#ffffff;
+                                    font-weight:700;
+                                    cursor:pointer;
+                                "
+                            >
+                                <i class="fa-solid fa-paper-plane"></i>
+                                Send
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+            document.body.appendChild(modal);
+
+
+            // =========================================
+            // LOAD MESSAGES
+            // =========================================
+
+            const messagesContainer =
+                document.getElementById(
+                    "customerChatMessages"
+                );
+
+
+            const messagesQuery =
+                query(
+                    collection(
+                        db,
+                        "bookingMessages"
+                    ),
+                    where(
+                        "bookingId",
+                        "==",
+                        bookingId
+                    )
+                );
+
+
+            onSnapshot(
+                messagesQuery,
+                (snapshot) => {
+
+                    const messages =
+    snapshot.docs
+        .map(messageDoc => ({
+            id: messageDoc.id,
+            ...messageDoc.data()
+        }))
+        .filter(
+            item =>
+                !(
+                    Array.isArray(item.deletedFor) &&
+                    item.deletedFor.includes("customer")
+                )
+        )
+                            .sort(
+                                (a, b) => {
+
+                                    const aTime =
+                                        a.createdAt?.seconds ||
+                                        0;
+
+                                    const bTime =
+                                        b.createdAt?.seconds ||
+                                        0;
+
+                                    return (
+                                        aTime -
+                                        bTime
+                                    );
+
+                                }
+                            );
+
+
+                    if (
+                        messages.length === 0
+                    ) {
+
+                        messagesContainer.innerHTML = `
+
+                            <div style="
+                                text-align:center;
+                                color:#94a3b8;
+                                font-size:13px;
+                                padding:40px 20px;
+                            ">
+                                No messages yet.<br>
+                                Start the conversation with Admin.
+                            </div>
+
+                        `;
+
+                        return;
+                    }
+
+
+                    messagesContainer.innerHTML =
+    messages
+        .map(
+            item => {
+
+                const isCustomer =
+                    item.sender === "customer";
+
+
+                return `
+
+                    <div style="
+                        display:flex;
+                        justify-content:
+                            ${
+                                isCustomer
+                                    ? "flex-end"
+                                    : "flex-start"
+                            };
+                        margin-bottom:10px;
+                    ">
+
+                        <div style="
+                            position:relative;
+                            max-width:75%;
+                            display:flex;
+                            flex-direction:column;
+                            align-items:
+                                ${
+                                    isCustomer
+                                        ? "flex-end"
+                                        : "flex-start"
+                                };
+                        ">
+
+
+                            <div style="
+                                display:flex;
+                                align-items:center;
+                                gap:5px;
+                            ">
+
+                                <div style="
+                                    padding:10px 13px;
+                                    border-radius:12px;
+                                    background:
+                                        ${
+                                            isCustomer
+                                                ? "#2563eb"
+                                                : "#ffffff"
+                                        };
+                                    color:
+                                        ${
+                                            isCustomer
+                                                ? "#ffffff"
+                                                : "#14285a"
+                                        };
+                                    border:1px solid #e2e8f0;
+                                    font-size:13px;
+                                    line-height:1.4;
+                                ">
+
+                                    ${
+                                        item.replyTo
+                                            ? `
+                                                <div style="
+                                                    margin-bottom:7px;
+                                                    padding:6px 8px;
+                                                    border-left:3px solid ${
+                                                        isCustomer
+                                                            ? "#bfdbfe"
+                                                            : "#6366f1"
+                                                    };
+                                                    background:${
+                                                        isCustomer
+                                                            ? "rgba(255,255,255,0.15)"
+                                                            : "#eef2ff"
+                                                    };
+                                                    border-radius:5px;
+                                                    font-size:11px;
+                                                    opacity:.9;
+                                                ">
+
+                                                    <div style="
+                                                        font-weight:700;
+                                                        margin-bottom:2px;
+                                                    ">
+                                                        ${
+                                                            item.replyTo.sender === "admin"
+                                                                ? "Admin"
+                                                                : "Customer"
+                                                        }
+                                                    </div>
+
+                                                    <div>
+                                                        ${String(
+                                                            item.replyTo.message || ""
+                                                        )
+                                                            .replace(/&/g, "&amp;")
+                                                            .replace(/</g, "&lt;")
+                                                            .replace(/>/g, "&gt;")
+                                                            .replace(/"/g, "&quot;")
+                                                            .replace(/'/g, "&#039;")}
+                                                    </div>
+
+                                                </div>
+                                            `
+                                            : ""
+                                    }
+
+
+                                    <div>
+                                        ${String(
+                                            item.message || ""
+                                        )
+                                            .replace(/&/g, "&amp;")
+                                            .replace(/</g, "&lt;")
+                                            .replace(/>/g, "&gt;")
+                                            .replace(/"/g, "&quot;")
+                                            .replace(/'/g, "&#039;")}
+                                    </div>
+
+                                </div>
+
+
+                                ${
+                                    isCustomer
+                                        ? `
+
+                                            <button
+                                                type="button"
+                                                onclick="
+                                                    openCustomerMessageMenu(
+                                                        '${item.id}'
+                                                    )
+                                                "
+                                                style="
+                                                    border:none;
+                                                    background:transparent;
+                                                    color:#64748b;
+                                                    cursor:pointer;
+                                                    font-size:18px;
+                                                    padding:3px;
+                                                "
+                                                title="Message options"
+                                            >
+                                                ⋮
+                                            </button>
+
+                                        `
+                                        : ""
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            }
+        )
+        .join("");
+
+
+                    messagesContainer.scrollTop =
+                        messagesContainer.scrollHeight;
+
+                }
+            );
+
+
+            // =========================================
+            // ENTER TO SEND
+            // =========================================
+
+            const input =
+                document.getElementById(
+                    "customerChatInput"
+                );
+
+
+            input.addEventListener(
+                "keydown",
+                function(event) {
+
+                    if (
+                        event.key === "Enter" &&
+                        !event.shiftKey
+                    ) {
+
+                        event.preventDefault();
+
+                        sendCustomerBookingMessage(
+                            bookingId
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Customer Chat Error:",
+                error
+            );
+
+            window.showEventSphereMessage(
+                "error",
+                "Chat Error",
+                "Unable to open the conversation."
+            );
+
+        }
+
+    };
+
+
+// =========================================================
+// CLOSE CUSTOMER CHAT
+// =========================================================
+
+window.closeCustomerBookingChat =
+    function() {
+
+        const modal =
+            document.getElementById(
+                "customerBookingChatModal"
+            );
+
+        if (modal) {
+            modal.remove();
+        }
+
+    };
+
+
+// =========================================================
+// SEND CUSTOMER MESSAGE
+// =========================================================
+
+window.sendCustomerBookingMessage =
+    async function(bookingId) {
+
+        try {
+
+            const input =
+                document.getElementById(
+                    "customerChatInput"
+                );
+
+
+            if (!input) {
+                return;
+            }
+
+
+            const message =
+                input.value.trim();
+
+
+            if (!message) {
+                return;
+            }
+
+
+            const user =
+                auth.currentUser;
+
+
+            if (!user) {
+
+                window.showEventSphereMessage(
+                    "warning",
+                    "Login Required",
+                    "Please login first."
+                );
+
+                return;
+            }
+
+
+            await addDoc(
+                collection(
+                    db,
+                    "bookingMessages"
+                ),
+                {
+
+                    bookingId:
+                        bookingId,
+
+                    sender:
+                        "customer",
+
+                    message:
+                        message,
+
+                    seen:
+                        false,
+
+                    createdAt:
+                        serverTimestamp()
+
+                }
+            );
+
+
+            input.value = "";
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Send Customer Message Error:",
+                error
+            );
+
+            window.showEventSphereMessage(
+                "error",
+                "Message Failed",
+                "Unable to send your message."
+            );
+
+        }
+
+    };
 
 // =========================================================
 // PAY FOR BOOKING
@@ -5867,3 +6582,263 @@ document.addEventListener(
 console.log(
     "EventSphere My Bookings loaded successfully."
 );
+
+// =========================================================
+// DELETE CUSTOMER MESSAGE FOR ME
+// =========================================================
+
+window.deleteCustomerMessageForMe =
+    async function(messageId) {
+
+        try {
+
+            await updateDoc(
+                doc(
+                    db,
+                    "bookingMessages",
+                    messageId
+                ),
+                {
+                    deletedFor:
+                        arrayUnion("customer")
+                }
+            );
+
+            window.showEventSphereMessage(
+                "success",
+                "Message Deleted",
+                "The message has been removed from your chat."
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Delete For Me Error:",
+                error
+            );
+
+            window.showEventSphereMessage(
+                "error",
+                "Delete Failed",
+                "Unable to delete the message."
+            );
+
+        }
+
+    };
+    // =========================================================
+// CUSTOMER MESSAGE MENU
+// =========================================================
+
+window.openCustomerMessageMenu =
+    function(messageId) {
+
+        const oldMenu =
+            document.getElementById(
+                "customerMessageOptionsMenu"
+            );
+
+        if (oldMenu) {
+            oldMenu.remove();
+        }
+
+
+        const menu =
+            document.createElement("div");
+
+        menu.id =
+            "customerMessageOptionsMenu";
+
+
+        menu.style.position =
+            "fixed";
+
+        menu.style.background =
+            "#ffffff";
+
+        menu.style.border =
+            "1px solid #e2e8f0";
+
+        menu.style.borderRadius =
+            "10px";
+
+        menu.style.boxShadow =
+            "0 10px 30px rgba(15,23,42,.18)";
+
+        menu.style.zIndex =
+            "100000";
+
+        menu.style.overflow =
+            "hidden";
+
+
+        menu.innerHTML = `
+
+            <button
+                type="button"
+                onclick="
+                    copyCustomerMessage(
+                        '${messageId}'
+                    );
+                    closeCustomerMessageMenu();
+                "
+                style="
+                    display:block;
+                    width:100%;
+                    border:none;
+                    background:#ffffff;
+                    padding:10px 14px;
+                    text-align:left;
+                    cursor:pointer;
+                    font-size:13px;
+                    color:#14285a;
+                "
+            >
+                <i class="fa-regular fa-copy"></i>
+                &nbsp; Copy
+            </button>
+
+
+            <button
+                type="button"
+                onclick="
+                    deleteCustomerMessageForMe(
+                        '${messageId}'
+                    );
+                    closeCustomerMessageMenu();
+                "
+                style="
+                    display:block;
+                    width:100%;
+                    border:none;
+                    background:#ffffff;
+                    padding:10px 14px;
+                    text-align:left;
+                    cursor:pointer;
+                    font-size:13px;
+                    color:#dc2626;
+                "
+            >
+                <i class="fa-solid fa-trash"></i>
+                &nbsp; Delete for me
+            </button>
+
+        `;
+
+
+        document.body.appendChild(menu);
+
+
+        const button =
+            document.querySelector(
+                `button[onclick*="${messageId}"]`
+            );
+
+
+        if (button) {
+
+            const rect =
+                button.getBoundingClientRect();
+
+            menu.style.top =
+                `${rect.bottom + 5}px`;
+
+            menu.style.left =
+                `${Math.min(
+                    rect.left,
+                    window.innerWidth - 180
+                )}px`;
+
+        }
+
+
+        setTimeout(
+            () => {
+
+                document.addEventListener(
+                    "click",
+                    closeCustomerMessageMenu,
+                    {
+                        once:true
+                    }
+                );
+
+            },
+            0
+        );
+
+    };
+
+
+// =========================================================
+// CLOSE CUSTOMER MESSAGE MENU
+// =========================================================
+
+window.closeCustomerMessageMenu =
+    function() {
+
+        const menu =
+            document.getElementById(
+                "customerMessageOptionsMenu"
+            );
+
+        if (menu) {
+            menu.remove();
+        }
+
+    };
+
+
+// =========================================================
+// COPY CUSTOMER MESSAGE
+// =========================================================
+
+window.copyCustomerMessage =
+    async function(messageId) {
+
+        try {
+
+            const messageDoc =
+                await getDoc(
+                    doc(
+                        db,
+                        "bookingMessages",
+                        messageId
+                    )
+                );
+
+
+            if (!messageDoc.exists()) {
+                return;
+            }
+
+
+            const data =
+                messageDoc.data();
+
+
+            await navigator.clipboard.writeText(
+                data.message || ""
+            );
+
+
+            window.showEventSphereMessage(
+                "success",
+                "Copied",
+                "Message copied to clipboard."
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Copy Customer Message Error:",
+                error
+            );
+
+        }
+
+    };

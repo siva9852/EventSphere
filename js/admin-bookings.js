@@ -3,13 +3,19 @@ import { db } from "./firebase-config.js";
 import {
     collection,
     getDocs,
+    addDoc,
+    onSnapshot,
+    orderBy,
+    query,
+    where,
+    serverTimestamp,
     doc,
     updateDoc,
+    arrayUnion,
     deleteDoc,
     increment,
     runTransaction
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
-
 
 // =========================================================
 // ELEMENTS
@@ -22,6 +28,8 @@ const searchInput =
     document.getElementById("bookingSearch");
 
 let allBookings = [];
+
+let replyingToAdminMessage = null;
 
 let currentFilter = "All";
 
@@ -856,15 +864,25 @@ function displayBookings() {
 
 
                     let actions = `
-                        <button
-                            type="button"
-                            class="table-action view-action"
-                            data-view-id="${escapeHtml(booking.id)}"
-                            title="View Details"
-                        >
-                            <i class="fa-solid fa-eye"></i>
-                        </button>
-                    `;
+    <button
+        type="button"
+        class="table-action view-action"
+        data-view-id="${escapeHtml(booking.id)}"
+        title="View Details"
+    >
+        <i class="fa-solid fa-eye"></i>
+    </button>
+
+    <button
+    type="button"
+    class="table-action message-action"
+    data-message-id="${escapeHtml(booking.id)}"
+    onclick="window.openBookingConversation('${escapeHtml(booking.id)}')"
+    title="Message Customer"
+>
+    <i class="fa-solid fa-message"></i>
+</button>
+`;
 
 
                     if (
@@ -1112,112 +1130,109 @@ function displayBookings() {
 function addTableEvents() {
 
     document
-        .querySelectorAll(
-            "[data-view-id]"
-        )
-        .forEach(
-            button => {
+        .querySelectorAll("[data-view-id]")
+        .forEach(button => {
 
-                button.addEventListener(
-                    "click",
-                    () => {
+            button.addEventListener(
+                "click",
+                () => {
 
-                        const id =
-                            button.dataset.viewId;
+                    const id =
+                        button.dataset.viewId;
 
-                        viewBookingDetails(
-                            id
+                    viewBookingDetails(id);
+
+                }
+            );
+
+        });
+
+
+    
+
+    document
+        .querySelectorAll("[data-approve-id]")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const id =
+                        button.dataset.approveId;
+
+                    const booking =
+                        allBookings.find(
+                            item =>
+                                item.id === id
                         );
 
+                    if (!booking) {
+                        return;
                     }
-                );
 
-            }
-        );
+                    approveBooking(
+                        id,
+                        booking.customerEmail || "",
+                        booking.eventName || "Event"
+                    );
+
+                }
+            );
+
+        });
 
 
     document
-        .querySelectorAll(
-            "[data-approve-id]"
-        )
-        .forEach(
-            button => {
+        .querySelectorAll("[data-reject-id]")
+        .forEach(button => {
 
-                button.addEventListener(
-                    "click",
-                    () => {
+            button.addEventListener(
+                "click",
+                () => {
 
-                        const id =
-                            button.dataset.approveId;
+                    const id =
+                        button.dataset.rejectId;
 
-                        const booking =
-                            allBookings.find(
-                                item =>
-                                    item.id === id
-                            );
-
-
-                        if (!booking) {
-                            return;
-                        }
-
-
-                        approveBooking(
-                            id,
-                            booking.customerEmail ||
-                            "",
-                            booking.eventName ||
-                            "Event"
+                    const booking =
+                        allBookings.find(
+                            item =>
+                                item.id === id
                         );
 
+                    if (!booking) {
+                        return;
                     }
-                );
 
-            }
-        );
+                    rejectBooking(
+                        id,
+                        booking.customerEmail || "",
+                        booking.eventName || "Event"
+                    );
 
+                }
+            );
 
-    document
-        .querySelectorAll(
-            "[data-reject-id]"
-        )
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        const id =
-                            button.dataset.rejectId;
-
-                        const booking =
-                            allBookings.find(
-                                item =>
-                                    item.id === id
-                            );
-
-
-                        if (!booking) {
-                            return;
-                        }
-
-
-                        rejectBooking(
-                            id,
-                            booking.customerEmail ||
-                            "",
-                            booking.eventName ||
-                            "Event"
-                        );
-
-                    }
-                );
-
-            }
-        );
+        });
 
 }
+document
+    .querySelectorAll("[data-message-id]")
+    .forEach((button) => {
+        button.addEventListener(
+            "click",
+            () => {
+                const bookingId =
+                    button.getAttribute(
+                        "data-message-id"
+                    );
+
+                openBookingConversation(
+                    bookingId
+                );
+            }
+        );
+    });
 
 
 // =========================================================
@@ -4253,3 +4268,1148 @@ setTimeout(
     },
     500
 );
+
+window.openBookingConversation = async function (bookingId) {
+
+    const booking =
+        allBookings.find(
+            item => item.id === bookingId
+        );
+
+    if (!booking) {
+        window.showEventSphereMessage(
+            "error",
+            "Booking Not Found",
+            "Unable to open this booking conversation."
+        );
+        return;
+    }
+
+    let oldPopup =
+        document.getElementById(
+            "adminBookingChatModal"
+        );
+
+    if (oldPopup) {
+        oldPopup.remove();
+    }
+
+    const modal =
+        document.createElement("div");
+
+    modal.id =
+        "adminBookingChatModal";
+
+    modal.innerHTML = `
+        <div class="es-chat-overlay">
+
+            <div class="es-chat-modal">
+
+                <div class="es-chat-header">
+
+                    <div>
+                        <h2>
+                            <i class="fa-solid fa-message"></i>
+                            Conversation
+                        </h2>
+
+                        <p>
+                            ${escapeHtml(
+                                booking.eventName ||
+                                "Event Booking"
+                            )}
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="es-chat-close"
+                        onclick="closeAdminBookingChat()"
+                    >
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+
+                </div>
+
+
+                <div
+                    class="es-chat-customer"
+                >
+                    <strong>
+                        ${escapeHtml(
+                            booking.customerName ||
+                            "Customer"
+                        )}
+                    </strong>
+
+                    <span>
+                        ${escapeHtml(
+                            booking.customerEmail ||
+                            ""
+                        )}
+                    </span>
+                </div>
+
+
+                <div
+                    class="es-chat-messages"
+                    id="adminChatMessages"
+                >
+                    <div class="es-chat-empty">
+                        No messages yet.
+                    </div>
+                </div>
+
+
+                <div class="es-chat-input-area">
+
+                <div
+    id="adminReplyPreview"
+    style="
+        display:none;
+        padding:8px 12px;
+        margin-bottom:6px;
+        background:#eef2ff;
+        border-left:3px solid #6366f1;
+        border-radius:6px;
+        font-size:12px;
+    "
+>
+    <div
+        id="adminReplyText"
+        style="font-weight:600;"
+    ></div>
+
+    <button
+        type="button"
+        onclick="cancelAdminReply()"
+        style="
+            border:none;
+            background:none;
+            cursor:pointer;
+            float:right;
+            font-size:16px;
+        "
+    >
+        ×
+    </button>
+</div>
+
+                    <textarea
+                        id="adminChatInput"
+                        placeholder="Type your message..."
+                        rows="2"
+                    ></textarea>
+
+                    <button
+                        type="button"
+                        onclick="sendAdminBookingMessage('${escapeHtml(bookingId)}')"
+                    >
+                        <i class="fa-solid fa-paper-plane"></i>
+                        Send
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+        const messagesContainer =
+    document.getElementById(
+        "adminChatMessages"
+    );
+
+let replyingToAdminMessage = null;
+
+
+
+    const messagesQuery =
+        query(
+            collection(
+                db,
+                "bookingMessages"
+            ),
+            where(
+                "bookingId",
+                "==",
+                bookingId
+            )
+        );
+
+    onSnapshot(
+        messagesQuery,
+        (snapshot) => {
+
+                        snapshot.docs.forEach(
+                async (messageDoc) => {
+
+                    const data =
+                        messageDoc.data();
+
+                    if (
+                        data.sender === "customer" &&
+                        data.seen !== true
+                    ) {
+
+                        try {
+
+                            await updateDoc(
+                                doc(
+                                    db,
+                                    "bookingMessages",
+                                    messageDoc.id
+                                ),
+                                {
+                                    seen: true
+                                }
+                            );
+
+                        }
+                        catch (error) {
+
+                            console.error(
+                                "Seen Update Error:",
+                                error
+                            );
+
+                        }
+
+                    }
+
+                }
+            );
+
+            const messages =
+    snapshot.docs
+        .map((messageDoc) => ({
+            id: messageDoc.id,
+            ...messageDoc.data()
+        }))
+        .filter(
+    item =>
+        item.deletedForEveryone !== true &&
+        !(
+            Array.isArray(item.deletedFor) &&
+            item.deletedFor.includes("admin")
+        )
+)
+                    .sort((a, b) => {
+
+                        const timeA =
+                            a.createdAt?.toMillis
+                                ? a.createdAt.toMillis()
+                                : 0;
+
+                        const timeB =
+                            b.createdAt?.toMillis
+                                ? b.createdAt.toMillis()
+                                : 0;
+
+                        return timeA - timeB;
+
+                    });
+
+
+            if (!messages.length) {
+
+                messagesContainer.innerHTML = `
+                    <div class="es-chat-empty">
+                        No messages yet.
+                    </div>
+                `;
+
+                return;
+            }
+
+
+            messagesContainer.innerHTML =
+                messages
+    .map((item) => {
+
+        const isAdmin =
+            item.sender === "admin";
+
+        return `
+            <div
+                class="es-message-row"
+                data-message-id="${item.id}"
+                style="
+                    display:flex;
+                    justify-content:${isAdmin ? "flex-end" : "flex-start"};
+                    margin-bottom:10px;
+                "
+            >
+
+                <div
+                    class="es-message-wrapper"
+                    data-message-id="${item.id}"
+                    style="
+                        display:flex;
+                        flex-direction:column;
+                        align-items:${isAdmin ? "flex-end" : "flex-start"};
+                        max-width:75%;
+                        cursor:pointer;
+                    "
+                >
+
+                    <div
+    style="
+        display:flex;
+        align-items:center;
+        gap:6px;
+    "
+>
+    <div
+    class="es-message-bubble"
+    style="
+        padding:10px 13px;
+        border-radius:12px;
+        background:${isAdmin ? "#2563eb" : "#ffffff"};
+        color:${isAdmin ? "#ffffff" : "#14285a"};
+        border:1px solid #e2e8f0;
+        font-size:13px;
+        line-height:1.4;
+        user-select:none;
+    "
+>
+
+    ${
+        item.replyTo
+            ? `
+                <div
+                    style="
+                        margin-bottom:7px;
+                        padding:6px 8px;
+                        border-left:3px solid ${
+                            isAdmin
+                                ? "#bfdbfe"
+                                : "#6366f1"
+                        };
+                        background:${
+                            isAdmin
+                                ? "rgba(255,255,255,0.15)"
+                                : "#eef2ff"
+                        };
+                        border-radius:5px;
+                        font-size:11px;
+                        opacity:0.9;
+                    "
+                >
+                    <div
+                        style="
+                            font-weight:600;
+                            margin-bottom:2px;
+                        "
+                    >
+                        ${
+                            item.replyTo.sender === "admin"
+                                ? "Admin"
+                                : "Customer"
+                        }
+                    </div>
+
+                    <div>
+                        ${escapeHtml(
+                            item.replyTo.message || ""
+                        )}
+                    </div>
+                </div>
+            `
+            : ""
+    }
+
+    <div>
+        ${escapeHtml(
+            item.message || ""
+        )}
+    </div>
+
+</div>
+        
+
+    <button
+        type="button"
+        onclick="showAdminMessageMenu('${item.id}', this, ${isAdmin})"
+        style="
+            border:none;
+            background:transparent;
+            color:#64748b;
+            font-size:18px;
+            cursor:pointer;
+            padding:3px 5px;
+            border-radius:6px;
+        "
+        title="Message options"
+    >
+        ⋮
+    </button>
+</div>
+
+                    ${
+                        isAdmin
+                            ? `
+                                <div style="
+                                    margin-top:3px;
+                                    padding:0 4px;
+                                    font-size:10px;
+                                    color:#64748b;
+                                ">
+                                    ${
+                                        item.seen === true
+                                            ? "✓✓ Seen"
+                                            : "✓ Sent"
+                                    }
+                                </div>
+                            `
+                            : ""
+                    }
+
+                </div>
+
+            </div>
+        `;
+
+    })
+    .join("");
+    
+    // =========================================================
+// LONG PRESS MESSAGE MENU
+// =========================================================
+
+let pressTimer = null;
+
+document
+    .querySelectorAll(".es-message-wrapper")
+    .forEach((messageElement) => {
+
+        const messageId =
+            messageElement.dataset.messageId;
+
+        function startPress(event) {
+            event.preventDefault();
+
+            pressTimer =
+                setTimeout(() => {
+
+                    showAdminMessageMenu(
+                        messageId,
+                        event
+                    );
+
+                }, 600);
+        }
+
+        function cancelPress() {
+            clearTimeout(pressTimer);
+        }
+
+        messageElement.addEventListener(
+            "mousedown",
+            startPress
+        );
+
+        messageElement.addEventListener(
+            "mouseup",
+            cancelPress
+        );
+
+        messageElement.addEventListener(
+            "mouseleave",
+            cancelPress
+        );
+
+        messageElement.addEventListener(
+            "touchstart",
+            startPress,
+            { passive:false }
+        );
+
+        messageElement.addEventListener(
+            "touchend",
+            cancelPress
+        );
+
+        messageElement.addEventListener(
+            "touchmove",
+            cancelPress
+        );
+
+    });
+
+// =========================================================
+// MESSAGE OPTIONS MENU
+// =========================================================
+
+window.showAdminMessageMenu =
+    function(messageId, trigger, isAdmin) {
+        const oldMenu =
+            document.getElementById(
+                "adminMessageOptionsMenu"
+            );
+
+        if (oldMenu) {
+            oldMenu.remove();
+        }
+
+
+        const menu =
+            document.createElement("div");
+
+        menu.id =
+            "adminMessageOptionsMenu";
+
+
+        menu.innerHTML = `
+
+            <button
+                type="button"
+                onclick="
+                    copyAdminMessage('${messageId}');
+                    closeAdminMessageMenu();
+                "
+            >
+                <i class="fa-regular fa-copy"></i>
+                Copy
+            </button>
+<button
+    type="button"
+    onclick="
+        replyToAdminMessage('${messageId}');
+        closeAdminMessageMenu();
+    "
+>
+    <i class="fa-solid fa-reply"></i>
+    Reply
+</button>
+
+            <button
+    type="button"
+    onclick="
+        deleteAdminMessageForMe('${messageId}');
+        closeAdminMessageMenu();
+    "
+>
+    <i class="fa-solid fa-trash"></i>
+    Delete for me
+</button>
+
+            ${
+    isAdmin
+        ? `
+            <button
+                type="button"
+                onclick="
+                    deleteAdminMessageForEveryone('${messageId}');
+                    closeAdminMessageMenu();
+                "
+            >
+                <i class="fa-solid fa-trash-can"></i>
+                Delete for everyone
+            </button>
+        `
+        : ""
+}
+
+        `;
+
+
+        menu.style.position =
+            "fixed";
+
+        const rect =
+    trigger.getBoundingClientRect();
+
+menu.style.left =
+    Math.min(
+        rect.left,
+        window.innerWidth - 210
+    ) + "px";
+
+menu.style.top =
+    Math.min(
+        rect.bottom + 5,
+        window.innerHeight - 160
+    ) + "px";
+
+        menu.style.width =
+            "190px";
+
+        menu.style.background =
+            "#ffffff";
+
+        menu.style.border =
+            "1px solid #e2e8f0";
+
+        menu.style.borderRadius =
+            "12px";
+
+        menu.style.boxShadow =
+            "0 10px 30px rgba(15,23,42,0.18)";
+
+        menu.style.padding =
+            "6px";
+
+        menu.style.zIndex =
+            "100001";
+
+
+        menu.querySelectorAll(
+            "button"
+        ).forEach((button) => {
+
+            button.style.display =
+                "flex";
+
+            button.style.alignItems =
+                "center";
+
+            button.style.gap =
+                "10px";
+
+            button.style.width =
+                "100%";
+
+            button.style.border =
+                "none";
+
+            button.style.background =
+                "transparent";
+
+            button.style.padding =
+                "10px 12px";
+
+            button.style.borderRadius =
+                "8px";
+
+            button.style.cursor =
+                "pointer";
+
+            button.style.fontSize =
+                "13px";
+
+            button.style.color =
+                "#14285a";
+
+            button.onmouseenter =
+                function() {
+
+                    this.style.background =
+                        "#f1f5f9";
+
+                };
+
+            button.onmouseleave =
+                function() {
+
+                    this.style.background =
+                        "transparent";
+
+                };
+
+        });
+
+
+        document.body.appendChild(
+            menu
+        );
+
+
+        setTimeout(() => {
+
+            document.addEventListener(
+                "click",
+                closeAdminMessageMenu,
+                {
+                    once:true
+                }
+            );
+
+        }, 0);
+
+    };
+
+
+// =========================================================
+// CLOSE MESSAGE MENU
+// =========================================================
+
+window.closeAdminMessageMenu =
+    function() {
+
+        const menu =
+            document.getElementById(
+                "adminMessageOptionsMenu"
+            );
+
+        if (menu) {
+            menu.remove();
+        }
+
+    };
+   // =========================================================
+// REPLY TO MESSAGE
+// =========================================================
+
+window.replyToAdminMessage =
+    function(messageId) {
+
+        const message =
+            messages.find(
+                item =>
+                    item.id === messageId
+            );
+
+        if (!message) {
+            return;
+        }
+
+        replyingToAdminMessage = {
+            id: message.id,
+            sender: message.sender,
+            message: message.message
+        };
+
+        const input =
+            document.getElementById(
+                "adminChatInput"
+            );
+
+        const replyPreview =
+            document.getElementById(
+                "adminReplyPreview"
+            );
+
+        const replyText =
+            document.getElementById(
+                "adminReplyText"
+            );
+
+        if (replyPreview && replyText) {
+
+            replyText.textContent =
+                `Replying to: ${
+                    message.message || ""
+                }`;
+
+            replyPreview.style.display =
+                "block";
+        }
+
+        if (input) {
+            input.focus();
+        }
+
+    };
+
+// =========================================================
+// COPY MESSAGE
+// =========================================================
+
+window.copyAdminMessage =
+    async function(messageId) {
+
+        const message =
+            messages.find(
+                item =>
+                    item.id ===
+                    messageId
+            );
+
+        if (!message) {
+            return;
+        }
+
+        try {
+
+            await navigator.clipboard.writeText(
+                message.message || ""
+            );
+
+            window.showEventSphereMessage(
+                "success",
+                "Copied",
+                "Message copied to clipboard."
+            );
+
+        }
+        catch (error) {
+
+            console.error(
+                "Copy Message Error:",
+                error
+            );
+
+        }
+
+    };
+
+// =========================================================
+// DELETE MESSAGE FOR ADMIN ONLY
+// =========================================================
+
+window.deleteAdminMessageForMe =
+    async function(messageId) {
+
+        try {
+
+            await updateDoc(
+                doc(
+                    db,
+                    "bookingMessages",
+                    messageId
+                ),
+                {
+                    deletedFor:
+                        arrayUnion("admin")
+                }
+            );
+
+            window.showEventSphereMessage(
+                "success",
+                "Message Deleted",
+                "The message has been removed from your chat."
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Delete For Me Error:",
+                error
+            );
+
+            window.showEventSphereMessage(
+                "error",
+                "Delete Failed",
+                "Unable to delete the message."
+            );
+
+        }
+
+    };
+
+
+// =========================================================
+// DELETE MESSAGE FOR EVERYONE
+// =========================================================
+
+window.deleteAdminMessageForEveryone =
+    async function(messageId) {
+
+        try {
+
+            await updateDoc(
+                doc(
+                    db,
+                    "bookingMessages",
+                    messageId
+                ),
+                {
+                    deletedForEveryone:
+                        true
+                }
+            );
+
+            window.showEventSphereMessage(
+                "success",
+                "Message Deleted",
+                "The message was deleted for everyone."
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Delete For Everyone Error:",
+                error
+            );
+
+            window.showEventSphereMessage(
+                "error",
+                "Delete Failed",
+                "Unable to delete the message."
+            );
+
+        }
+
+    };
+                    
+            messagesContainer.scrollTop =
+                messagesContainer.scrollHeight;
+
+        },
+        (error) => {
+
+            console.error(
+                "Chat History Error:",
+                error
+            );
+
+        }
+    );
+
+
+    const style =
+        document.createElement("style");
+
+    style.id =
+        "adminBookingChatStyles";
+
+    style.textContent = `
+
+        .es-chat-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            padding: 20px;
+        }
+
+        .es-chat-modal {
+            width: min(560px, 100%);
+            background: #ffffff;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow:
+                0 20px 60px
+                rgba(15, 23, 42, 0.25);
+        }
+
+        .es-chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .es-chat-header h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #14285a;
+        }
+
+        .es-chat-header p {
+            margin: 5px 0 0;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .es-chat-close {
+            border: none;
+            background: transparent;
+            font-size: 18px;
+            color: #64748b;
+            cursor: pointer;
+        }
+
+        .es-chat-customer {
+            padding: 12px 20px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .es-chat-customer strong {
+            display: block;
+            font-size: 13px;
+            color: #14285a;
+        }
+
+        .es-chat-customer span {
+            display: block;
+            margin-top: 3px;
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .es-chat-messages {
+            height: 320px;
+            overflow-y: auto;
+            padding: 18px;
+            background: #f8fafc;
+        }
+
+        .es-chat-empty {
+            text-align: center;
+            padding-top: 120px;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .es-chat-input-area {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .es-chat-input-area textarea {
+            flex: 1;
+            resize: none;
+            border: 1px solid #dbe2ea;
+            border-radius: 10px;
+            padding: 10px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .es-chat-input-area button {
+            border: none;
+            border-radius: 10px;
+            padding: 0 16px;
+            background: #2563eb;
+            color: #ffffff;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .es-chat-input-area button:hover {
+            opacity: 0.9;
+        }
+
+    `;
+
+    document.head.appendChild(style);
+};
+
+
+window.closeAdminBookingChat =
+    function () {
+
+        const modal =
+            document.getElementById(
+                "adminBookingChatModal"
+            );
+
+        if (modal) {
+            modal.remove();
+        }
+
+        const style =
+            document.getElementById(
+                "adminBookingChatStyles"
+            );
+
+        if (style) {
+            style.remove();
+        }
+    };
+    window.sendAdminBookingMessage = async function (bookingId) {
+
+    const input =
+        document.getElementById(
+            "adminChatInput"
+        );
+
+    const message =
+        input.value.trim();
+
+    if (!message) {
+        window.showEventSphereMessage(
+            "warning",
+            "Message Required",
+            "Please type a message before sending."
+        );
+        return;
+    }
+
+    try {
+
+        await addDoc(
+            collection(
+                db,
+                "bookingMessages"
+            ),
+    {
+    bookingId: bookingId,
+    sender: "admin",
+    message: message,
+    seen: false,
+    createdAt: serverTimestamp(),
+
+    replyTo:
+        replyingToAdminMessage
+            ? {
+                messageId:
+                    replyingToAdminMessage.id,
+
+                sender:
+                    replyingToAdminMessage.sender,
+
+                message:
+                    replyingToAdminMessage.message
+            }
+            : null
+}
+        );
+
+        input.value = "";
+
+        window.showEventSphereMessage(
+            "success",
+            "Message Sent",
+            "Your message has been sent to the customer."
+        );
+
+    }
+    catch (error) {
+
+    console.error(
+        "Send Message Error:",
+        error
+    );
+
+    window.showEventSphereMessage(
+        "error",
+        "Message Failed",
+        error.message ||
+        "Unable to send the message."
+    );
+
+}
+};
+window.deleteAdminBookingMessage =
+    async function(messageId) {
+
+        try {
+
+            await deleteDoc(
+                doc(
+                    db,
+                    "bookingMessages",
+                    messageId
+                )
+            );
+
+            window.showEventSphereMessage(
+                "success",
+                "Message Deleted",
+                "The message has been deleted successfully."
+            );
+
+        }
+        catch (error) {
+
+            console.error(
+                "Delete Message Error:",
+                error
+            );
+
+            window.showEventSphereMessage(
+                "error",
+                "Delete Failed",
+                "Unable to delete the message."
+            );
+
+        }
+
+    };
